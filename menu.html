@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cooked.lua</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        body { 
+            background: transparent !important; 
+            color: #ffffff; 
+            overflow: hidden; 
+            height: 100vh; 
+            pointer-events: none;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        @keyframes slideIn { 
+            from { 
+                opacity: 0; 
+                transform: translate(-50%, -60%) scale(0.95); 
+                filter: blur(4px);
+            } 
+            to { 
+                opacity: 1; 
+                transform: translate(-50%, -50%) scale(1);
+                filter: blur(0);
+            } 
+        }
+        
+        .menu-container {
+            width: 620px; 
+            height: 720px;
+            background: transparent;
+            border-radius: 16px;
+            display: flex; 
+            flex-direction: column;
+            overflow: hidden;
+            animation: slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            position: absolute; 
+            top: 50%; 
+            left: 50%;
+            transform: translate(-50%, -50%);
+            visibility: hidden;
+            pointer-events: auto;
+            filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.6));
+        }
+        
+        .menu-header { 
+            padding: 24px; 
+            text-align: center; 
+            background: rgba(8, 8, 12, 0.75);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: none;
+            border-radius: 16px 16px 0 0;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .menu-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.6), transparent);
+        }
+        
+        .logo h1 { 
+            font-family: 'JetBrains Mono', monospace; 
+            font-size: 32px; 
+            font-weight: 700; 
+            background: linear-gradient(45deg, #a855f7, #c084fc, #e879f9, #f0abfc);
+            background-size: 400% 400%;
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            background-clip: text; 
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            text-shadow: 0 0 30px rgba(168, 85, 247, 0.8), 0 0 60px rgba(168, 85, 247, 0.4);
+            filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.6));
+            animation: glow 3s ease-in-out infinite alternate, gradientShift 4s ease-in-out infinite;
+            position: relative;
+        }
+        
+        @keyframes glow {
+            from { 
+                filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.6)) brightness(1);
+            }
+            to { 
+                filter: drop-shadow(0 0 40px rgba(168, 85, 247, 1)) brightness(1.2);
+            }
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .logo h1::before {
+            content: 'COOKED.LUA';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(168, 85, 247, 0.3), transparent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shine 2s linear infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .logo p { 
+            font-size: 12px; 
+            color: rgba(168, 85, 247, 0.9); 
+            font-weight: 600; 
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+        }
+        
+        .tab-nav { 
+            display: flex; 
+            justify-content: center; 
+            padding: 16px; 
+            background: rgba(8, 8, 12, 0.75);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-left: 1px solid rgba(255, 255, 255, 0.08);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            flex-shrink: 0;
+            gap: 4px;
+        }
+        
+        .tab-button { 
+            padding: 10px 18px; 
+            background: rgba(255, 255, 255, 0.04); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            color: rgba(255, 255, 255, 0.6); 
+            font-size: 12px; 
+            font-weight: 500; 
+            cursor: pointer; 
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); 
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .tab-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.1), transparent);
+            transition: left 0.6s;
+        }
+        
+        .tab-button:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.8);
+            border-color: rgba(139, 92, 246, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        .tab-button:hover::before {
+            left: 100%;
+        }
+        
+        .tab-button.active { 
+            color: #ffffff; 
+            background: rgba(139, 92, 246, 0.15); 
+            border-color: rgba(139, 92, 246, 0.4);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+        }
+        
+        .main-content { 
+            flex: 1;
+            overflow: hidden; 
+            position: relative;
+            background: rgba(8, 8, 12, 0.75);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: none;
+            border-radius: 0 0 16px 16px;
+        }
+        
+        .tab-content { 
+            display: none; 
+            padding: 24px; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            bottom: 0; 
+            overflow-y: auto;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+        
+        .tab-content.active { 
+            display: block; 
+        }
+        
+        .section-header { 
+            font-size: 14px; 
+            font-weight: 600; 
+            color: rgba(255, 255, 255, 0.8); 
+            margin-bottom: 20px; 
+            text-align: center; 
+            letter-spacing: 0.5px;
+        }
+        
+        .button-grid { 
+            display: grid; 
+            gap: 12px; 
+            grid-template-columns: 1fr 1fr; 
+        }
+        
+        .list-container { 
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .action-button, .list-item, .input-group { 
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); 
+        }
+        
+        .action-button { 
+            padding: 16px 14px; 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 10px; 
+            color: #ffffff; 
+            font-size: 12px; 
+            font-weight: 500; 
+            text-align: center; 
+            background: rgba(255, 255, 255, 0.04);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .action-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(139, 92, 246, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .action-button:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(139, 92, 246, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .action-button:hover::before {
+            left: 100%;
+        }
+        
+        .action-button.selected { 
+            background: rgba(139, 92, 246, 0.15); 
+            color: #ffffff; 
+            border-color: rgba(139, 92, 246, 0.5); 
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25); 
+            transform: translateY(-2px);
+        }
+        
+        .list-item { 
+            padding: 14px 16px; 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 10px; 
+            color: #ffffff; 
+            font-size: 12px; 
+            font-weight: 400; 
+            background: rgba(255, 255, 255, 0.04);
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            word-break: break-all;
+            white-space: pre-wrap;
+        }
+        
+        .list-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(139, 92, 246, 0.3);
+            transform: translateX(4px);
+        }
+        
+        .list-item.selected { 
+            background: rgba(139, 92, 246, 0.15); 
+            color: #ffffff; 
+            border-color: rgba(139, 92, 246, 0.5); 
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2); 
+        }
+
+        /* NEW STYLE FOR INFO LABELS */
+        .info-label {
+            padding: 14px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 13px;
+            font-weight: 500;
+            background: rgba(0, 0, 0, 0.2);
+            text-align: center;
+            margin-bottom: 16px;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .input-group { 
+            margin-bottom: 16px; 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 10px; 
+            padding: 16px; 
+            background: rgba(255, 255, 255, 0.04);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .input-group::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.03) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .input-group.selected::before {
+            opacity: 1;
+        }
+        
+        .input-group.selected { 
+            background: rgba(139, 92, 246, 0.08); 
+            border-color: rgba(139, 92, 246, 0.4); 
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.15); 
+        }
+        
+        .input-group label { 
+            display: block; 
+            margin-bottom: 10px; 
+            color: rgba(255, 255, 255, 0.7); 
+            font-size: 11px; 
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        
+        .input-field { 
+            width: 100%; 
+            padding: 12px 14px; 
+            background: rgba(0, 0, 0, 0.3); 
+            border: 1px solid rgba(255, 255, 255, 0.15); 
+            border-radius: 8px; 
+            color: #fff; 
+            font-size: 13px; 
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 400;
+            transition: all 0.25s ease;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: rgba(139, 92, 246, 0.6);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+            background: rgba(0, 0, 0, 0.4);
+        }
+        
+        .input-field::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .state { 
+            font-weight: 600; 
+            text-transform: uppercase; 
+            font-size: 10px; 
+            padding: 4px 10px;
+            border-radius: 6px;
+            letter-spacing: 0.5px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .state.started { 
+            color: #000; 
+            background: linear-gradient(135deg, #10b981, #059669);
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+        
+        .state.stopped { 
+            color: #000; 
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+        }
+        
+        .state.unknown {
+            color: #000;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+        }
+        
+        ::-webkit-scrollbar { 
+            width: 6px; 
+        }
+        
+        ::-webkit-scrollbar-track { 
+            background: rgba(0, 0, 0, 0.1); 
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb { 
+            background: rgba(139, 92, 246, 0.4); 
+            border-radius: 3px; 
+            transition: background 0.25s ease;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover { 
+            background: rgba(139, 92, 246, 0.6); 
+        }
+        
+        .player-item {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            font-weight: 400;
+        }
+        
+        .player-id {
+            color: #8b5cf6;
+            font-weight: 600;
+        }
+        
+        .resource-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
+            word-break: break-all;
+            white-space: pre-wrap;
+            flex: 1;
+            margin-right: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="menu-container" id="menu-container">
+        <header class="menu-header">
+            <div class="logo">
+                <h1>cooked.lua</h1>
+                <p>Made By CodePlug</p>
+            </div>
+        </header>
+        <nav class="tab-nav" id="tab-nav-buttons"></nav>
+        <div class="main-content">
+            <div class="tab-content" id="servers-content"></div>
+            <div class="tab-content" id="executor-content"></div>
+            <div class="tab-content" id="trigger_finder-content"></div>
+            <div class="tab-content" id="players-content"></div>
+            <div class="tab-content" id="resources-content"></div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuContainer = document.getElementById('menu-container');
+            const tabButtonsContainer = document.getElementById('tab-nav-buttons');
+            // UPDATED TAB CONTENTS OBJECT
+            const tabContents = { 
+                servers: document.getElementById('servers-content'), 
+                executor: document.getElementById('executor-content'), 
+                trigger_finder: document.getElementById('trigger_finder-content'), 
+                players: document.getElementById('players-content'), 
+                resources: document.getElementById('resources-content') 
+            };
+
+            function safeEncode(text) {
+                if (!text || typeof text !== 'string') return '';
+                return text.replace(/&/g, '&amp;')
+                           .replace(/</g, '&lt;')
+                           .replace(/>/g, '&gt;')
+                           .replace(/"/g, '&quot;')
+                           .replace(/'/g, '&#39;');
+            }
+
+            function sanitizeResourceName(text) {
+                if (!text) return 'Unknown Resource';
+                const str = String(text);
+                return str.replace(/[^\x20-\x7E]/g, '?');
+            }
+
+            function scrollIntoView() {
+                const activeContent = document.querySelector('.tab-content.active');
+                if (!activeContent) return;
+                const selected = activeContent.querySelector('.selected');
+                if (selected) { 
+                    selected.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+
+            window.addEventListener("message", (event) => {
+                const { action, data } = event.data;
+                if (action === "show" || action === "update") {
+                    renderMenu(data);
+                    setTimeout(scrollIntoView, 100); 
+                }
+                menuContainer.style.visibility = (action === 'hide') ? 'hidden' : 'visible';
+            });
+
+            function renderMenu(state) {
+                if (!state || !state.tabs) return;
+                
+                tabButtonsContainer.innerHTML = '';
+                let activeTabKey = '';
+                
+                state.tabs.forEach((tabData, tabIndex) => {
+                    const isActive = state.activeTab === tabIndex;
+                    if (isActive) activeTabKey = tabData.key;
+                    
+                    const tabButton = document.createElement('button');
+                    tabButton.className = `tab-button ${isActive ? 'active' : ''}`;
+                    tabButton.textContent = tabData.title;
+                    tabButtonsContainer.appendChild(tabButton);
+                });
+                
+                for (const key in tabContents) {
+                    const isActive = key === activeTabKey;
+                    const contentElement = tabContents[key];
+                    if (contentElement) {
+                        contentElement.classList.toggle('active', isActive);
+                        if (isActive) populateTab(contentElement, state.tabs[state.activeTab], state);
+                    }
+                }
+            }
+
+            function populateTab(tabElement, tabData, state) {
+                tabElement.innerHTML = ''; 
+                const sectionHeader = document.createElement('div');
+                sectionHeader.className = 'section-header';
+                sectionHeader.textContent = tabData.header;
+                tabElement.appendChild(sectionHeader);
+                
+                const itemsContainer = document.createElement('div');
+                itemsContainer.className = tabData.type === 'grid' ? 'button-grid' : 'list-container';
+                
+                if (tabData.items && Array.isArray(tabData.items)) {
+                    tabData.items.forEach((item, index) => {
+                        let element;
+                        const isSelected = state.selection.index === index;
+                        
+                        // UPDATED LOGIC TO HANDLE ALL ITEM TYPES
+                        if (item.type === 'input') {
+                            element = document.createElement('div');
+                            element.className = `input-group ${isSelected ? 'selected' : ''}`;
+                            element.innerHTML = `
+                                <label>${safeEncode(item.label)}</label>
+                                <input type="text" class="input-field" value="${safeEncode(item.value || '')}" placeholder="${safeEncode(item.placeholder || '')}" readonly>
+                            `;
+                        } else if (item.type === 'label') {
+                             element = document.createElement('div');
+                             element.className = 'info-label';
+                             element.textContent = item.label || 'Info';
+                        } else if (tabData.key === 'resources') {
+                            element = document.createElement('div');
+                            element.className = `list-item ${isSelected ? 'selected' : ''}`;
+                            const stateText = item.state ? item.state.toUpperCase() : 'UNKNOWN';
+                            const stateClass = item.state || 'unknown';
+                            const resourceName = sanitizeResourceName(item.label);
+                            element.innerHTML = `<span class="resource-name">${safeEncode(resourceName)}</span><span class="state ${stateClass}">${stateText}</span>`;
+                        } else if (tabData.key === 'players') {
+                            element = document.createElement('div');
+                            element.className = `list-item player-item ${isSelected ? 'selected' : ''}`;
+                            element.innerHTML = `<span>${safeEncode(item.label || 'Unknown Player')}</span>`;
+                        } else { // Default to button/list-item
+                            element = document.createElement('button');
+                            const baseClass = (tabData.type === 'grid' || (tabData.type === 'form' && item.type === 'button')) ? 'action-button' : 'list-item';
+                            element.className = `${baseClass} ${isSelected ? 'selected' : ''}`;
+                            element.textContent = item.label || 'Unknown';
+                        }
+                        
+                        itemsContainer.appendChild(element);
+                    });
+                }
+                
+                tabElement.appendChild(itemsContainer);
+            }
+        });
+    </script>
+</body>
+</html>
