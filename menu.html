@@ -3,103 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cooked.lua</title>
+    <title>COOKED.LUA</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        
-        body { 
-            background: transparent !important; 
-            color: #ffffff; 
-            overflow: hidden; 
-            height: 100vh; 
+
+        body {
+            background: transparent !important;
+            color: #ffffff;
+            overflow: hidden;
+            height: 100vh;
             pointer-events: none;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-weight: 400;
         }
-        
-        @keyframes slideIn { 
-            from { 
-                opacity: 0; 
-                transform: translate(-50%, -60%) scale(0.95); 
-                filter: blur(4px);
-            } 
-            to { 
-                opacity: 1; 
-                transform: translate(-50%, -50%) scale(1);
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-100%) scale(0.95);
+                filter: blur(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
                 filter: blur(0);
-            } 
+            }
         }
-        
-        .menu-container {
-            width: 620px; 
-            height: 720px;
-            background: transparent;
-            border-radius: 16px;
-            display: flex; 
-            flex-direction: column;
-            overflow: hidden;
-            animation: slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            position: absolute; 
-            top: 50%; 
-            left: 50%;
-            transform: translate(-50%, -50%);
-            visibility: hidden;
-            pointer-events: auto;
-            filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.6));
-        }
-        
-        .menu-header { 
-            padding: 24px; 
-            text-align: center; 
-            background: rgba(8, 8, 12, 0.75);
-            backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-bottom: none;
-            border-radius: 16px 16px 0 0;
-            flex-shrink: 0;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .menu-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.6), transparent);
-        }
-        
-        .logo h1 { 
-            font-family: 'JetBrains Mono', monospace; 
-            font-size: 32px; 
-            font-weight: 700; 
-            background: linear-gradient(45deg, #a855f7, #c084fc, #e879f9, #f0abfc);
-            background-size: 400% 400%;
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent; 
-            background-clip: text; 
-            letter-spacing: 1px;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            text-shadow: 0 0 30px rgba(168, 85, 247, 0.8), 0 0 60px rgba(168, 85, 247, 0.4);
-            filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.6));
-            animation: glow 3s ease-in-out infinite alternate, gradientShift 4s ease-in-out infinite;
-            position: relative;
-        }
-        
+
         @keyframes glow {
-            from { 
+            from {
                 filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.6)) brightness(1);
             }
-            to { 
+            to {
                 filter: drop-shadow(0 0 40px rgba(168, 85, 247, 1)) brightness(1.2);
             }
         }
@@ -109,63 +51,126 @@
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-        
-        .logo h1::before {
-            content: 'COOKED.LUA';
-            position: absolute;
+
+        .menu-container {
+            width: 420px;
+            height: 100vh;
+            background: rgba(8, 8, 12, 0.75);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: slideInLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            position: fixed;
             top: 0;
             left: 0;
+            visibility: hidden;
+            pointer-events: auto;
+            box-shadow: none;
+        }
+
+        .menu-header {
+            padding: 24px 20px 20px 20px;
+            text-align: center;
+            background: rgba(8, 8, 12, 0.75);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .banner-container {
+            width: 100%;
+            height: 80px;
+            margin-bottom: 16px;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(168, 85, 247, 0.1));
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3), 0 0 40px rgba(139, 92, 246, 0.1);
+        }
+
+        .banner-image {
             width: 100%;
             height: 100%;
-            background: linear-gradient(45deg, transparent, rgba(168, 85, 247, 0.3), transparent);
+            object-fit: cover;
+            border-radius: 11px;
+        }
+
+        .banner-fallback {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(168, 85, 247, 0.2));
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 18px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+        }
+
+        .logo h1 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(45deg, #a855f7, #c084fc, #e879f9, #f0abfc);
+            background-size: 400% 400%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: shine 2s linear infinite;
-            pointer-events: none;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(168, 85, 247, 0.6), 0 0 40px rgba(168, 85, 247, 0.3);
+            filter: drop-shadow(0 0 15px rgba(168, 85, 247, 0.6));
+            animation: glow 3s ease-in-out infinite alternate, gradientShift 4s ease-in-out infinite;
+            position: relative;
         }
-        
-        @keyframes shine {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-        
-        .logo p { 
-            font-size: 12px; 
-            color: rgba(168, 85, 247, 0.9); 
-            font-weight: 600; 
-            letter-spacing: 2px;
+
+        .logo p {
+            font-size: 11px;
+            color: rgba(168, 85, 247, 0.9);
+            font-weight: 600;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
             text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
         }
-        
-        .tab-nav { 
-            display: flex; 
-            justify-content: center; 
-            padding: 16px; 
+
+        .tab-nav {
+            padding: 16px 12px;
             background: rgba(8, 8, 12, 0.75);
             backdrop-filter: blur(20px) saturate(180%);
-            border-left: 1px solid rgba(255, 255, 255, 0.08);
-            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
             gap: 4px;
         }
-        
-        .tab-button { 
-            padding: 10px 18px; 
-            background: rgba(255, 255, 255, 0.04); 
-            border: 1px solid rgba(255, 255, 255, 0.08); 
-            color: rgba(255, 255, 255, 0.6); 
-            font-size: 12px; 
-            font-weight: 500; 
-            cursor: pointer; 
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); 
-            border-radius: 8px;
+
+        .tab-button {
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            border-radius: 10px;
             position: relative;
             overflow: hidden;
             font-family: 'Inter', sans-serif;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
-        
+
         .tab-button::before {
             content: '';
             position: absolute;
@@ -176,93 +181,110 @@
             background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.1), transparent);
             transition: left 0.6s;
         }
-        
+
         .tab-button:hover {
             background: rgba(255, 255, 255, 0.06);
             color: rgba(255, 255, 255, 0.8);
             border-color: rgba(139, 92, 246, 0.3);
-            transform: translateY(-1px);
+            transform: translateX(6px);
         }
-        
+
         .tab-button:hover::before {
             left: 100%;
         }
-        
-        .tab-button.active { 
-            color: #ffffff; 
-            background: rgba(139, 92, 246, 0.15); 
+
+        .tab-button.active {
+            color: #ffffff;
+            background: rgba(139, 92, 246, 0.15);
             border-color: rgba(139, 92, 246, 0.4);
-            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.2);
+            transform: translateX(8px);
         }
-        
-        .main-content { 
+
+        .tab-arrow {
+            font-size: 16px;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button:hover .tab-arrow {
+            opacity: 1;
+            transform: translateX(2px);
+        }
+
+        .tab-button.active .tab-arrow {
+            opacity: 1;
+            color: rgba(139, 92, 246, 1);
+        }
+
+        .main-content {
             flex: 1;
-            overflow: hidden; 
+            overflow: hidden;
             position: relative;
             background: rgba(8, 8, 12, 0.75);
             backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-top: none;
-            border-radius: 0 0 16px 16px;
         }
-        
-        .tab-content { 
-            display: none; 
-            padding: 24px; 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            right: 0; 
-            bottom: 0; 
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             overflow-y: auto;
             overflow-x: hidden;
             scroll-behavior: smooth;
         }
-        
-        .tab-content.active { 
-            display: block; 
+
+        .tab-content.active {
+            display: block;
         }
-        
-        .section-header { 
-            font-size: 14px; 
-            font-weight: 600; 
-            color: rgba(255, 255, 255, 0.8); 
-            margin-bottom: 20px; 
-            text-align: center; 
+
+        .section-header {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 16px;
+            text-align: left;
             letter-spacing: 0.5px;
+            text-transform: uppercase;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
-        
-        .button-grid { 
-            display: grid; 
-            gap: 12px; 
-            grid-template-columns: 1fr 1fr; 
+
+        .button-grid {
+            display: grid;
+            gap: 10px;
+            grid-template-columns: 1fr 1fr;
         }
-        
-        .list-container { 
+
+        .list-container {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
-        
-        .action-button, .list-item, .input-group { 
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); 
+
+        .action-button, .list-item, .input-group {
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        
-        .action-button { 
-            padding: 16px 14px; 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 10px; 
-            color: #ffffff; 
-            font-size: 12px; 
-            font-weight: 500; 
-            text-align: center; 
+
+        .action-button {
+            padding: 14px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 12px;
+            font-weight: 500;
+            text-align: center;
             background: rgba(255, 255, 255, 0.04);
             cursor: pointer;
             position: relative;
             overflow: hidden;
             font-family: 'Inter', sans-serif;
         }
-        
+
         .action-button::before {
             content: '';
             position: absolute;
@@ -273,79 +295,104 @@
             background: linear-gradient(45deg, transparent, rgba(139, 92, 246, 0.1), transparent);
             transition: left 0.5s ease;
         }
-        
+
         .action-button:hover {
             background: rgba(255, 255, 255, 0.06);
             border-color: rgba(139, 92, 246, 0.3);
-            transform: translateY(-2px);
+            transform: translateY(-1px);
+            color: #ffffff;
         }
-        
+
         .action-button:hover::before {
             left: 100%;
         }
-        
-        .action-button.selected { 
-            background: rgba(139, 92, 246, 0.15); 
-            color: #ffffff; 
-            border-color: rgba(139, 92, 246, 0.5); 
-            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25); 
-            transform: translateY(-2px);
+
+        .action-button.selected {
+            background: rgba(139, 92, 246, 0.15);
+            color: #ffffff;
+            border-color: rgba(139, 92, 246, 0.4);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
+            transform: translateY(-1px);
         }
-        
-        .list-item { 
-            padding: 14px 16px; 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 10px; 
-            color: #ffffff; 
-            font-size: 12px; 
-            font-weight: 400; 
+
+        .list-item {
+            padding: 12px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 12px;
+            font-weight: 400;
             background: rgba(255, 255, 255, 0.04);
-            display: flex; 
-            justify-content: space-between; 
+            display: flex;
+            justify-content: space-between;
             align-items: center;
             cursor: pointer;
             font-family: 'JetBrains Mono', monospace;
             word-break: break-all;
             white-space: pre-wrap;
+            position: relative;
+            overflow: hidden;
         }
-        
+
+        .list-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 3px;
+            height: 100%;
+            background: rgba(139, 92, 246, 0.6);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
         .list-item:hover {
             background: rgba(255, 255, 255, 0.06);
             border-color: rgba(139, 92, 246, 0.3);
-            transform: translateX(4px);
-        }
-        
-        .list-item.selected { 
-            background: rgba(139, 92, 246, 0.15); 
-            color: #ffffff; 
-            border-color: rgba(139, 92, 246, 0.5); 
-            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2); 
+            transform: translateX(6px);
+            color: #ffffff;
         }
 
-        /* NEW STYLE FOR INFO LABELS */
+        .list-item:hover::before {
+            transform: scaleY(1);
+        }
+
+        .list-item.selected {
+            background: rgba(139, 92, 246, 0.12);
+            color: #ffffff;
+            border-color: rgba(139, 92, 246, 0.3);
+            box-shadow: 0 3px 12px rgba(139, 92, 246, 0.15);
+            transform: translateX(6px);
+        }
+
+        .list-item.selected::before {
+            transform: scaleY(1);
+            background: rgba(139, 92, 246, 1);
+        }
+
         .info-label {
-            padding: 14px 16px;
+            padding: 12px 14px;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 13px;
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
             font-weight: 500;
             background: rgba(0, 0, 0, 0.2);
             text-align: center;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             font-family: 'Inter', sans-serif;
         }
-        
-        .input-group { 
-            margin-bottom: 16px; 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 10px; 
-            padding: 16px; 
+
+        .input-group {
+            margin-bottom: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 14px;
             background: rgba(255, 255, 255, 0.04);
             position: relative;
             overflow: hidden;
         }
-        
+
         .input-group::before {
             content: '';
             position: absolute;
@@ -353,132 +400,141 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(139, 92, 246, 0.03) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.04) 0%, transparent 70%);
             opacity: 0;
             transition: opacity 0.3s ease;
             pointer-events: none;
         }
-        
+
         .input-group.selected::before {
             opacity: 1;
         }
-        
-        .input-group.selected { 
-            background: rgba(139, 92, 246, 0.08); 
-            border-color: rgba(139, 92, 246, 0.4); 
-            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.15); 
+
+        .input-group.selected {
+            background: rgba(139, 92, 246, 0.08);
+            border-color: rgba(139, 92, 246, 0.25);
+            box-shadow: 0 3px 12px rgba(139, 92, 246, 0.1);
         }
-        
-        .input-group label { 
-            display: block; 
-            margin-bottom: 10px; 
-            color: rgba(255, 255, 255, 0.7); 
-            font-size: 11px; 
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 11px;
             font-weight: 600;
             letter-spacing: 0.5px;
             text-transform: uppercase;
         }
-        
-        .input-field { 
-            width: 100%; 
-            padding: 12px 14px; 
-            background: rgba(0, 0, 0, 0.3); 
-            border: 1px solid rgba(255, 255, 255, 0.15); 
-            border-radius: 8px; 
-            color: #fff; 
-            font-size: 13px; 
+
+        .input-field {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 12px;
             font-family: 'JetBrains Mono', monospace;
             font-weight: 400;
             transition: all 0.25s ease;
             position: relative;
             z-index: 1;
         }
-        
+
         .input-field:focus {
             outline: none;
             border-color: rgba(139, 92, 246, 0.6);
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.1);
             background: rgba(0, 0, 0, 0.4);
         }
-        
+
         .input-field::placeholder {
             color: rgba(255, 255, 255, 0.3);
         }
-        
-        .state { 
-            font-weight: 600; 
-            text-transform: uppercase; 
-            font-size: 10px; 
-            padding: 4px 10px;
-            border-radius: 6px;
+
+        .state {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 9px;
+            padding: 3px 8px;
+            border-radius: 4px;
             letter-spacing: 0.5px;
             font-family: 'JetBrains Mono', monospace;
         }
-        
-        .state.started { 
-            color: #000; 
+
+        .state.started {
+            color: #000;
             background: linear-gradient(135deg, #10b981, #059669);
-            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+            box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
         }
-        
-        .state.stopped { 
-            color: #000; 
+
+        .state.stopped {
+            color: #000;
             background: linear-gradient(135deg, #ef4444, #dc2626);
-            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
         }
-        
+
         .state.unknown {
             color: #000;
             background: linear-gradient(135deg, #f59e0b, #d97706);
-            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+            box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4);
         }
-        
-        ::-webkit-scrollbar { 
-            width: 6px; 
+
+        ::-webkit-scrollbar {
+            width: 4px;
         }
-        
-        ::-webkit-scrollbar-track { 
-            background: rgba(0, 0, 0, 0.1); 
-            border-radius: 3px;
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 2px;
         }
-        
-        ::-webkit-scrollbar-thumb { 
-            background: rgba(139, 92, 246, 0.4); 
-            border-radius: 3px; 
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(139, 92, 246, 0.4);
+            border-radius: 2px;
             transition: background 0.25s ease;
         }
-        
-        ::-webkit-scrollbar-thumb:hover { 
-            background: rgba(139, 92, 246, 0.6); 
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(139, 92, 246, 0.6);
         }
-        
+
         .player-item {
             font-family: 'JetBrains Mono', monospace;
             font-size: 12px;
             font-weight: 400;
         }
-        
+
         .player-id {
             color: #8b5cf6;
             font-weight: 600;
         }
-        
+
         .resource-name {
             font-family: 'JetBrains Mono', monospace;
-            font-weight: 500;
+            font-weight: 400;
             word-break: break-all;
             white-space: pre-wrap;
             flex: 1;
-            margin-right: 12px;
+            margin-right: 10px;
         }
     </style>
 </head>
 <body>
     <div class="menu-container" id="menu-container">
         <header class="menu-header">
+            <div class="banner-container">
+                <img src="https://github.com/uhfdsauifgyuasfbhasgdghu/LUIOS8BV8/raw/main/banner.png"
+                     alt="XCLIPS.LUA Banner"
+                     class="banner-image"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="banner-fallback" style="display: none;">
+                    COOKED.LUA
+                </div>
+            </div>
             <div class="logo">
-                <h1>cooked.lua</h1>
-                <p>Made By CodePlug</p>
+                <h1>Made By CodePlug</h1>
+                <p>.gg/codeplug</p>
             </div>
         </header>
         <nav class="tab-nav" id="tab-nav-buttons"></nav>
@@ -490,18 +546,18 @@
             <div class="tab-content" id="resources-content"></div>
         </div>
     </div>
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const menuContainer = document.getElementById('menu-container');
             const tabButtonsContainer = document.getElementById('tab-nav-buttons');
-            // UPDATED TAB CONTENTS OBJECT
-            const tabContents = { 
-                servers: document.getElementById('servers-content'), 
-                executor: document.getElementById('executor-content'), 
-                trigger_finder: document.getElementById('trigger_finder-content'), 
-                players: document.getElementById('players-content'), 
-                resources: document.getElementById('resources-content') 
+
+            const tabContents = {
+                servers: document.getElementById('servers-content'),
+                executor: document.getElementById('executor-content'),
+                trigger_finder: document.getElementById('trigger_finder-content'),
+                players: document.getElementById('players-content'),
+                resources: document.getElementById('resources-content')
             };
 
             function safeEncode(text) {
@@ -523,7 +579,7 @@
                 const activeContent = document.querySelector('.tab-content.active');
                 if (!activeContent) return;
                 const selected = activeContent.querySelector('.selected');
-                if (selected) { 
+                if (selected) {
                     selected.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
             }
@@ -532,27 +588,30 @@
                 const { action, data } = event.data;
                 if (action === "show" || action === "update") {
                     renderMenu(data);
-                    setTimeout(scrollIntoView, 100); 
+                    setTimeout(scrollIntoView, 100);
                 }
                 menuContainer.style.visibility = (action === 'hide') ? 'hidden' : 'visible';
             });
 
             function renderMenu(state) {
                 if (!state || !state.tabs) return;
-                
+
                 tabButtonsContainer.innerHTML = '';
                 let activeTabKey = '';
-                
+
                 state.tabs.forEach((tabData, tabIndex) => {
                     const isActive = state.activeTab === tabIndex;
                     if (isActive) activeTabKey = tabData.key;
-                    
+
                     const tabButton = document.createElement('button');
                     tabButton.className = `tab-button ${isActive ? 'active' : ''}`;
-                    tabButton.textContent = tabData.title;
+                    tabButton.innerHTML = `
+                        <span>${tabData.title}</span>
+                        <span class="tab-arrow">›</span>
+                    `;
                     tabButtonsContainer.appendChild(tabButton);
                 });
-                
+
                 for (const key in tabContents) {
                     const isActive = key === activeTabKey;
                     const contentElement = tabContents[key];
@@ -564,21 +623,20 @@
             }
 
             function populateTab(tabElement, tabData, state) {
-                tabElement.innerHTML = ''; 
+                tabElement.innerHTML = '';
                 const sectionHeader = document.createElement('div');
                 sectionHeader.className = 'section-header';
                 sectionHeader.textContent = tabData.header;
                 tabElement.appendChild(sectionHeader);
-                
+
                 const itemsContainer = document.createElement('div');
                 itemsContainer.className = tabData.type === 'grid' ? 'button-grid' : 'list-container';
-                
+
                 if (tabData.items && Array.isArray(tabData.items)) {
                     tabData.items.forEach((item, index) => {
                         let element;
                         const isSelected = state.selection.index === index;
-                        
-                        // UPDATED LOGIC TO HANDLE ALL ITEM TYPES
+
                         if (item.type === 'input') {
                             element = document.createElement('div');
                             element.className = `input-group ${isSelected ? 'selected' : ''}`;
@@ -607,11 +665,11 @@
                             element.className = `${baseClass} ${isSelected ? 'selected' : ''}`;
                             element.textContent = item.label || 'Unknown';
                         }
-                        
+
                         itemsContainer.appendChild(element);
                     });
                 }
-                
+
                 tabElement.appendChild(itemsContainer);
             }
         });
