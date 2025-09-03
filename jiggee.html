@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jiggy On That</title>
+    <title>Jiggy Menu</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Courier+New:wght@400;700&family=Inconsolata:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Courier+New:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -16,7 +16,7 @@
         }
 
         body {
-            font-family: 'Courier New', 'Inconsolata', monospace;
+            font-family: 'Courier New', monospace;
             background: transparent !important;
             color: white;
             overflow: hidden;
@@ -25,64 +25,7 @@
             pointer-events: none;
             display: block;
         }
-
-        #intro-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            text-align: center;
-            padding-top: 10vh;
-            z-index: 20;
-            background: rgba(0, 0, 0, 0.5);
-            transition: opacity 1s ease-out;
-        }
         
-        #intro-container.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .message-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .intro-welcome-message {
-            font-size: 30px;
-            font-weight: bold;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.5);
-            white-space: nowrap;
-            margin-bottom: 10px;
-            opacity: 0;
-            transition: opacity 1s ease-out;
-        }
-
-        .intro-secondary-message {
-            font-size: 14px;
-            font-weight: bold;
-            white-space: nowrap;
-            opacity: 0;
-            transition: opacity 1s ease-out;
-        }
-
-        .text-line {
-            display: inline-block;
-            white-space: pre;
-        }
-        
-        .redish-pink-char { color: #FF00FF; text-shadow: 0 0 5px #FF00FF; }
-        .cyan-char { color: #00FFFF; text-shadow: 0 0 5px #00FFFF; }
-        .purple-char { color: #8A2BE2; text-shadow: 0 0 5px #8A2BE2; }
-        .purplish-white-char { color: #C8BFE7; text-shadow: 0 0 5px #C8BFE7; }
-        .white-char { color: #FFFFFF; text-shadow: 0 0 5px #FFFFFF; }
-
         .menu-container {
             position: absolute;
             right: 50px;
@@ -248,6 +191,43 @@
         .jiggy-banner .pink { color: #FF00FF; text-shadow: 0 0 5px #FF00FF; }
         .jiggy-banner .cyan { color: #00FFFF; text-shadow: 0 0 5px #00FFFF; }
 
+        .welcome-message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 30px;
+            font-weight: bold;
+            opacity: 0;
+            pointer-events: none;
+            text-shadow: 0 0 10px rgba(255,255,255,0.5), 0 0 20px rgba(255,255,255,0.5);
+            white-space: nowrap;
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: #FF00FF; }
+        }
+
+        .welcome-message-text {
+            display: inline-block;
+            overflow: hidden;
+            border-right: 0.15em solid #FF00FF;
+            white-space: nowrap;
+            letter-spacing: 0.1em;
+            animation: typing 3s steps(40, end), blink-caret .75s step-end infinite;
+        }
+
+        .welcome-message span {
+            display: inline-block;
+            transition: color 0.2s ease;
+        }
+
         .input-group {
             padding: 8px 15px;
             background: rgba(255, 255, 255, 0.02);
@@ -286,17 +266,10 @@
     </style>
 </head>
 <body>
-    <div id="intro-container">
-        <div class="message-container">
-            <div class="intro-welcome-message" id="intro-welcome-message">
-                <span class="text-line" id="intro-welcome-message-text"></span>
-            </div>
-            <div class="intro-secondary-message" id="intro-secondary-message">
-                <span class="text-line" id="intro-secondary-message-text"></span>
-            </div>
-        </div>
+    <div class="welcome-message" id="welcome-message">
+        <span id="welcome-message-text"></span>
     </div>
-
+    
     <div class="menu-container" id="menu-container">
         <div class="menu-background"></div>
         <div class="menu-title" id="menu-title">
@@ -327,312 +300,213 @@
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const introContainer = document.getElementById('intro-container');
-            const introWelcomeMessage = document.getElementById('intro-welcome-message');
-            const introWelcomeMessageText = document.getElementById('intro-welcome-message-text');
-            const introSecondaryMessage = document.getElementById('intro-secondary-message');
-            const introSecondaryMessageText = document.getElementById('intro-secondary-message-text');
+        let currentSelection = 0;
+        let currentState = null;
+        let isContentPanelOpen = false;
+        let welcomeMessageShown = false;
 
-            const message1 = "Hello there, Welcome to Jiggy Menu LUA";
-            const message2 = "All updates on discord jiggymenulua";
-            const scrambleChars = "0123456789!@#$%^&*()_+-=[]{}|;':,./<>?~`";
-            
-            const message1Data = Array.from(message1).map(char => ({ char: char, typed: false, scrambleCount: 0 }));
-            const message2Data = Array.from(message2).map(char => ({ char: char, typed: false, scrambleCount: 0 }));
-            
-            const scrambleSpeed = 5;
-            let animationFrame = 0;
+        const menuContainer = document.getElementById('menu-container');
+        const modStatus = document.getElementById('mod-status');
+        const menuOptionsList = document.getElementById('menuOptions');
+        const contentHeader = document.getElementById('contentHeader');
+        const contentList = document.getElementById('status-list');
+        const selectionIndicator = document.getElementById('selectionIndicator');
+        const welcomeMessage = document.getElementById('welcome-message');
+        const welcomeMessageText = document.getElementById('welcome-message-text');
+        const bannerLetters = document.querySelectorAll('.jiggy-banner span');
 
-            function getRandomChar() {
-                return scrambleChars[Math.floor(Math.random() * scrambleChars.length)];
-            }
-            
-            function getCharacterClass(message, index) {
-                const parts = message.split(' ');
-                let charCount = 0;
-                let currentWord = '';
-                for (let i = 0; i < parts.length; i++) {
-                    if (index >= charCount && index < charCount + parts[i].length) {
-                        currentWord = parts[i];
-                        break;
-                    }
-                    charCount += parts[i].length + 1;
-                }
+        const neonColors = ['#00FFFF', '#FF00FF', '#39FF14', '#FFD700', '#FF073A'];
 
-                if (currentWord === 'Hello') return 'redish-pink-char';
-                if (currentWord === 'there,') return 'cyan-char';
-                if (currentWord === 'Welcome' || currentWord === 'to') return 'purple-char';
-                
-                if (currentWord === 'Jiggy') {
-                    const charIndexInWord = index - message.indexOf('Jiggy');
-                    return charIndexInWord % 2 === 0 ? 'redish-pink-char' : 'cyan-char';
+        function safeEncode(text) {
+            if (!text || typeof text !== 'string') return '';
+            return text.replace(/&/g, '&amp;')
+                       .replace(/</g, '&lt;')
+                       .replace(/>/g, '&gt;')
+                       .replace(/"/g, '&quot;')
+                       .replace(/'/g, '&#39;');
+        }
+        
+        function populateContent(tabData, state) {
+            contentList.innerHTML = '';
+            if (!tabData || !tabData.items || !Array.isArray(tabData.items)) return;
+
+            tabData.items.forEach((item, index) => {
+                let element = document.createElement('div');
+                element.className = `status-item`;
+                if (state.selection.index === index) {
+                    element.classList.add('selected');
                 }
                 
-                if (currentWord === 'Menu') {
-                    const charIndexInWord = index - message.indexOf('Jiggy');
-                    return charIndexInWord % 2 === 0 ? 'redish-pink-char' : 'cyan-char';
-                }
-                
-                if (currentWord === 'All' || currentWord === 'updates' || currentWord === 'on' || currentWord === 'discord') return 'purplish-white-char';
-                
-                if (currentWord === 'jiggymenulua') return 'purple-char';
+                let itemHTML;
+                const isToggleOrState = (item.type === 'toggle' || (item.label && (item.label.toLowerCase().includes('toggle') || item.label.toLowerCase().includes('enabled') || item.label.toLowerCase().includes('boost') || item.label.toLowerCase().includes('crasher'))));
+                const isResourceState = (tabData.key === 'resources' && item.state !== undefined);
 
-                return 'white-char';
-            }
-
-            function updateDisplay(messageData, element, message) {
-                element.innerHTML = '';
-                let tempHTML = '';
-                for (let i = 0; i < messageData.length; i++) {
-                    const charData = messageData[i];
-                    const charClass = getCharacterClass(message, i);
-                    
-                    if (charData.typed) {
-                        tempHTML += `<span class="${charClass}">${charData.char}</span>`;
-                    } else if (charData.char === ' ') {
-                        tempHTML += `<span> </span>`;
-                    } else {
-                        tempHTML += `<span class="${charClass}">${getRandomChar()}</span>`;
-                    }
-                }
-                element.innerHTML = tempHTML;
-            }
-
-            function animate() {
-                let allCompleted = true;
-                
-                for (let i = 0; i < message1Data.length; i++) {
-                    if (!message1Data[i].typed) {
-                        allCompleted = false;
-                        if (animationFrame % scrambleSpeed === 0) {
-                             if (message1Data[i].scrambleCount < scrambleSpeed) {
-                                 message1Data[i].scrambleCount++;
-                             } else {
-                                 message1Data[i].typed = true;
-                                 break;
-                             }
-                        }
-                    }
-                }
-                updateDisplay(message1Data, introWelcomeMessageText, message1);
-
-                for (let i = 0; i < message2Data.length; i++) {
-                    if (!message2Data[i].typed) {
-                        allCompleted = false;
-                        if (animationFrame % scrambleSpeed === 0) {
-                             if (message2Data[i].scrambleCount < scrambleSpeed) {
-                                 message2Data[i].scrambleCount++;
-                             } else {
-                                 message2Data[i].typed = true;
-                                 break;
-                             }
-                        }
-                    }
-                }
-                updateDisplay(message2Data, introSecondaryMessageText, message2);
-
-                if (allCompleted) {
-                    clearInterval(typingInterval);
-                    setTimeout(() => {
-                        introContainer.classList.add('hidden');
-                        menuContainer.style.visibility = 'visible';
-                        modStatus.style.visibility = 'visible';
-                    }, 2000);
+                if (isToggleOrState || isResourceState) {
+                    const statusState = (item.state === 'on' || item.state === 'started') ? 'ON' : 'OFF';
+                    const statusClass = (item.state === 'on' || item.state === 'started') ? 'status-on' : 'status-off';
+                    itemHTML = `<span>${safeEncode(item.label || 'Unknown')}</span><span class="${statusClass}">${statusState}</span>`;
+                    element.style.color = neonColors[index % neonColors.length];
+                } else if (item.type === 'input') {
+                    const inputElement = `<input type="text" class="input-field" value="${safeEncode(item.value || '')}" readonly>`;
+                    itemHTML = `
+                        <div class="input-group ${state.selection.index === index ? 'selected' : ''}">
+                            <label>${safeEncode(item.label)}</label>
+                            ${inputElement}
+                        </div>`;
+                    element.classList.remove('status-item');
                 } else {
-                    animationFrame++;
-                }
-            }
-            
-            let currentSelection = 0;
-            let currentState = null;
-            let isContentPanelOpen = false;
-            let welcomeMessageShown = false;
-
-            const menuContainer = document.getElementById('menu-container');
-            const modStatus = document.getElementById('mod-status');
-            const menuOptionsList = document.getElementById('menuOptions');
-            const contentHeader = document.getElementById('contentHeader');
-            const contentList = document.getElementById('status-list');
-            const selectionIndicator = document.getElementById('selectionIndicator');
-            const bannerLetters = document.querySelectorAll('.jiggy-banner span');
-
-            const neonColors = ['#00FFFF', '#FF00FF', '#39FF14', '#FFD700', '#FF073A'];
-
-            function safeEncode(text) {
-                if (!text || typeof text !== 'string') return '';
-                return text.replace(/&/g, '&amp;')
-                           .replace(/</g, '&lt;')
-                           .replace(/>/g, '&gt;')
-                           .replace(/"/g, '&quot;')
-                           .replace(/'/g, '&#39;');
-            }
-            
-            function populateContent(tabData, state) {
-                contentList.innerHTML = '';
-                if (!tabData || !tabData.items || !Array.isArray(tabData.items)) return;
-
-                tabData.items.forEach((item, index) => {
-                    let element = document.createElement('div');
-                    element.className = `status-item`;
-                    if (state.selection.index === index) {
-                        element.classList.add('selected');
-                    }
-                    
-                    let itemHTML;
-                    const isToggleOrState = (item.type === 'toggle' || (item.label && (item.label.toLowerCase().includes('toggle') || item.label.toLowerCase().includes('enabled') || item.label.toLowerCase().includes('boost') || item.label.toLowerCase().includes('crasher'))));
-                    const isResourceState = (tabData.key === 'resources' && item.state !== undefined);
-
-                    if (isToggleOrState || isResourceState) {
-                        const statusState = (item.state === 'on' || item.state === 'started') ? 'ON' : 'OFF';
-                        const statusClass = (item.state === 'on' || item.state === 'started') ? 'status-on' : 'status-off';
-                        itemHTML = `<span>${safeEncode(item.label || 'Unknown')}</span><span class="${statusClass}">${statusState}</span>`;
-                        element.style.color = neonColors[index % neonColors.length];
-                    } else if (item.type === 'input') {
-                        const inputElement = `<input type="text" class="input-field" value="${safeEncode(item.value || '')}" readonly>`;
-                        itemHTML = `
-                            <div class="input-group ${state.selection.index === index ? 'selected' : ''}">
-                                <label>${safeEncode(item.label)}</label>
-                                ${inputElement}
-                            </div>`;
-                        element.classList.remove('status-item');
-                    } else {
-                        itemHTML = `<span>${safeEncode(item.label || 'Unknown')}</span>`;
-                        element.style.color = neonColors[index % neonColors.length];
-                    }
-
-                    element.innerHTML = itemHTML;
-                    contentList.appendChild(element);
-                });
-            }
-            
-            function updateMenuFromState(state) {
-                if (!state || !state.tabs) return;
-
-                currentState = state;
-
-                menuOptionsList.innerHTML = '';
-                state.tabs.forEach((tabData, tabIndex) => {
-                    const menuOption = document.createElement('li');
-                    menuOption.className = 'menu-option';
-                    menuOption.setAttribute('data-index', tabIndex);
-                    if (tabIndex === state.activeTab) {
-                        menuOption.classList.add('selected');
-                    }
-                    menuOption.textContent = tabData.title || `Tab ${tabIndex + 1}`;
-                    
-                    menuOptionsList.appendChild(menuOption);
-                });
-                
-                isContentPanelOpen = state.isContentPanelOpen;
-                if (isContentPanelOpen) {
-                    modStatus.style.visibility = 'visible';
-                    const activeTab = state.tabs[state.activeTab];
-                    if (activeTab) {
-                        contentHeader.textContent = activeTab.header || activeTab.title;
-                        populateContent(activeTab, state);
-                    }
-                } else {
-                    modStatus.style.visibility = 'hidden';
+                    itemHTML = `<span>${safeEncode(item.label || 'Unknown')}</span>`;
+                    element.style.color = neonColors[index % neonColors.length];
                 }
 
-                attachEventListeners();
-                updateIndicatorPosition();
-            }
+                element.innerHTML = itemHTML;
+                contentList.appendChild(element);
+            });
+        }
+        
+        function updateMenuFromState(state) {
+            if (!state || !state.tabs) return;
 
-            function attachEventListeners() {
-                const menuOptions = document.querySelectorAll('.menu-option');
-                menuOptions.forEach((option, index) => {
-                    option.addEventListener('mouseenter', () => updateSelection(index));
-                    option.addEventListener('click', () => {
-                        if (window.parent) {
-                            window.parent.postMessage({ action: 'select', tabIndex: index, isContentPanel: false }, '*');
-                        }
-                    });
-                });
+            currentState = state;
+
+            menuOptionsList.innerHTML = '';
+            state.tabs.forEach((tabData, tabIndex) => {
+                const menuOption = document.createElement('li');
+                menuOption.className = 'menu-option';
+                menuOption.setAttribute('data-index', tabIndex);
+                if (tabIndex === state.activeTab) {
+                    menuOption.classList.add('selected');
+                }
+                menuOption.textContent = tabData.title || `Tab ${tabIndex + 1}`;
                 
-                const contentItems = document.querySelectorAll('.status-item, .input-group');
-                contentItems.forEach((item, index) => {
-                    item.addEventListener('mouseenter', () => {
-                        contentItems.forEach(i => i.classList.remove('selected'));
-                        item.classList.add('selected');
-                    });
-                    item.addEventListener('click', () => {
-                        if (window.parent) {
-                            window.parent.postMessage({ action: 'select', itemIndex: index, isContentPanel: true }, '*');
-                        }
-                    });
-                });
+                menuOptionsList.appendChild(menuOption);
+            });
+            
+            isContentPanelOpen = state.isContentPanelOpen;
+            if (isContentPanelOpen) {
+                modStatus.style.visibility = 'visible';
+                const activeTab = state.tabs[state.activeTab];
+                if (activeTab) {
+                    contentHeader.textContent = activeTab.header || activeTab.title;
+                    populateContent(activeTab, state);
+                }
+            } else {
+                modStatus.style.visibility = 'hidden';
             }
 
-            function updateSelection(index) {
-                const menuOptions = document.querySelectorAll('.menu-option');
-                menuOptions.forEach((option, i) => option.classList.toggle('selected', i === index));
-                currentSelection = index;
-                updateIndicatorPosition();
-            }
+            attachEventListeners();
+            updateIndicatorPosition();
+        }
 
-            function updateIndicatorPosition() {
-                const menuOptions = document.querySelectorAll('.menu-option');
-                if (menuOptions.length === 0) return;
-                const selectedOption = menuOptions[currentSelection];
-                if (!selectedOption) return;
-                const containerRect = document.querySelector('.menu-options-container').getBoundingClientRect();
-                const optionRect = selectedOption.getBoundingClientRect();
-                const relativeTop = optionRect.top - containerRect.top;
-                selectionIndicator.style.top = relativeTop + 'px';
-                selectionIndicator.style.height = optionRect.height + 'px';
-            }
-
-            function startBannerFlicker() {
-                bannerLetters.forEach(letter => {
-                    if (letter.textContent.trim() !== '') {
-                        setInterval(() => {
-                            if (Math.random() > 0.7) {
-                                const originalColor = letter.style.color;
-                                const originalShadow = letter.style.textShadow;
-                                
-                                letter.style.color = '#fff';
-                                letter.style.textShadow = '0 0 10px #fff, 0 0 20px #fff';
-                                
-                                setTimeout(() => {
-                                    letter.style.color = originalColor;
-                                    letter.style.textShadow = originalShadow;
-                                }, 50 + Math.random() * 100);
-                            }
-                        }, 100 + Math.random() * 400);
+        function attachEventListeners() {
+            const menuOptions = document.querySelectorAll('.menu-option');
+            menuOptions.forEach((option, index) => {
+                option.addEventListener('mouseenter', () => updateSelection(index));
+                option.addEventListener('click', () => {
+                    if (window.parent) {
+                        window.parent.postMessage({ action: 'select', tabIndex: index, isContentPanel: false }, '*');
                     }
                 });
-            }
+            });
+            
+            const contentItems = document.querySelectorAll('.status-item, .input-group');
+            contentItems.forEach((item, index) => {
+                item.addEventListener('mouseenter', () => {
+                    contentItems.forEach(i => i.classList.remove('selected'));
+                    item.classList.add('selected');
+                });
+                item.addEventListener('click', () => {
+                    if (window.parent) {
+                        window.parent.postMessage({ action: 'select', itemIndex: index, isContentPanel: true }, '*');
+                    }
+                });
+            });
+        }
 
-            startBannerFlicker();
+        function updateSelection(index) {
+            const menuOptions = document.querySelectorAll('.menu-option');
+            menuOptions.forEach((option, i) => option.classList.toggle('selected', i === index));
+            currentSelection = index;
+            updateIndicatorPosition();
+        }
 
-            window.addEventListener("message", (event) => {
-                const { action, data } = event.data;
-                if (action === "show") {
-                    if (data) {
-                        if (!welcomeMessageShown) {
-                            welcomeMessageShown = true;
-                            introWelcomeMessage.style.opacity = '1';
-                            introSecondaryMessage.style.opacity = '1';
-                            const typingInterval = setInterval(animate, 20);
-                        } else {
-                            menuContainer.style.visibility = 'visible';
-                            modStatus.style.visibility = data.isContentPanelOpen ? 'visible' : 'hidden';
-                            updateMenuFromState(data);
+        function updateIndicatorPosition() {
+            const menuOptions = document.querySelectorAll('.menu-option');
+            if (menuOptions.length === 0) return;
+            const selectedOption = menuOptions[currentSelection];
+            if (!selectedOption) return;
+            const containerRect = document.querySelector('.menu-options-container').getBoundingClientRect();
+            const optionRect = selectedOption.getBoundingClientRect();
+            const relativeTop = optionRect.top - containerRect.top;
+            selectionIndicator.style.top = relativeTop + 'px';
+            selectionIndicator.style.height = optionRect.height + 'px';
+        }
+
+        function startBannerFlicker() {
+            bannerLetters.forEach(letter => {
+                if (letter.textContent.trim() !== '') {
+                    setInterval(() => {
+                        if (Math.random() > 0.7) {
+                            const originalColor = letter.style.color;
+                            const originalShadow = letter.style.textShadow;
+                            
+                            letter.style.color = '#fff';
+                            letter.style.textShadow = '0 0 10px #fff, 0 0 20px #fff';
+                            
+                            setTimeout(() => {
+                                letter.style.color = originalColor;
+                                letter.style.textShadow = originalShadow;
+                            }, 50 + Math.random() * 100);
                         }
-                    }
-                } else if (action === "update") {
-                    if (data) {
-                        menuContainer.style.visibility = 'visible';
-                        modStatus.style.visibility = data.isContentPanelOpen ? 'visible' : 'hidden';
-                        updateMenuFromState(data);
-                    }
-                } else if (action === 'hide') {
-                    menuContainer.style.visibility = 'hidden';
-                    modStatus.style.visibility = 'hidden';
+                    }, 100 + Math.random() * 400);
                 }
             });
+        }
+
+        startBannerFlicker();
+
+        window.addEventListener("message", (event) => {
+            const { action, data } = event.data;
+            if (action === "update" || action === "show") {
+                if (data) {
+                    if (data.isContentPanelOpen !== isContentPanelOpen) {
+                        modStatus.style.visibility = data.isContentPanelOpen ? 'visible' : 'hidden';
+                        isContentPanelOpen = data.isContentPanelOpen;
+                    }
+
+                    updateMenuFromState(data);
+                    menuContainer.style.visibility = 'visible';
+
+                    if (action === "show" && !welcomeMessageShown) {
+                        welcomeMessage.style.opacity = '1';
+                        welcomeMessageText.innerHTML = '';
+                        const message = "WELCOME TO JIGGY MENU";
+                        let i = 0;
+                        function typeWriter() {
+                            if (i < message.length) {
+                                const char = message.charAt(i);
+                                const span = document.createElement('span');
+                                span.textContent = char;
+                                const colors = ['#FF00FF', '#00FFFF', '#FF00FF', '#00FFFF', '#FF00FF', '#00FFFF', '#FF00FF', '#00FFFF', '#FF00FF', '#00FFFF', '#FF00FF', '#00FFFF', '#FF00FF', '#00FFFF', '#FF00FF', '#00FFFF', '#FF00FF', '#00FFFF'];
+                                span.style.color = colors[i % colors.length];
+                                welcomeMessageText.appendChild(span);
+                                i++;
+                                setTimeout(typeWriter, 50);
+                            } else {
+                                setTimeout(() => {
+                                    welcomeMessage.style.opacity = '0';
+                                }, 0);
+                            }
+                        }
+                        typeWriter();
+                        welcomeMessageShown = true;
+                    }
+                }
+            }
+            if (action === 'hide') {
+                menuContainer.style.visibility = 'hidden';
+                modStatus.style.visibility = 'hidden';
+            }
         });
     </script>
 </body>
