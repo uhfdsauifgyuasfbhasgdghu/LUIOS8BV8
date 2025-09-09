@@ -197,7 +197,6 @@
         let optionStates = {};
         let currentMenuId = 'main';
         let selectedIndex = 0;
-        let isContentPanelOpen = false;
 
         function showNotification(message) {
             notification.textContent = message;
@@ -336,9 +335,11 @@
             updateSelection();
         }
         
-        // Function to update the menu with state data from an external message
+        // --- Added communication logic from jiggy.html ---
+        
+        let isContentPanelOpen = false;
+
         function updateMenuFromState(data) {
-            // Update the menu data and states based on the received data
             if (data.menus) {
                 menus = data.menus;
             }
@@ -354,17 +355,14 @@
             renderMenu(currentMenuId);
         }
 
-        // Add the message listener from jiggy.html
         window.addEventListener("message", (event) => {
             const { action, data } = event.data;
             if (action === "update" || action === "show") {
                 if (data) {
                     if (data.isContentPanelOpen !== isContentPanelOpen) {
-                        // Assuming you want to show/hide the menu based on this
                         menuContainer.style.visibility = data.isContentPanelOpen ? 'visible' : 'hidden';
                         isContentPanelOpen = data.isContentPanelOpen;
                     }
-
                     updateMenuFromState(data);
                     menuContainer.style.visibility = 'visible';
                 }
@@ -375,7 +373,6 @@
         });
 
         document.onkeydown = handleMenuInput;
-        // renderMenu('main'); // Commented out to prevent rendering until an external message is received.
     });
 </script>
 
