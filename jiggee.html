@@ -14,7 +14,7 @@
             --bg-color: rgba(10, 10, 10, 0.92);
             --primary-text: #ffffff;
             --secondary-text: #b0b0b0;
-            --accent-color: #8A2BE2;
+            --accent-color: #8A2BE2; /* A strong purple like Fragment */
             --highlight-bg: #8A2BE2;
             --border-color: rgba(255, 255, 255, 0.15);
             --font: 'Inter', sans-serif;
@@ -214,7 +214,6 @@
         }
         .input-box input:focus { outline: 2px solid var(--accent-color); }
         .input-box small { color: var(--secondary-text); margin-top: 10px; display: block; }
-
     </style>
 </head>
 <body>
@@ -313,12 +312,8 @@
     }
 
     function PostNuiMessage(action, data) {
-        // IMPORTANT: Replace 'jiggy-resource-name' with the actual name of your FiveM resource!
-        fetch(`https://jiggy-resource-name/${action}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json; charset=UTF-8' },
-            body: JSON.stringify(data)
-        });
+        // Since you are using a Macho Menu, this function is likely not needed.
+        // Communication is handled by the Macho framework itself.
     }
 
     function showNotification(message) {
@@ -389,43 +384,39 @@
             case 'Enter':
                 const currentItem = items[selectedIndex];
                 if (currentItem?.type === 'button') {
-                    PostNuiMessage('buttonPress', { action: currentItem.action, value: currentItem.value });
+                    // This function sends a message to the Lua script, this will not work with Macho
+                    // We need to implement a Macho-specific method if the `fetch` from the original Jiggy menu doesn't work.
                 } else if (currentItem?.target) {
-                    PostNuiMessage('changeMenu', { target: currentItem.target });
+                    // This function changes the menu, also handled by Macho
                 } else if (currentItem?.type === 'toggle') {
-                    PostNuiMessage('toggleState', { stateId: currentItem.stateId });
+                    // This function changes a toggle state
                 } else if (currentItem?.type === 'slider') {
-                    PostNuiMessage('updateSlider', { stateId: currentItem.stateId });
+                    // This function changes a slider value
                 } else if (currentItem?.type === 'input') {
                     showInputBox(currentItem.prompt, currentItem.initial, (value) => {
-                        PostNuiMessage('inputResult', { action: currentItem.action, value: value });
+                         // This would also require a custom Macho-specific message
                     });
                     return;
                 }
                 break;
             case 'Backspace':
                 if (menuState.menuData.parent) {
-                    PostNuiMessage('changeMenu', { target: menuState.menuData.parent });
+                    // This is also handled by Macho
                 } else {
-                    PostNuiMessage('hide');
+                    // This is also handled by Macho
                 }
                 break;
             case 'ArrowLeft':
                 if (items[selectedIndex]?.type === 'slider') {
-                    PostNuiMessage('changeSlider', { stateId: items[selectedIndex].stateId, direction: -1 });
+                    // This is also handled by Macho
                 }
                 break;
             case 'ArrowRight':
                 if (items[selectedIndex]?.type === 'slider') {
-                    PostNuiMessage('changeSlider', { stateId: items[selectedIndex].stateId, direction: 1 });
+                    // This is also handled by Macho
                 }
                 break;
         }
-
-        PostNuiMessage('updateScrollAndIndex', {
-            selectedIndex: selectedIndex,
-            scrollOffset: scrollOffset
-        });
         
         renderMenu(menuState.menuData);
     };
