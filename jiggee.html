@@ -9,23 +9,21 @@
     <link href="https://fonts.googleapis.com/css2?family=Courier+New:wght@400;700&family=Inconsolata:wght@700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --purple-neon: #8A2BE2;
-            --cyan-neon: #00FFFF;
-            --pink-neon: #FF00FF;
-            --purple-bg: rgba(20, 0, 40, 0.9);
-            --dark-panel-bg: rgba(0, 0, 0, 0.7);
-            --border-glow-1: rgba(128, 0, 255, 0.5);
-            --border-glow-2: rgba(0, 255, 255, 0.3);
-            --selected-bg: rgba(0, 0, 255, 0.4);
+            --primary-color: #A020F0; /* Purple */
+            --secondary-color: #00FFFF; /* Cyan */
+            --accent-color: #FF1493; /* Deep Pink */
+            --menu-bg-main: rgba(10, 0, 20, 0.85);
+            --menu-bg-layered: rgba(20, 0, 40, 0.7);
+            --selected-bg: rgba(0, 200, 255, 0.2);
             --selected-border: #00FFFF;
-            --input-border: #FF00FF;
+            --input-border: #FF1493;
             --input-focus-glow: #00FFFF;
         }
 
-        @keyframes pulse {
-            0% { box-shadow: 0 0 5px var(--cyan-neon), 0 0 10px var(--cyan-neon); }
-            50% { box-shadow: 0 0 15px var(--cyan-neon), 0 0 25px var(--cyan-neon); }
-            100% { box-shadow: 0 0 5px var(--cyan-neon), 0 0 10px var(--cyan-neon); }
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 5px var(--selected-border), 0 0 10px var(--selected-border); }
+            50% { box-shadow: 0 0 20px var(--selected-border), 0 0 30px var(--selected-border); }
+            100% { box-shadow: 0 0 5px var(--selected-border), 0 0 10px var(--selected-border); }
         }
 
         @keyframes fadeIn {
@@ -102,9 +100,9 @@
             white-space: pre;
         }
         
-        .redish-pink-char { color: var(--pink-neon); text-shadow: 0 0 5px var(--pink-neon); }
-        .cyan-char { color: var(--cyan-neon); text-shadow: 0 0 5px var(--cyan-neon); }
-        .purple-char { color: var(--purple-neon); text-shadow: 0 0 5px var(--purple-neon); }
+        .redish-pink-char { color: var(--accent-color); text-shadow: 0 0 5px var(--accent-color); }
+        .cyan-char { color: var(--secondary-color); text-shadow: 0 0 5px var(--secondary-color); }
+        .purple-char { color: var(--primary-color); text-shadow: 0 0 5px var(--primary-color); }
         .purplish-white-char { color: #C8BFE7; text-shadow: 0 0 5px #C8BFE7; }
         .white-char { color: #FFFFFF; text-shadow: 0 0 5px #FFFFFF; }
 
@@ -120,18 +118,19 @@
             pointer-events: auto;
             animation: fadeIn 0.3s ease-out;
             z-index: 10;
+            background: var(--menu-bg-main);
+            border: 1px solid var(--primary-color);
+            box-shadow: 0 0 20px rgba(160, 32, 240, 0.6), 0 0 40px rgba(255, 20, 147, 0.4);
+            backdrop-filter: blur(4px);
             display: flex;
             flex-direction: column;
-            background: var(--purple-bg);
-            border: 1px solid var(--border-glow-1);
-            box-shadow: 0 0 20px var(--border-glow-1), 0 0 30px var(--border-glow-2);
-            backdrop-filter: blur(4px);
         }
-        
+
         .menu-header {
             padding: 15px 20px;
-            border-bottom: 2px solid var(--cyan-neon);
-            box-shadow: 0 2px 15px rgba(0, 255, 255, 0.4);
+            background: var(--menu-bg-layered);
+            border-bottom: 2px solid var(--secondary-color);
+            box-shadow: 0 4px 15px rgba(0, 255, 255, 0.4);
             text-align: center;
         }
 
@@ -140,7 +139,7 @@
             font-size: 32px;
             font-weight: bold;
             color: white;
-            text-shadow: 0 0 15px var(--pink-neon), 0 0 25px var(--pink-neon);
+            text-shadow: 0 0 15px var(--accent-color), 0 0 25px var(--accent-color);
         }
 
         .menu-title span {
@@ -149,10 +148,10 @@
         
         .menu-status {
             font-size: 14px;
-            color: var(--purple-neon);
+            color: var(--primary-color);
             text-align: center;
             padding: 8px 0;
-            border-bottom: 1px solid rgba(128, 0, 255, 0.1);
+            border-bottom: 1px solid rgba(160, 32, 240, 0.2);
             position: relative;
         }
 
@@ -178,8 +177,8 @@
         .menu-option {
             padding: 12px 20px;
             font-size: 16px;
-            color: var(--cyan-neon);
-            text-shadow: 0 0 5px var(--cyan-neon);
+            color: var(--secondary-color);
+            text-shadow: 0 0 5px var(--secondary-color);
             cursor: pointer;
             transition: all 0.2s ease;
             position: relative;
@@ -189,7 +188,7 @@
 
         .menu-option:hover {
             color: white;
-            text-shadow: 0 0 10px var(--cyan-neon), 0 0 20px var(--cyan-neon);
+            text-shadow: 0 0 10px var(--secondary-color), 0 0 20px var(--secondary-color);
             transform: translateX(5px);
         }
 
@@ -199,6 +198,7 @@
             border-left: 3px solid var(--selected-border);
             text-shadow: 0 0 8px var(--selected-border);
             transform: translateX(5px);
+            animation: pulse-glow 1.5s infinite;
         }
 
         .mod-status {
@@ -206,9 +206,9 @@
             left: 50px;
             top: 50%;
             transform: translateY(-50%);
-            background: var(--dark-panel-bg);
-            border: 1px solid var(--pink-neon);
-            box-shadow: 0 0 15px var(--pink-neon);
+            background: var(--menu-bg-main);
+            border: 1px solid var(--accent-color);
+            box-shadow: 0 0 15px var(--accent-color);
             padding: 20px;
             width: 300px;
             height: 500px;
@@ -228,13 +228,13 @@
         }
 
         .mod-status-title {
-            color: var(--cyan-neon);
+            color: var(--secondary-color);
             font-weight: bold;
             margin-bottom: 10px;
             text-align: center;
-            border-bottom: 1px solid rgba(128, 0, 255, 0.2);
+            border-bottom: 1px solid rgba(160, 32, 240, 0.2);
             padding-bottom: 8px;
-            text-shadow: 0 0 8px var(--cyan-neon);
+            text-shadow: 0 0 8px var(--secondary-color);
         }
 
         .status-list {
@@ -252,7 +252,7 @@
         }
 
         .status-item.selected {
-            background: rgba(128, 0, 255, 0.2);
+            background: rgba(160, 32, 240, 0.2);
         }
 
         .status-on, .status-started { color: #39FF14; font-weight: bold; text-shadow: 0 0 5px #39FF14; }
@@ -264,8 +264,8 @@
             left: 0px;
             width: 5px;
             height: 100%;
-            background: var(--cyan-neon);
-            animation: pulse 1.5s infinite;
+            background: var(--selected-border);
+            animation: pulse-glow 1.5s infinite;
             transition: top 0.2s ease, height 0.2s ease;
             z-index: 3;
         }
@@ -278,7 +278,7 @@
             font-weight: bold;
             white-space: nowrap;
             overflow: hidden;
-            text-shadow: 0 0 5px rgba(128, 0, 255, 0.5);
+            text-shadow: 0 0 5px rgba(160, 32, 240, 0.5);
             pointer-events: auto;
         }
         
@@ -286,8 +286,8 @@
             display: inline-block;
         }
 
-        .jiggy-banner .pink { color: var(--pink-neon); text-shadow: 0 0 5px var(--pink-neon); }
-        .jiggy-banner .cyan { color: var(--cyan-neon); text-shadow: 0 0 5px var(--cyan-neon); }
+        .jiggy-banner .pink { color: var(--accent-color); text-shadow: 0 0 5px var(--accent-color); }
+        .jiggy-banner .cyan { color: var(--secondary-color); text-shadow: 0 0 5px var(--secondary-color); }
 
         .input-group {
             padding: 8px 15px;
@@ -297,7 +297,7 @@
         }
         
         .input-group.selected {
-            background: rgba(128, 0, 255, 0.2);
+            background: rgba(160, 32, 240, 0.2);
         }
 
         .input-group label {
@@ -317,7 +317,7 @@
             border-radius: 3px;
             color: #fff;
             font-size: 11px;
-            font-family: 'Courier New', monospace;
+            font-family: 'Inconsolata', monospace;
         }
 
         .input-field:focus {
@@ -342,11 +342,11 @@
     <div class="menu-container" id="menu-container">
         <div class="menu-header">
             <div class="menu-title" id="menu-title">
-                <span style="color:var(--pink-neon)">J</span><span style="color:var(--cyan-neon)">i</span><span style="color:var(--pink-neon)">g</span><span style="color:var(--cyan-neon)">g</span><span style="color:var(--pink-neon)">y</span>
-                <span style="color:var(--pink-neon)"> </span>
-                <span style="color:var(--cyan-neon)">M</span><span style="color:var(--pink-neon)">e</span><span style="color:var(--cyan-neon)">n</span><span style="color:var(--pink-neon)">u</span>
-                <span style="color:var(--pink-neon)"> </span>
-                <span style="color:var(--cyan-neon)">LUA</span>
+                <span style="color:var(--accent-color)">J</span><span style="color:var(--secondary-color)">i</span><span style="color:var(--accent-color)">g</span><span style="color:var(--secondary-color)">g</span><span style="color:var(--accent-color)">y</span>
+                <span style="color:var(--accent-color)"> </span>
+                <span style="color:var(--secondary-color)">M</span><span style="color:var(--accent-color)">e</span><span style="color:var(--secondary-color)">n</span><span style="color:var(--accent-color)">u</span>
+                <span style="color:var(--accent-color)"> </span>
+                <span style="color:var(--secondary-color)">LUA</span>
             </div>
             <div class="menu-status" id="menu-status">By Anonymous</div>
         </div>
