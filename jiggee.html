@@ -6,26 +6,18 @@
     <title>Jiggy Menu</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Courier+New:wght@400;700&family=Inconsolata:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --background-start: #0f0c29;
-            --background-mid: #302b63;
-            --background-end: #24243e;
-            --panel-bg: rgba(15, 15, 35, 0.95);
-            --panel-border: rgba(138, 43, 226, 0.3);
-            --primary-accent: #8A2BE2;
-            --secondary-accent: #00FFFF;
-            --text-primary: #FFFFFF;
-            --text-secondary: #B8B8B8;
-            --status-on: #00FF88;
-            --status-off: #FF4757;
-            --border-color: rgba(138, 43, 226, 0.4);
-            --shadow-color: rgba(138, 43, 226, 0.6);
-            --hover-bg: rgba(138, 43, 226, 0.15);
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+            --purple-neon: #8A2BE2;
+            --cyan-neon: #00FFFF;
+            --pink-neon: #FF00FF;
+            --purple-bg: rgba(45, 0, 85, 0.8);
+            --border-glow: rgba(128, 0, 255, 0.7);
+            --selected-bg: rgba(0, 0, 255, 0.4);
+            --selected-border: #00FFFF;
+            --input-border: #FF00FF;
+            --input-focus-glow: #00FFFF;
         }
 
         * {
@@ -36,33 +28,31 @@
         }
 
         body {
-            font-family: var(--font-primary);
+            font-family: 'Courier New', 'Inconsolata', monospace;
             background: transparent !important;
-            color: var(--text-primary);
+            color: white;
             overflow: hidden;
             height: 100vh;
             width: 100vw;
             pointer-events: none;
             display: block;
-            font-weight: 400;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
         }
 
-        /* --- Intro Screen Styles --- */
         #intro-container {
             position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
             text-align: center;
+            padding-top: 10vh;
             z-index: 20;
-            background: transparent;
+            background: rgba(0, 0, 0, 0.5);
             transition: opacity 1s ease-out;
-            pointer-events: all;
         }
         
         #intro-container.hidden {
@@ -74,420 +64,257 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 1.5rem;
         }
 
         .intro-welcome-message {
-            font-size: 3rem;
-            font-weight: 700;
+            font-size: 30px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.5);
             white-space: nowrap;
+            margin-bottom: 10px;
             opacity: 0;
             transition: opacity 1s ease-out;
-            text-shadow: 0 0 20px rgba(138, 43, 226, 0.8), 0 0 40px rgba(138, 43, 226, 0.4);
-            letter-spacing: -0.02em;
         }
 
         .intro-secondary-message {
-            font-size: 1.1rem;
-            font-weight: 400;
-            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: bold;
             white-space: nowrap;
             opacity: 0;
             transition: opacity 1s ease-out;
-            letter-spacing: 0.02em;
+        }
+
+        .text-line {
+            display: inline-block;
+            white-space: pre;
         }
         
-        /* Character coloring from JS (maintained original values) */
-        .redish-pink-char { color: #FF00FF; text-shadow: 0 0 8px #FF00FF; }
-        .cyan-char { color: #00FFFF; text-shadow: 0 0 8px #00FFFF; }
-        .purple-char { color: #8A2BE2; text-shadow: 0 0 8px #8A2BE2; }
-        .purplish-white-char { color: #C8BFE7; text-shadow: 0 0 8px #C8BFE7; }
-        .white-char { color: #FFFFFF; text-shadow: 0 0 8px #FFFFFF; }
+        .redish-pink-char { color: var(--pink-neon); text-shadow: 0 0 5px var(--pink-neon); }
+        .cyan-char { color: var(--cyan-neon); text-shadow: 0 0 5px var(--cyan-neon); }
+        .purple-char { color: var(--purple-neon); text-shadow: 0 0 5px var(--purple-neon); }
+        .purplish-white-char { color: #C8BFE7; text-shadow: 0 0 5px #C8BFE7; }
+        .white-char { color: #FFFFFF; text-shadow: 0 0 5px #FFFFFF; }
 
-        /* --- Base Panel Style --- */
-        .panel {
-            position: absolute;
-            background: var(--panel-bg);
-            border: 1px solid var(--panel-border);
-            border-radius: 20px;
-            backdrop-filter: blur(20px) saturate(1.2);
-            box-shadow: 
-                0 20px 40px rgba(0, 0, 0, 0.4),
-                0 0 20px var(--shadow-color),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            visibility: hidden;
-            pointer-events: auto;
-            animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        @keyframes fadeIn {
-            from { 
-                opacity: 0; 
-                transform: translateY(-50%) scale(0.9) translateZ(0);
-                filter: blur(10px);
-            }
-            to { 
-                opacity: 1; 
-                transform: translateY(-50%) scale(1) translateZ(0);
-                filter: blur(0px);
-            }
-        }
-
-        /* --- Main Menu Styles --- */
+        /* Main Menu Styles */
         .menu-container {
+            position: absolute;
             right: 50px;
             top: 50%;
             transform: translateY(-50%);
-            width: 340px;
-            height: 600px;
+            width: 350px;
+            visibility: hidden;
+            pointer-events: auto;
+            animation: fadeIn 0.3s ease-out;
             z-index: 10;
+            height: 600px;
         }
 
-        .menu-background { display: none; }
-
-        .menu-header {
-            padding: 24px 28px;
-            text-align: center;
-            border-bottom: 1px solid var(--border-color);
-            background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(0, 255, 255, 0.05));
-            position: relative;
-        }
-
-        .menu-header::before {
-            content: '';
+        .menu-background {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--primary-accent), transparent);
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--purple-bg);
+            border: 1px solid var(--border-glow);
+            box-shadow: 0 0 15px var(--border-glow);
+            backdrop-filter: blur(4px);
+            z-index: 1;
+        }
+        
+        .menu-header {
+            position: relative;
+            z-index: 2;
+            padding: 10px 0;
+            border-bottom: 2px solid var(--cyan-neon);
+            box-shadow: 0 2px 10px rgba(0, 255, 255, 0.3);
+            text-align: center;
         }
 
         .menu-title {
-            font-size: 2rem;
-            font-weight: 800;
-            text-shadow: 0 0 20px #FF00FF;
-            letter-spacing: -0.02em;
+            font-size: 32px;
+            font-weight: bold;
+            color: white;
+            padding: 10px 0;
+            text-shadow: 0 0 15px var(--pink-neon), 0 0 25px var(--pink-neon);
+            position: relative;
         }
 
+        .menu-title span {
+            display: inline-block;
+        }
+        
         .menu-status {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-top: 6px;
-            font-weight: 500;
-            opacity: 0.8;
+            font-size: 14px;
+            color: var(--purple-neon);
+            text-align: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(128, 0, 255, 0.1);
+            position: relative;
+            z-index: 2;
         }
 
         .menu-options-container {
             position: relative;
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 16px;
-            scrollbar-width: thin;
-            scrollbar-color: var(--primary-accent) transparent;
-        }
-        
-        .menu-options-container::-webkit-scrollbar {
-            width: 6px;
-        }
-        .menu-options-container::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .menu-options-container::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, var(--primary-accent), var(--secondary-accent));
-            border-radius: 10px;
+            height: calc(100% - 100px);
+            overflow-y: scroll;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            z-index: 2;
+            padding-top: 15px;
         }
 
-        .menu-options {
-            list-style: none;
+        .menu-options-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .menu-options { 
+            list-style: none; 
+            padding: 0; 
+            height: 100%;
         }
 
         .menu-option {
-            padding: 16px 20px;
-            font-size: 1rem;
-            font-weight: 500;
-            color: var(--text-secondary);
+            padding: 12px 20px;
+            font-size: 16px;
+            color: var(--cyan-neon);
+            text-shadow: 0 0 5px var(--cyan-neon);
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s ease;
             position: relative;
-            border-radius: 12px;
-            margin-bottom: 6px;
-            background: var(--glass-bg);
-            border: 1px solid transparent;
-            letter-spacing: 0.01em;
-        }
-
-        .menu-option::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 0;
-            background: linear-gradient(180deg, var(--primary-accent), var(--secondary-accent));
-            border-radius: 12px 0 0 12px;
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 3px solid transparent;
+            margin-bottom: 10px;
+            transform: translateX(0);
         }
 
         .menu-option:hover {
-            background: var(--hover-bg);
-            color: var(--text-primary);
-            transform: translateX(4px);
-            border-color: rgba(138, 43, 226, 0.3);
-        }
-
-        .menu-option:hover::before {
-            width: 3px;
+            color: white;
+            text-shadow: 0 0 10px var(--cyan-neon), 0 0 20px var(--cyan-neon);
+            transform: translateX(5px);
         }
 
         .menu-option.selected {
-            color: var(--text-primary);
-            background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(0, 255, 255, 0.1));
-            font-weight: 600;
-            border-color: var(--primary-accent);
-            transform: translateX(4px);
-            box-shadow: 0 0 20px rgba(138, 43, 226, 0.3);
+            color: white;
+            background: var(--selected-bg);
+            border-left: 3px solid var(--selected-border);
+            text-shadow: 0 0 8px var(--selected-border);
+            transform: translateX(5px);
         }
 
-        .menu-option.selected::before {
-            width: 3px;
-        }
-
-        .selection-indicator { display: none; }
-
-        /* --- Content Panel Styles --- */
         .mod-status {
+            position: absolute;
             left: 50px;
             top: 50%;
             transform: translateY(-50%);
-            width: 380px;
-            height: 600px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--pink-neon);
+            box-shadow: 0 0 15px var(--pink-neon);
+            padding: 20px;
+            width: 300px;
+            height: 500px;
+            font-size: 14px;
+            line-height: 1.8;
+            visibility: hidden;
+            pointer-events: auto;
+            overflow-y: scroll;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .mod-status::-webkit-scrollbar {
+            display: none;
         }
 
         .mod-status-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            padding: 24px 28px;
+            color: var(--cyan-neon);
+            font-weight: bold;
+            margin-bottom: 10px;
             text-align: center;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--secondary-accent);
-            text-shadow: 0 0 10px var(--secondary-accent);
-            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(138, 43, 226, 0.05));
-            position: relative;
-            letter-spacing: 0.02em;
+            border-bottom: 1px solid rgba(128, 0, 255, 0.2);
+            padding-bottom: 8px;
+            text-shadow: 0 0 8px var(--cyan-neon);
         }
 
-        .mod-status-title::before {
-            content: '';
+        .status-item { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 8px; 
+            padding: 5px;
+            transition: background 0.15s ease;
+            border-radius: 3px;
+        }
+
+        .status-item.selected {
+            background: rgba(128, 0, 255, 0.2);
+        }
+
+        .status-on, .status-started { color: #39FF14; font-weight: bold; text-shadow: 0 0 5px #39FF14; }
+        .status-off, .status-stopped { color: #FF073A; font-weight: bold; text-shadow: 0 0 5px #FF073A; }
+        .status-unknown { color: #FFFF33; font-weight: bold; text-shadow: 0 0 5px #FFFF33; }
+
+        .selection-indicator {
             position: absolute;
+            left: -5px;
             top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--secondary-accent), transparent);
+            width: 3px;
+            height: 100%;
+            background: var(--cyan-neon);
+            box-shadow: 0 0 10px var(--cyan-neon);
+            transition: top 0.2s ease, height 0.2s ease;
+            z-index: 3;
         }
 
-        #status-list {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            scrollbar-width: thin;
-            scrollbar-color: var(--secondary-accent) transparent;
-        }
-        
-        #status-list::-webkit-scrollbar {
-            width: 6px;
-        }
-        #status-list::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        #status-list::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, var(--secondary-accent), var(--primary-accent));
-            border-radius: 10px;
-        }
-
-        .status-item, .input-group {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 20px;
-            background: var(--glass-bg);
-            border-radius: 12px;
-            font-size: 0.95rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid transparent;
-            color: var(--text-primary);
-            font-weight: 500;
-            position: relative;
-        }
-        
-        .status-item::before, .input-group::before {
-            content: '';
+        .jiggy-banner {
             position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 0;
-            background: linear-gradient(180deg, var(--secondary-accent), var(--primary-accent));
-            border-radius: 12px 0 0 12px;
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            bottom: 820px;
+            left: 20px;
+            font-size: 25px;
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-shadow: 0 0 5px rgba(128, 0, 255, 0.5);
+            pointer-events: auto;
         }
         
-        .status-item:hover, .input-group:hover {
-            background: rgba(255, 255, 255, 0.08);
-            transform: translateX(4px);
-            border-color: rgba(0, 255, 255, 0.3);
+        .jiggy-banner span {
+            display: inline-block;
         }
 
-        .status-item:hover::before, .input-group:hover::before {
-            width: 3px;
-        }
-        
-        .status-item.selected, .input-group.selected {
-            background: linear-gradient(135deg, rgba(0, 255, 255, 0.15), rgba(138, 43, 226, 0.1));
-            border-color: var(--secondary-accent);
-            transform: translateX(4px);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
-        }
+        .jiggy-banner .pink { color: var(--pink-neon); text-shadow: 0 0 5px var(--pink-neon); }
+        .jiggy-banner .cyan { color: var(--cyan-neon); text-shadow: 0 0 5px var(--cyan-neon); }
 
-        .status-item.selected::before, .input-group.selected::before {
-            width: 3px;
-        }
-
-        /* Status colors */
-        .status-on, .status-started { 
-            color: var(--status-on); 
-            font-weight: 700; 
-            text-shadow: 0 0 8px var(--status-on);
-            background: rgba(0, 255, 136, 0.1);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        
-        .status-off, .status-stopped { 
-            color: var(--status-off); 
-            font-weight: 700; 
-            text-shadow: 0 0 8px var(--status-off);
-            background: rgba(255, 71, 87, 0.1);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        
-        .status-unknown { 
-            color: #FFD700; 
-            font-weight: 700; 
-            text-shadow: 0 0 8px #FFD700;
-            background: rgba(255, 215, 0, 0.1);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        
-        /* Input Field styles */
         .input-group {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 10px;
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.02);
+            transition: all 0.15s ease;
+            border-radius: 3px;
+        }
+        
+        .input-group.selected {
+            background: rgba(128, 0, 255, 0.2);
         }
 
         .input-group label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-secondary);
+            display: block;
+            margin-bottom: 4px;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
         }
 
         .input-field {
             width: 100%;
-            padding: 12px 16px;
-            background: rgba(0, 0, 0, 0.6);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-size: 0.9rem;
-            font-family: var(--font-mono);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-weight: 500;
+            padding: 4px 6px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--input-border);
+            border-radius: 3px;
+            color: #fff;
+            font-size: 11px;
+            font-family: 'Courier New', monospace;
         }
 
         .input-field:focus {
             outline: none;
-            border-color: var(--secondary-accent);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-            background: rgba(0, 0, 0, 0.8);
-        }
-
-        /* --- Watermark Banner --- */
-        .jiggy-banner {
-            position: absolute;
-            top: 30px;
-            left: 30px;
-            font-size: 2.5rem;
-            font-weight: 800;
-            pointer-events: auto;
-            opacity: 0.9;
-            text-shadow: 0 0 20px rgba(138, 43, 226, 0.8);
-            letter-spacing: -0.02em;
-            z-index: 15;
-        }
-        
-        .jiggy-banner .pink { color: #FF00FF; }
-        .jiggy-banner .cyan { color: #00FFFF; }
-
-        /* Smooth scrolling for panels */
-        .menu-options-container,
-        #status-list {
-            scroll-behavior: smooth;
-        }
-
-        /* Enhanced glow effects */
-        .menu-container.panel {
-            box-shadow: 
-                0 25px 50px rgba(0, 0, 0, 0.5),
-                0 0 30px rgba(138, 43, 226, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        }
-
-        .mod-status.panel {
-            box-shadow: 
-                0 25px 50px rgba(0, 0, 0, 0.5),
-                0 0 30px rgba(0, 255, 255, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        }
-
-        /* Responsive adjustments */
-        @media (max-height: 800px) {
-            .menu-container,
-            .mod-status {
-                height: 500px;
-            }
-        }
-
-        @media (max-width: 1200px) {
-            .menu-container {
-                width: 300px;
-                right: 30px;
-            }
-            
-            .mod-status {
-                width: 320px;
-                left: 30px;
-            }
+            border-color: var(--input-focus-glow);
+            box-shadow: 0 0 8px var(--input-focus-glow);
         }
     </style>
 </head>
@@ -503,31 +330,35 @@
         </div>
     </div>
 
-    <div class="menu-container panel" id="menu-container">
-        <div class="menu-background"></div> 
+    <div class="menu-container" id="menu-container">
+        <div class="menu-background"></div>
         <div class="menu-header">
             <div class="menu-title" id="menu-title">
-                <span style="color:#FF00FF">J</span><span style="color:#00FFFF">i</span><span style="color:#FF00FF">g</span><span style="color:#00FFFF">g</span><span style="color:#FF00FF">y</span>
-                <span style="color:#FF00FF"> </span>
-                <span style="color:#00FFFF">M</span><span style="color:#FF00FF">e</span><span style="color:#00FFFF">n</span><span style="color:#FF00FF">u</span>
+                <span style="color:var(--pink-neon)">J</span><span style="color:var(--cyan-neon)">i</span><span style="color:var(--pink-neon)">g</span><span style="color:var(--cyan-neon)">g</span><span style="color:var(--pink-neon)">y</span>
+                <span style="color:var(--pink-neon)"> </span>
+                <span style="color:var(--cyan-neon)">M</span><span style="color:var(--pink-neon)">e</span><span style="color:var(--cyan-neon)">n</span><span style="color:var(--pink-neon)">u</span>
+                <span style="color:var(--pink-neon)"> </span>
+                <span style="color:var(--cyan-neon)">LUA</span>
             </div>
-            <div class="menu-status" id="menu-status">By Anonymous</div>
         </div>
+        <div class="menu-status" id="menu-status">By Anonymous</div>
         <div class="menu-options-container">
-            <div class="selection-indicator" id="selectionIndicator"></div> 
+            <div class="selection-indicator" id="selectionIndicator"></div>
             <ul class="menu-options" id="menuOptions"></ul>
         </div>
     </div>
 
-    <div class="mod-status panel" id="mod-status">
+    <div class="mod-status" id="mod-status">
         <div class="mod-status-title" id="contentHeader">MOD STATUS</div>
         <div id="status-list"></div>
     </div>
 
     <div class="jiggy-banner" id="jiggy-banner">
         <span class="pink">J</span><span class="cyan">i</span><span class="pink">G</span><span class="cyan">g</span><span class="pink">Y</span>
-        <span class="pink">&nbsp;</span>
+        <span class="pink"> </span>
         <span class="cyan">M</span><span class="pink">e</span><span class="cyan">N</span><span class="pink">u</span>
+        <span class="cyan"> </span>
+        <span class="pink">L</span><span class="cyan">U</span><span class="pink">A</span>
     </div>
 
     <script>
@@ -611,12 +442,12 @@
                     if (!message1Data[i].typed) {
                         allCompleted = false;
                         if (animationFrame % scrambleSpeed === 0) {
-                                if (message1Data[i].scrambleCount < scrambleSpeed) {
-                                    message1Data[i].scrambleCount++;
-                                } else {
-                                    message1Data[i].typed = true;
-                                    break;
-                                }
+                             if (message1Data[i].scrambleCount < scrambleSpeed) {
+                                 message1Data[i].scrambleCount++;
+                             } else {
+                                 message1Data[i].typed = true;
+                                 break;
+                             }
                         }
                     }
                 }
@@ -626,12 +457,12 @@
                     if (!message2Data[i].typed) {
                         allCompleted = false;
                         if (animationFrame % scrambleSpeed === 0) {
-                                if (message2Data[i].scrambleCount < scrambleSpeed) {
-                                    message2Data[i].scrambleCount++;
-                                } else {
-                                    message2Data[i].typed = true;
-                                    break;
-                                }
+                             if (message2Data[i].scrambleCount < scrambleSpeed) {
+                                 message2Data[i].scrambleCount++;
+                             } else {
+                                 message2Data[i].typed = true;
+                                 break;
+                             }
                         }
                     }
                 }
@@ -665,7 +496,6 @@
         const selectionIndicator = document.getElementById('selectionIndicator');
         const bannerLetters = document.querySelectorAll('.jiggy-banner span');
 
-        // Maintained original neon colors for content items where no state is present
         const neonColors = ['#00FFFF', '#FF00FF', '#39FF14', '#FFD700', '#FF073A'];
 
         function safeEncode(text) {
@@ -690,10 +520,10 @@
                 
                 let itemHTML;
                 const isToggleOrState = (item.type === 'toggle' || (item.label && (item.label.toLowerCase().includes('toggle') || item.label.toLowerCase().includes('enabled') || item.label.toLowerCase().includes('boost') || item.label.toLowerCase().includes('crasher'))));
-                const isResourceState = (tabData.key === 'resources' && item.state !== undefined); // Check if it's a resource state
+                const isResourceState = (tabData.key === 'resources' && item.state !== undefined);
 
-                if (isToggleOrState || isResourceState) { // Apply to toggles, or any item in 'resources' with a state
-                    const statusClass = item.state ? (item.state.toLowerCase() === 'on' || item.state.toLowerCase() === 'started' ? 'status-on' : item.state.toLowerCase() === 'off' || item.state.toLowerCase() === 'stopped' ? 'status-off' : 'status-unknown') : '';
+                if (isToggleOrState || isResourceState) {
+                    const statusClass = item.state ? (item.state === 'ON' ? 'status-on' : item.state === 'OFF' ? 'status-off' : 'status-unknown') : '';
                     const statusText = item.state ? item.state : '';
                     itemHTML = `<span>${safeEncode(item.label || 'Unknown')}</span><span class="${statusClass}">${safeEncode(statusText)}</span>`;
                 } else if (item.type === 'input') {
@@ -706,7 +536,6 @@
                     element.classList.remove('status-item');
                 } else {
                     itemHTML = `<span>${safeEncode(item.label || 'Unknown')}</span>`;
-                    // Only apply neon colors to items without state if they are not input fields
                     element.style.color = neonColors[index % neonColors.length];
                 }
 
@@ -786,27 +615,30 @@
             if (menuOptions.length === 0) return;
             const selectedOption = menuOptions[currentSelection];
             if (!selectedOption) return;
-            // Scroll the selected item into view if it's not visible
-            selectedOption.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            const containerRect = document.querySelector('.menu-options-container').getBoundingClientRect();
+            const optionRect = selectedOption.getBoundingClientRect();
+            const relativeTop = optionRect.top - containerRect.top;
+            selectionIndicator.style.top = relativeTop + 'px';
+            selectionIndicator.style.height = optionRect.height + 'px';
         }
 
         function startBannerFlicker() {
             bannerLetters.forEach(letter => {
                 if (letter.textContent.trim() !== '') {
                     setInterval(() => {
-                        if (Math.random() > 0.85) { // less frequent flicker
+                        if (Math.random() > 0.7) {
                             const originalColor = letter.style.color;
                             const originalShadow = letter.style.textShadow;
                             
                             letter.style.color = '#fff';
-                            letter.style.textShadow = '0 0 15px #fff, 0 0 25px #fff';
+                            letter.style.textShadow = '0 0 10px #fff, 0 0 20px #fff';
                             
                             setTimeout(() => {
                                 letter.style.color = originalColor;
                                 letter.style.textShadow = originalShadow;
-                            }, 60 + Math.random() * 100);
+                            }, 50 + Math.random() * 100);
                         }
-                    }, 100 + Math.random() * 500);
+                    }, 100 + Math.random() * 400);
                 }
             });
         }
