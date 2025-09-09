@@ -217,8 +217,6 @@
             background: rgba(128, 0, 255, 0.2);
         }
 
-        .status-on, .status-started { color: #39FF14; font-weight: bold; text-shadow: 0 0 5px #39FF14; }
-        .status-off, .status-stopped { color: #FF073A; font-weight: bold; text-shadow: 0 0 5px #FF073A; }
         .status-unknown { color: #FFFF33; font-weight: bold; text-shadow: 0 0 5px #FFFF33; }
 
         .selection-indicator {
@@ -491,8 +489,6 @@
                 const isResourceState = (tabData.key === 'resources' && item.state !== undefined);
 
                 if (isToggleOrState || isResourceState) {
-                    const statusState = (item.state === 'on' || item.state === 'started') ? 'ON' : 'OFF';
-                    const statusClass = (item.state === 'on' || item.state === 'started') ? 'status-on' : 'status-off';
                     itemHTML = `<span>${safeEncode(item.label || 'Unknown')}</span><span class="${statusClass}">${statusState}</span>`;
                     element.style.color = neonColors[index % neonColors.length];
                 } else if (item.type === 'input') {
