@@ -621,7 +621,7 @@
                     content += `<i class="chevron fa-solid fa-angle-right"></i>`;
                 } else if (item.type === 'toggle') {
                     const isChecked = optionStates[item.stateId] || false;
-                    content += `<div class="item-value"><span class="toggle-indicator ${isChecked ? 'on' : 'off'}">[ ${isChecked ? 'On' : 'Off'} ]</span></div>`;
+                    content += `<div class="item-value"></div>`;
                 } else if (item.type === 'slider') {
                     const value = optionStates[item.stateId] || item.min;
                     const percent = ((value - item.min) / (item.max - item.min)) * 100;
