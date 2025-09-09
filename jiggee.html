@@ -1,992 +1,765 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jiggy Menu</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jiggy Menu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
 
-        body {
-            font-family: 'Rajdhani', 'Orbitron', monospace;
-            background: transparent !important;
-            color: white;
-            overflow: hidden;
-            height: 100vh;
-            width: 100vw;
-            pointer-events: none;
-            display: block;
-        }
+        body {
+            font-family: 'Inter', 'Fira Code', sans-serif;
+            background: transparent !important;
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            pointer-events: none;
+            display: block;
+        }
 
-        /* Animated background particles */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(255, 0, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(0, 255, 255, 0.1) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: -1;
-            animation: backgroundPulse 4s ease-in-out infinite alternate;
-        }
+        #intro-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            text-align: center;
+            padding-top: 10vh;
+            z-index: 20;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+            transition: opacity 1s ease-out;
+        }
+        
+        #intro-container.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
 
-        @keyframes backgroundPulse {
-            0% { opacity: 0.3; }
-            100% { opacity: 0.7; }
-        }
+        .message-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-        #intro-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            text-align: center;
-            padding-top: 10vh;
-            z-index: 20;
-            background: 
-                linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(45, 0, 85, 0.6) 100%),
-                radial-gradient(circle at center, rgba(255, 0, 255, 0.1) 0%, transparent 70%);
-            backdrop-filter: blur(10px);
-            transition: opacity 1s ease-out;
-        }
-        
-        #intro-container.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
+        .intro-welcome-message {
+            font-size: 28px;
+            font-weight: 600;
+            text-shadow: 0 2px 10px rgba(255, 255, 255, 0.3);
+            white-space: nowrap;
+            margin-bottom: 12px;
+            opacity: 0;
+            transition: opacity 1s ease-out;
+            letter-spacing: 1px;
+        }
 
-        .message-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-        }
+        .intro-secondary-message {
+            font-size: 14px;
+            font-weight: 400;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 1s ease-out;
+            color: rgba(255, 255, 255, 0.8);
+            letter-spacing: 0.5px;
+        }
 
-        .message-container::before {
-            content: '';
-            position: absolute;
-            top: -50px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 200px;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #FF00FF, #00FFFF, transparent);
-            animation: scanLine 2s linear infinite;
-        }
+        .text-line {
+            display: inline-block;
+            white-space: pre;
+        }
+        
+        .redish-pink-char { color: #FF00FF; text-shadow: 0 0 8px rgba(255, 0, 255, 0.4); }
+        .cyan-char { color: #00FFFF; text-shadow: 0 0 8px rgba(0, 255, 255, 0.4); }
+        .purple-char { color: #8A2BE2; text-shadow: 0 0 8px rgba(138, 43, 226, 0.4); }
+        .purplish-white-char { color: #C8BFE7; text-shadow: 0 0 8px rgba(200, 191, 231, 0.4); }
+        .white-char { color: #FFFFFF; text-shadow: 0 0 8px rgba(255, 255, 255, 0.3); }
 
-        @keyframes scanLine {
-            0% { opacity: 0; transform: translateX(-50%) scaleX(0); }
-            50% { opacity: 1; transform: translateX(-50%) scaleX(1); }
-            100% { opacity: 0; transform: translateX(-50%) scaleX(0); }
-        }
+        /* Clean Modern Menu */
+        .menu-container {
+            position: absolute;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 320px;
+            visibility: hidden;
+            pointer-events: auto;
+            z-index: 10;
+            height: 500px;
+        }
 
-        .intro-welcome-message {
-            font-family: 'Orbitron', monospace;
-            font-size: 36px;
-            font-weight: 900;
-            text-shadow: 
-                0 0 10px currentColor, 
-                0 0 20px currentColor, 
-                0 0 40px currentColor,
-                0 5px 15px rgba(0, 0, 0, 0.5);
-            white-space: nowrap;
-            margin-bottom: 20px;
-            opacity: 0;
-            transition: opacity 1s ease-out;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-        }
+        .menu-background {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 15, 25, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
 
-        .intro-secondary-message {
-            font-size: 16px;
-            font-weight: 600;
-            white-space: nowrap;
-            opacity: 0;
-            transition: opacity 1s ease-out;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            background: linear-gradient(90deg, #FF00FF, #00FFFF, #FF00FF);
-            background-size: 200% 100%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: gradientShift 3s ease-in-out infinite;
-        }
+        .menu-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+            text-align: center;
+            padding: 20px 0 16px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 2;
+            margin: 0 20px;
+            letter-spacing: 2px;
+        }
+        
+        .menu-title span {
+            display: inline-block;
+        }
 
-        @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
+        .menu-status {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.6);
+            text-align: center;
+            padding: 8px 0;
+            position: relative;
+            z-index: 2;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-        .text-line {
-            display: inline-block;
-            white-space: pre;
-        }
-        
-        .redish-pink-char { color: #FF00FF; text-shadow: 0 0 5px #FF00FF, 0 0 15px #FF00FF; }
-        .cyan-char { color: #00FFFF; text-shadow: 0 0 5px #00FFFF, 0 0 15px #00FFFF; }
-        .purple-char { color: #8A2BE2; text-shadow: 0 0 5px #8A2BE2, 0 0 15px #8A2BE2; }
-        .purplish-white-char { color: #C8BFE7; text-shadow: 0 0 5px #C8BFE7, 0 0 15px #C8BFE7; }
-        .white-char { color: #FFFFFF; text-shadow: 0 0 5px #FFFFFF, 0 0 15px #FFFFFF; }
+        .menu-options-container {
+            position: relative;
+            height: calc(100% - 80px);
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+            z-index: 2;
+            padding: 0 20px 20px 20px;
+        }
 
-        /* Enhanced Menu Styles */
-        .menu-container {
-            position: absolute;
-            right: 50px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 380px;
-            visibility: hidden;
-            pointer-events: auto;
-            animation: slideInRight 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            z-index: 10;
-            height: 650px;
-            filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.5));
-        }
+        .menu-options-container::-webkit-scrollbar {
+            width: 2px;
+        }
 
-        @keyframes slideInRight {
-            from { 
-                transform: translateY(-50%) translateX(100px);
-                opacity: 0;
-            }
-            to { 
-                transform: translateY(-50%) translateX(0);
-                opacity: 1;
-            }
-        }
+        .menu-options-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
 
-        .menu-background {
-            position: absolute;
-            top: -30px; left: -30px; right: -30px; bottom: -30px;
-            background: 
-                linear-gradient(135deg, rgba(20, 0, 40, 0.95) 0%, rgba(45, 0, 85, 0.9) 50%, rgba(10, 0, 30, 0.95) 100%);
-            border: 2px solid transparent;
-            border-radius: 20px;
-            backdrop-filter: blur(15px);
-            position: relative;
-        }
+        .menu-options-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 1px;
+        }
 
-        .menu-background::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            padding: 2px;
-            background: linear-gradient(135deg, #FF00FF, #00FFFF, #8A2BE2, #FF00FF);
-            border-radius: 20px;
-            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            mask-composite: xor;
-            -webkit-mask-composite: xor;
-            animation: borderGlow 3s linear infinite;
-        }
+        .menu-options { 
+            list-style: none; 
+            padding: 10px 0; 
+            height: 100%;
+        }
 
-        @keyframes borderGlow {
-            0% { filter: hue-rotate(0deg) brightness(1); }
-            50% { filter: hue-rotate(180deg) brightness(1.2); }
-            100% { filter: hue-rotate(360deg) brightness(1); }
-        }
+        .menu-option {
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
 
-        .menu-background::after {
-            content: '';
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            right: 10px;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            animation: shimmer 2s ease-in-out infinite;
-        }
+        .menu-option:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #00FFFF;
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+            transform: translateX(4px);
+        }
 
-        @keyframes shimmer {
-            0% { opacity: 0; transform: translateX(-100%); }
-            50% { opacity: 1; transform: translateX(0); }
-            100% { opacity: 0; transform: translateX(100%); }
-        }
+        .menu-option.selected {
+            background: linear-gradient(90deg, rgba(255, 0, 255, 0.15), rgba(0, 255, 255, 0.15));
+            color: white;
+            border-left: 3px solid #FF00FF;
+            padding-left: 13px;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+        }
 
-        .menu-title {
-            font-family: 'Orbitron', monospace;
-            font-size: 32px;
-            font-weight: 900;
-            color: white;
-            text-align: center;
-            padding: 25px 0;
-            text-shadow: 
-                0 0 10px currentColor,
-                0 0 20px currentColor,
-                0 0 40px currentColor;
-            border-bottom: 2px solid;
-            border-image: linear-gradient(90deg, #FF00FF, #00FFFF, #FF00FF) 1;
-            position: relative;
-            z-index: 2;
-            letter-spacing: 3px;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
-            margin: 15px;
-            border-radius: 10px 10px 0 0;
-        }
-        
-        .menu-title span {
-            display: inline-block;
-            animation: titleGlow 2s ease-in-out infinite alternate;
-        }
+        .mod-status {
+            position: absolute;
+            left: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(15, 15, 25, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            width: 280px;
+            height: 420px; 
+            font-size: 13px;
+            line-height: 1.6;
+            visibility: hidden;
+            pointer-events: auto;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+        }
 
-        @keyframes titleGlow {
-            0% { filter: brightness(1) saturate(1); }
-            100% { filter: brightness(1.3) saturate(1.5); }
-        }
+        .mod-status::-webkit-scrollbar {
+            width: 2px;
+        }
 
-        .menu-status {
-            font-size: 14px;
-            color: #C8BFE7;
-            text-align: center;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(128, 0, 255, 0.3);
-            position: relative;
-            z-index: 2;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            background: rgba(0, 0, 0, 0.2);
-            margin: 0 15px;
-        }
+        .mod-status::-webkit-scrollbar-track {
+            background: transparent;
+        }
 
-        .menu-options-container {
-            position: relative;
-            height: calc(100% - 150px);
-            overflow-y: scroll;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            z-index: 2;
-            margin: 0 15px 15px 15px;
-            border-radius: 0 0 10px 10px;
-            background: rgba(0, 0, 0, 0.1);
-        }
+        .mod-status::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 1px;
+        }
 
-        .menu-options-container::-webkit-scrollbar {
-            display: none;
-        }
+        .mod-status-title {
+            color: #00FFFF;
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 16px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 8px;
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
 
-        .menu-options { 
-            list-style: none; 
-            padding: 15px 0; 
-            height: 100%;
-        }
+        .status-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            margin-bottom: 6px; 
+            padding: 8px 12px;
+            transition: all 0.2s ease;
+            border-radius: 6px;
+            font-weight: 500;
+        }
 
-        .menu-option {
-            padding: 18px 25px;
-            font-size: 18px;
-            font-weight: 600;
-            color: #00FFFF;
-            text-shadow: 0 0 10px currentColor;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            position: relative;
-            border-left: 4px solid transparent;
-            margin: 8px 0;
-            border-radius: 0 15px 15px 0;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            backdrop-filter: blur(5px);
-        }
+        .status-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(2px);
+        }
 
-        .menu-option::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 0;
-            background: linear-gradient(90deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
-            transition: width 0.3s ease;
-            border-radius: 0 15px 15px 0;
-        }
+        .status-item.selected {
+            background: rgba(255, 0, 255, 0.1);
+            border-left: 2px solid #FF00FF;
+            padding-left: 10px;
+        }
 
-        .menu-option::after {
-            content: '▶';
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            opacity: 0;
-            transition: all 0.3s ease;
-            color: #FF00FF;
-            text-shadow: 0 0 10px currentColor;
-        }
+        .status-on, .status-started { 
+            color: #39FF14; 
+            font-weight: 600; 
+            text-shadow: 0 0 6px rgba(57, 255, 20, 0.4);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .status-off, .status-stopped { 
+            color: #FF073A; 
+            font-weight: 600; 
+            text-shadow: 0 0 6px rgba(255, 7, 58, 0.4);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .status-unknown { 
+            color: #FFFF33; 
+            font-weight: 600; 
+            text-shadow: 0 0 6px rgba(255, 255, 51, 0.4);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
-        .menu-option:hover {
-            color: white;
-            background: rgba(0, 255, 255, 0.1);
-            border-left: 4px solid #00FFFF;
-            text-shadow: 0 0 15px currentColor, 0 0 30px currentColor;
-            transform: translateX(10px) scale(1.02);
-            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
-        }
+        .selection-indicator {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(180deg, #FF00FF, #00FFFF);
+            transition: all 0.3s ease;
+            z-index: 3;
+            border-radius: 0 2px 2px 0;
+            opacity: 0;
+        }
 
-        .menu-option:hover::before {
-            width: 100%;
-        }
+        .menu-option.selected ~ .selection-indicator,
+        .menu-option:hover ~ .selection-indicator {
+            opacity: 1;
+        }
 
-        .menu-option:hover::after {
-            opacity: 1;
-            transform: translateY(-50%) translateX(-5px);
-        }
+        .jiggy-banner {
+            position: absolute;
+            bottom: 50px;
+            left: 30px;
+            font-size: 18px;
+            font-weight: 700;
+            white-space: nowrap;
+            pointer-events: auto;
+            letter-spacing: 2px;
+            background: rgba(15, 15, 25, 0.8);
+            backdrop-filter: blur(15px);
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        .jiggy-banner span {
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
 
-        .menu-option.selected {
-            color: white;
-            background: linear-gradient(135deg, rgba(255, 0, 255, 0.2), rgba(0, 255, 255, 0.2));
-            border-left: 4px solid #FF00FF;
-            text-shadow: 0 0 15px currentColor, 0 0 30px currentColor;
-            transform: translateX(15px) scale(1.05);
-            box-shadow: 0 15px 40px rgba(255, 0, 255, 0.4);
-        }
+        .jiggy-banner:hover span {
+            transform: scale(1.1);
+        }
 
-        .menu-option.selected::before {
-            width: 100%;
-        }
+        .jiggy-banner .pink { 
+            color: #FF00FF; 
+            text-shadow: 0 0 6px rgba(255, 0, 255, 0.4); 
+        }
+        .jiggy-banner .cyan { 
+            color: #00FFFF; 
+            text-shadow: 0 0 6px rgba(0, 255, 255, 0.4); 
+        }
 
-        .menu-option.selected::after {
-            opacity: 1;
-            transform: translateY(-50%) translateX(-5px);
-            animation: pulse 1.5s ease-in-out infinite;
-        }
+        .input-group {
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.03);
+            transition: all 0.2s ease;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 8px;
+        }
+        
+        .input-group.selected {
+            background: rgba(255, 0, 255, 0.1);
+            border: 1px solid rgba(255, 0, 255, 0.3);
+            transform: scale(1.02);
+        }
 
-        @keyframes pulse {
-            0%, 100% { transform: translateY(-50%) translateX(-5px) scale(1); }
-            50% { transform: translateY(-50%) translateX(-5px) scale(1.2); }
-        }
+        .input-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
-        .mod-status {
-            position: absolute;
-            left: 50px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: linear-gradient(135deg, rgba(10, 0, 25, 0.95) 0%, rgba(25, 0, 50, 0.9) 50%, rgba(5, 0, 20, 0.95) 100%);
-            border: 2px solid transparent;
-            border-radius: 20px;
-            backdrop-filter: blur(15px);
-            padding: 30px;
-            width: 350px;
-            height: 550px; 
-            font-size: 15px;
-            line-height: 1.8;
-            visibility: hidden;
-            pointer-events: auto;
-            overflow-y: scroll;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.5));
-            position: relative;
-        }
+        .input-field {
+            width: 100%;
+            padding: 6px 10px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            color: #fff;
+            font-size: 12px;
+            font-family: 'Fira Code', monospace;
+            font-weight: 400;
+            transition: all 0.2s ease;
+        }
 
-        .mod-status::before {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            padding: 2px;
-            background: linear-gradient(135deg, #FF00FF, #00FFFF, #8A2BE2, #FF00FF);
-            border-radius: 20px;
-            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            mask-composite: xor;
-            -webkit-mask-composite: xor;
-            animation: borderGlow 3s linear infinite;
-        }
+        .input-field:focus {
+            outline: none;
+            border-color: #00FFFF;
+            box-shadow: 0 0 8px rgba(0, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.6);
+        }
 
-        .mod-status::-webkit-scrollbar {
-            display: none;
-        }
+        /* Subtle animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-        .mod-status-title {
-            font-family: 'Orbitron', monospace;
-            color: #00FFFF;
-            font-weight: 900;
-            font-size: 18px;
-            margin-bottom: 20px;
-            text-align: center;
-            border-bottom: 2px solid;
-            border-image: linear-gradient(90deg, transparent, #00FFFF, transparent) 1;
-            padding-bottom: 15px;
-            text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
+        .menu-container[style*="visible"] {
+            animation: fadeIn 0.3s ease-out;
+        }
 
-        .status-item { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            margin-bottom: 8px; 
-            padding: 12px 15px;
-            transition: all 0.3s ease;
-            border-radius: 10px;
-            border-left: 3px solid transparent;
-            font-weight: 600;
-            backdrop-filter: blur(5px);
-        }
+        .mod-status[style*="visible"] {
+            animation: fadeIn 0.3s ease-out;
+        }
 
-        .status-item:hover {
-            background: rgba(128, 0, 255, 0.1);
-            border-left: 3px solid #8A2BE2;
-            transform: translateX(5px);
-            box-shadow: 0 5px 20px rgba(128, 0, 255, 0.2);
-        }
-
-        .status-item.selected {
-            background: linear-gradient(135deg, rgba(128, 0, 255, 0.2), rgba(255, 0, 255, 0.1));
-            border-left: 3px solid #FF00FF;
-            transform: translateX(10px);
-            box-shadow: 0 8px 25px rgba(255, 0, 255, 0.3);
-        }
-
-        .status-on, .status-started { 
-            color: #39FF14; 
-            font-weight: bold; 
-            text-shadow: 0 0 10px currentColor;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .status-off, .status-stopped { 
-            color: #FF073A; 
-            font-weight: bold; 
-            text-shadow: 0 0 10px currentColor;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .status-unknown { 
-            color: #FFFF33; 
-            font-weight: bold; 
-            text-shadow: 0 0 10px currentColor;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .selection-indicator {
-            position: absolute;
-            left: -5px;
-            top: 0;
-            width: 4px;
-            height: 100%;
-            background: linear-gradient(180deg, #FF00FF, #00FFFF, #FF00FF);
-            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            z-index: 3;
-            border-radius: 2px;
-            box-shadow: 0 0 20px currentColor;
-            animation: indicatorPulse 2s ease-in-out infinite;
-        }
-
-        @keyframes indicatorPulse {
-            0%, 100% { box-shadow: 0 0 20px rgba(255, 0, 255, 0.5); }
-            50% { box-shadow: 0 0 30px rgba(0, 255, 255, 0.8); }
-        }
-
-        .jiggy-banner {
-            position: absolute;
-            bottom: 820px;
-            left: 30px;
-            font-family: 'Orbitron', monospace;
-            font-size: 28px;
-            font-weight: 900;
-            white-space: nowrap;
-            overflow: hidden;
-            text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
-            pointer-events: auto;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), transparent);
-            padding: 15px 25px;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-        }
-        
-        .jiggy-banner span {
-            display: inline-block;
-            transition: all 0.3s ease;
-        }
-
-        .jiggy-banner:hover span {
-            animation: letterBounce 0.6s ease-in-out;
-        }
-
-        @keyframes letterBounce {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-10px) scale(1.2); }
-        }
-
-        .jiggy-banner .pink { 
-            color: #FF00FF; 
-            text-shadow: 0 0 10px #FF00FF, 0 0 20px #FF00FF; 
-        }
-        .jiggy-banner .cyan { 
-            color: #00FFFF; 
-            text-shadow: 0 0 10px #00FFFF, 0 0 20px #00FFFF; 
-        }
-
-        .input-group {
-            padding: 15px 20px;
-            background: rgba(255, 255, 255, 0.03);
-            transition: all 0.3s ease;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 10px;
-        }
-        
-        .input-group.selected {
-            background: linear-gradient(135deg, rgba(128, 0, 255, 0.15), rgba(255, 0, 255, 0.1));
-            border: 1px solid rgba(255, 0, 255, 0.3);
-            box-shadow: 0 8px 25px rgba(255, 0, 255, 0.2);
-            transform: scale(1.02);
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #C8BFE7;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            text-shadow: 0 0 5px currentColor;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 8px 12px;
-            background: rgba(0, 0, 0, 0.6);
-            border: 2px solid rgba(255, 0, 255, 0.3);
-            border-radius: 8px;
-            color: #fff;
-            font-size: 13px;
-            font-family: 'Rajdhani', monospace;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .input-field:focus {
-            outline: none;
-            border-color: #00FFFF;
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
-            background: rgba(0, 0, 0, 0.8);
-        }
-
-        /* Enhanced particle effects */
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(180deg); }
-        }
-
-        /* Glitch effect for enhanced cyberpunk feel */
-        .glitch {
-            position: relative;
-        }
-
-        .glitch::before,
-        .glitch::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .glitch::before {
-            animation: glitch-1 0.5s infinite linear alternate-reverse;
-            color: #FF00FF;
-            z-index: -1;
-        }
-
-        .glitch::after {
-            animation: glitch-2 0.5s infinite linear alternate-reverse;
-            color: #00FFFF;
-            z-index: -2;
-        }
-
-        @keyframes glitch-1 {
-            0% { transform: translate(0); }
-            20% { transform: translate(-2px, 2px); }
-            40% { transform: translate(-2px, -2px); }
-            60% { transform: translate(2px, 2px); }
-            80% { transform: translate(2px, -2px); }
-            100% { transform: translate(0); }
-        }
-
-        @keyframes glitch-2 {
-            0% { transform: translate(0); }
-            20% { transform: translate(2px, -2px); }
-            40% { transform: translate(2px, 2px); }
-            60% { transform: translate(-2px, -2px); }
-            80% { transform: translate(-2px, 2px); }
-            100% { transform: translate(0); }
-        }
-
-        /* Smooth transitions for all interactive elements */
-        * {
-            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-    </style>
+        /* Clean minimal scrollbar for Firefox */
+        .menu-options-container,
+        .mod-status {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+        }
+    </style>
 </head>
 <body>
-    <div id="intro-container">
-        <div class="message-container">
-            <div class="intro-welcome-message" id="intro-welcome-message">
-                <span class="text-line" id="intro-welcome-message-text"></span>
-            </div>
-            <div class="intro-secondary-message" id="intro-secondary-message">
-                <span class="text-line" id="intro-secondary-message-text"></span>
-            </div>
-        </div>
-    </div>
+    <div id="intro-container">
+        <div class="message-container">
+            <div class="intro-welcome-message" id="intro-welcome-message">
+                <span class="text-line" id="intro-welcome-message-text"></span>
+            </div>
+            <div class="intro-secondary-message" id="intro-secondary-message">
+                <span class="text-line" id="intro-secondary-message-text"></span>
+            </div>
+        </div>
+    </div>
 
-    <div class="menu-container" id="menu-container">
-        <div class="menu-background"></div>
-        <div class="menu-title" id="menu-title">
-            <span style="color:#FF00FF">J</span><span style="color:#00FFFF">i</span><span style="color:#FF00FF">g</span><span style="color:#00FFFF">g</span><span style="color:#FF00FF">y</span>
-            <span style="color:#FF00FF"> </span>
-            <span style="color:#00FFFF">M</span><span style="color:#FF00FF">e</span><span style="color:#00FFFF">n</span><span style="color:#FF00FF">u</span>
-            <span style="color:#FF00FF"> </span>
-            <span style="color:#00FFFF">LUA</span>
-        </div>
-        <div class="menu-status" id="menu-status">By Anonymous</div>
-        <div class="menu-options-container">
-            <div class="selection-indicator" id="selectionIndicator"></div>
-            <ul class="menu-options" id="menuOptions"></ul>
-        </div>
-    </div>
+    <div class="menu-container" id="menu-container">
+        <div class="menu-background"></div>
+        <div class="menu-title" id="menu-title">
+            <span style="color:#FF00FF">J</span><span style="color:#00FFFF">i</span><span style="color:#FF00FF">g</span><span style="color:#00FFFF">g</span><span style="color:#FF00FF">y</span>
+            <span style="color:#FF00FF"> </span>
+            <span style="color:#00FFFF">M</span><span style="color:#FF00FF">e</span><span style="color:#00FFFF">n</span><span style="color:#FF00FF">u</span>
+            <span style="color:#FF00FF"> </span>
+            <span style="color:#00FFFF">LUA</span>
+        </div>
+        <div class="menu-status" id="menu-status">By Anonymous</div>
+        <div class="menu-options-container">
+            <div class="selection-indicator" id="selectionIndicator"></div>
+            <ul class="menu-options" id="menuOptions"></ul>
+        </div>
+    </div>
 
-    <div class="mod-status" id="mod-status">
-        <div class="mod-status-title" id="contentHeader">MOD STATUS</div>
-        <div id="status-list"></div>
-    </div>
+    <div class="mod-status" id="mod-status">
+        <div class="mod-status-title" id="contentHeader">MOD STATUS</div>
+        <div id="status-list"></div>
+    </div>
 
-    <div class="jiggy-banner" id="jiggy-banner">
-        <span class="pink">J</span><span class="cyan">i</span><span class="pink">G</span><span class="cyan">g</span><span class="pink">Y</span>
-        <span class="pink"> </span>
-        <span class="cyan">M</span><span class="pink">e</span><span class="cyan">N</span><span class="pink">u</span>
-        <span class="cyan"> </span>
-        <span class="pink">L</span><span class="cyan">U</span><span class="pink">A</span>
-    </div>
+    <div class="jiggy-banner" id="jiggy-banner">
+        <span class="pink">J</span><span class="cyan">i</span><span class="pink">G</span><span class="cyan">g</span><span class="pink">Y</span>
+        <span class="pink"> </span>
+        <span class="cyan">M</span><span class="pink">e</span><span class="cyan">N</span><span class="pink">u</span>
+        <span class="cyan"> </span>
+        <span class="pink">L</span><span class="cyan">U</span><span class="pink">A</span>
+    </div>
 
-    <script>
-        // Intro Screen Script
-        document.addEventListener("DOMContentLoaded", () => {
-            const introContainer = document.getElementById('intro-container');
-            const introWelcomeMessage = document.getElementById('intro-welcome-message');
-            const introWelcomeMessageText = document.getElementById('intro-welcome-message-text');
-            const introSecondaryMessage = document.getElementById('intro-secondary-message');
-            const introSecondaryMessageText = document.getElementById('intro-secondary-message-text');
+    <script>
+        // Intro Screen Script
+        document.addEventListener("DOMContentLoaded", () => {
+            const introContainer = document.getElementById('intro-container');
+            const introWelcomeMessage = document.getElementById('intro-welcome-message');
+            const introWelcomeMessageText = document.getElementById('intro-welcome-message-text');
+            const introSecondaryMessage = document.getElementById('intro-secondary-message');
+            const introSecondaryMessageText = document.getElementById('intro-secondary-message-text');
 
-            const message1 = "Hello there, Welcome to Jiggy Menu LUA";
-            const message2 = "All updates on discord jiggymenulua";
-            const scrambleChars = "0123456789!@#$%^&*()_+-=[]{}|;':,./<>?~`";
-            
-            const message1Data = Array.from(message1).map(char => ({ char: char, typed: false, scrambleCount: 0 }));
-            const message2Data = Array.from(message2).map(char => ({ char: char, typed: false, scrambleCount: 0 }));
-            
-            const scrambleSpeed = 5;
-            let animationFrame = 0;
+            const message1 = "Hello there, Welcome to Jiggy Menu LUA";
+            const message2 = "All updates on discord jiggymenulua";
+            const scrambleChars = "0123456789!@#$%^&*()_+-=[]{}|;':,./<>?~`";
+            
+            const message1Data = Array.from(message1).map(char => ({ char: char, typed: false, scrambleCount: 0 }));
+            const message2Data = Array.from(message2).map(char => ({ char: char, typed: false, scrambleCount: 0 }));
+            
+            const scrambleSpeed = 5;
+            let animationFrame = 0;
 
-            function getRandomChar() {
-                return scrambleChars[Math.floor(Math.random() * scrambleChars.length)];
-            }
-            
-            function getCharacterClass(message, index) {
-                const parts = message.split(' ');
-                let charCount = 0;
-                let currentWord = '';
-                for (let i = 0; i < parts.length; i++) {
-                    if (index >= charCount && index < charCount + parts[i].length) {
-                        currentWord = parts[i];
-                        break;
-                    }
-                    charCount += parts[i].length + 1;
-                }
+            function getRandomChar() {
+                return scrambleChars[Math.floor(Math.random() * scrambleChars.length)];
+            }
+            
+            function getCharacterClass(message, index) {
+                const parts = message.split(' ');
+                let charCount = 0;
+                let currentWord = '';
+                for (let i = 0; i < parts.length; i++) {
+                    if (index >= charCount && index < charCount + parts[i].length) {
+                        currentWord = parts[i];
+                        break;
+                    }
+                    charCount += parts[i].length + 1;
+                }
 
-                if (currentWord === 'Hello') return 'redish-pink-char';
-                if (currentWord === 'there,') return 'cyan-char';
-                if (currentWord === 'Welcome' || currentWord === 'to') return 'purple-char';
-                
-                if (currentWord === 'Jiggy') {
-                    const charIndexInWord = index - message.indexOf('Jiggy');
-                    return charIndexInWord % 2 === 0 ? 'redish-pink-char' : 'cyan-char';
-                }
-                
-                if (currentWord === 'Menu') {
-                    const charIndexInWord = index - message.indexOf('Jiggy');
-                    return charIndexInWord % 2 === 0 ? 'redish-pink-char' : 'cyan-char';
-                }
-                
-                if (currentWord === 'All' || currentWord === 'updates' || currentWord === 'on' || currentWord === 'discord') return 'purplish-white-char';
-                
-                if (currentWord === 'jiggymenulua') return 'purple-char';
+                if (currentWord === 'Hello') return 'redish-pink-char';
+                if (currentWord === 'there,') return 'cyan-char';
+                if (currentWord === 'Welcome' || currentWord === 'to') return 'purple-char';
+                
+                if (currentWord === 'Jiggy') {
+                    const charIndexInWord = index - message.indexOf('Jiggy');
+                    return charIndexInWord % 2 === 0 ? 'redish-pink-char' : 'cyan-char';
+                }
+                
+                if (currentWord === 'Menu') {
+                    const charIndexInWord = index - message.indexOf('Menu');
+                    return charIndexInWord % 2 === 0 ? 'redish-pink-char' : 'cyan-char';
+                }
+                
+                if (currentWord === 'All' || currentWord === 'updates' || currentWord === 'on' || currentWord === 'discord') return 'purplish-white-char';
+                
+                if (currentWord === 'jiggymenulua') return 'purple-char';
 
-                return 'white-char';
-            }
+                return 'white-char';
+            }
 
-            function updateDisplay(messageData, element, message) {
-                element.innerHTML = '';
-                let tempHTML = '';
-                for (let i = 0; i < messageData.length; i++) {
-                    const charData = messageData[i];
-                    const charClass = getCharacterClass(message, i);
-                    
-                    if (charData.typed) {
-                        tempHTML += `<span class="${charClass}">${charData.char}</span>`;
-                    } else if (charData.char === ' ') {
-                        tempHTML += `<span> </span>`;
-                    } else {
-                        tempHTML += `<span class="${charClass}">${getRandomChar()}</span>`;
-                    }
-                }
-                element.innerHTML = tempHTML;
-            }
+            function updateDisplay(messageData, element, message) {
+                element.innerHTML = '';
+                let tempHTML = '';
+                for (let i = 0; i < messageData.length; i++) {
+                    const charData = messageData[i];
+                    const charClass = getCharacterClass(message, i);
+                    
+                    if (charData.typed) {
+                        tempHTML += `<span class="${charClass}">${charData.char}</span>`;
+                    } else if (charData.char === ' ') {
+                        tempHTML += `<span> </span>`;
+                    } else {
+                        tempHTML += `<span class="${charClass}">${getRandomChar()}</span>`;
+                    }
+                }
+                element.innerHTML = tempHTML;
+            }
 
-            function animate() {
-                let allCompleted = true;
-                
-                for (let i = 0; i < message1Data.length; i++) {
-                    if (!message1Data[i].typed) {
-                        allCompleted = false;
-                        if (animationFrame % scrambleSpeed === 0) {
-                             if (message1Data[i].scrambleCount < scrambleSpeed) {
-                                 message1Data[i].scrambleCount++;
-                             } else {
-                                 message1Data[i].typed = true;
-                                 break;
-                             }
-                        }
-                    }
-                }
-                updateDisplay(message1Data, introWelcomeMessageText, message1);
+            function animate() {
+                let allCompleted = true;
+                
+                for (let i = 0; i < message1Data.length; i++) {
+                    if (!message1Data[i].typed) {
+                        allCompleted = false;
+                        if (animationFrame % scrambleSpeed === 0) {
+                             if (message1Data[i].scrambleCount < scrambleSpeed) {
+                                 message1Data[i].scrambleCount++;
+                             } else {
+                                 message1Data[i].typed = true;
+                                 break;
+                             }
+                        }
+                    }
+                }
+                updateDisplay(message1Data, introWelcomeMessageText, message1);
 
-                for (let i = 0; i < message2Data.length; i++) {
-                    if (!message2Data[i].typed) {
-                        allCompleted = false;
-                        if (animationFrame % scrambleSpeed === 0) {
-                             if (message2Data[i].scrambleCount < scrambleSpeed) {
-                                 message2Data[i].scrambleCount++;
-                             } else {
-                                 message2Data[i].typed = true;
-                                 break;
-                             }
-                        }
-                    }
-                }
-                updateDisplay(message2Data, introSecondaryMessageText, message2);
+                for (let i = 0; i < message2Data.length; i++) {
+                    if (!message2Data[i].typed) {
+                        allCompleted = false;
+                        if (animationFrame % scrambleSpeed === 0) {
+                             if (message2Data[i].scrambleCount < scrambleSpeed) {
+                                 message2Data[i].scrambleCount++;
+                             } else {
+                                 message2Data[i].typed = true;
+                                 break;
+                             }
+                        }
+                    }
+                }
+                updateDisplay(message2Data, introSecondaryMessageText, message2);
 
-                if (allCompleted) {
-                    clearInterval(typingInterval);
-                    setTimeout(() => {
-                        introContainer.classList.add('hidden');
-                    }, 2000);
-                } else {
-                    animationFrame++;
-                }
-            }
-            
-            introWelcomeMessage.style.opacity = '1';
-            introSecondaryMessage.style.opacity = '1';
-            const typingInterval = setInterval(animate, 20);
-        });
+                if (allCompleted) {
+                    clearInterval(typingInterval);
+                    setTimeout(() => {
+                        introContainer.classList.add('hidden');
+                    }, 2000);
+                } else {
+                    animationFrame++;
+                }
+            }
+            
+            introWelcomeMessage.style.opacity = '1';
+            introSecondaryMessage.style.opacity = '1';
+            const typingInterval = setInterval(animate, 20);
+        });
 
-        let currentSelection = 0;
-        let currentState = null;
-        let isContentPanelOpen = false;
-        let welcomeMessageShown = false;
+        let currentSelection = 0;
+        let currentState = null;
+        let isContentPanelOpen = false;
+        let welcomeMessageShown = false;
 
-        const menuContainer = document.getElementById('menu-container');
-        const modStatus = document.getElementById('mod-status');
-        const menuOptionsList = document.getElementById('menuOptions');
-        const contentHeader = document.getElementById('contentHeader');
-        const contentList = document.getElementById('status-list');
-        const selectionIndicator = document.getElementById('selectionIndicator');
-        const bannerLetters = document.querySelectorAll('.jiggy-banner span');
+        const menuContainer = document.getElementById('menu-container');
+        const modStatus = document.getElementById('mod-status');
+        const menuOptionsList = document.getElementById('menuOptions');
+        const contentHeader = document.getElementById('contentHeader');
+        const contentList = document.getElementById('status-list');
+        const selectionIndicator = document.getElementById('selectionIndicator');
+        const bannerLetters = document.querySelectorAll('.jiggy-banner span');
 
-        const neonColors = ['#00FFFF', '#FF00FF', '#39FF14', '#FFD700', '#FF073A'];
+        const neonColors = ['#00FFFF', '#FF00FF', '#39FF14', '#FFD700', '#FF073A'];
 
-        function safeEncode(text) {
-            if (!text || typeof text !== 'string') return '';
-            return text.replace(/&/g, '&amp;')
-                       .replace(/</g, '&lt;')
-                       .replace(/>/g, '&gt;')
-                       .replace(/"/g, '&quot;')
-                       .replace(/'/g, '&#39;');
-        }
-        
-        function populateContent(tabData, state) {
-            contentList.innerHTML = '';
-            if (!tabData || !tabData.items || !Array.isArray(tabData.items)) return;
+        function safeEncode(text) {
+            if (!text || typeof text !== 'string') return '';
+            return text.replace(/&/g, '&amp;')
+                       .replace(/</g, '&lt;')
+                       .replace(/>/g, '&gt;')
+                       .replace(/"/g, '&quot;')
+                       .replace(/'/g, '&#39;');
+        }
+        
+        function populateContent(tabData, state) {
+            contentList.innerHTML = '';
+            if (!tabData || !tabData.items || !Array.isArray(tabData.items)) return;
 
-            tabData.items.forEach((item, index) => {
-                let element = document.createElement('div');
-                element.className = `status-item`;
-                if (state.selection.index === index) {
-                    element.classList.add('selected');
-                }
-                
-                let itemHTML;
-                const isToggleOrState = (item.type === 'toggle' || (item.label && (item.label.toLowerCase().includes('toggle') || item.label.toLowerCase().includes('enabled') || item.label.toLowerCase().includes('boost') || item.label.toLowerCase().includes('crasher'))));
-                const isResourceState = (tabData.key === 'resources' && item.state !== undefined);
+            tabData.items.forEach((item, index) => {
+                let element = document.createElement('div');
+                element.className = `status-item`;
+                if (state.selection.index === index) {
+                    element.classList.add('selected');
+                }
+                
+                let itemHTML;
+                const isToggleOrState = (item.type === 'toggle' || (item.label && (item.label.toLowerCase().includes('toggle') || item.label.toLowerCase().includes('enabled') || item.label.toLowerCase().includes('boost') || item.label.toLowerCase().includes('crasher'))));
+                const isResourceState = (tabData.key === 'resources' && item.state !== undefined);
 
-                if (isToggleOrState || isResourceState) {
-                    const statusClass = item.state ? (item.state === 'ON' ? 'status-on' : item.state === 'OFF' ? 'status-off' : 'status-unknown') : '';
-                    const statusText = item.state ? item.state : '';
-                    itemHTML = `<span>${safeEncode(item.label || 'Unknown')}</span><span class="${statusClass}">${safeEncode(statusText)}</span>`;
-                } else if (item.type === 'input') {
-                    const inputElement = `<input type="text" class="input-field" value="${safeEncode(item.value || '')}" readonly>`;
-                    itemHTML = `
-                        <div class="input-group ${state.selection.index === index ? 'selected' : ''}">
-                            <label>${safeEncode(item.label)}</label>
-                            ${inputElement}
-                        </div>`;
-                    element.classList.remove('status-item');
-                } else {
-                    itemHTML = `<span>${safeEncode(item.label || 'Unknown')}</span>`;
-                    element.style.color = neonColors[index % neonColors.length];
-                }
+                if (isToggleOrState || isResourceState) {
+                    const statusClass = item.state ? (item.state === 'ON' ? 'status-on' : item.state === 'OFF' ? 'status-off' : 'status-unknown') : '';
+                    const statusText = item.state ? item.state : '';
+                    itemHTML = `<span>${safeEncode(item.label || 'Unknown')}</span><span class="${statusClass}">${safeEncode(statusText)}</span>`;
+                } else if (item.type === 'input') {
+                    const inputElement = `<input type="text" class="input-field" value="${safeEncode(item.value || '')}" readonly>`;
+                    itemHTML = `
+                        <div class="input-group ${state.selection.index === index ? 'selected' : ''}">
+                            <label>${safeEncode(item.label)}</label>
+                            ${inputElement}
+                        </div>`;
+                    element.classList.remove('status-item');
+                } else {
+                    itemHTML = `<span>${safeEncode(item.label || 'Unknown')}</span>`;
+                    element.style.color = neonColors[index % neonColors.length];
+                }
 
-                element.innerHTML = itemHTML;
-                contentList.appendChild(element);
-            });
-        }
-        
-        function updateMenuFromState(state) {
-            if (!state || !state.tabs) return;
+                element.innerHTML = itemHTML;
+                contentList.appendChild(element);
+            });
+        }
+        
+        function updateMenuFromState(state) {
+            if (!state || !state.tabs) return;
 
-            currentState = state;
+            currentState = state;
 
-            menuOptionsList.innerHTML = '';
-            state.tabs.forEach((tabData, tabIndex) => {
-                const menuOption = document.createElement('li');
-                menuOption.className = 'menu-option';
-                menuOption.setAttribute('data-index', tabIndex);
-                if (tabIndex === state.activeTab) {
-                    menuOption.classList.add('selected');
-                }
-                menuOption.textContent = tabData.title || `Tab ${tabIndex + 1}`;
-                
-                menuOptionsList.appendChild(menuOption);
-            });
-            
-            isContentPanelOpen = state.isContentPanelOpen;
-            if (isContentPanelOpen) {
-                modStatus.style.visibility = 'visible';
-                const activeTab = state.tabs[state.activeTab];
-                if (activeTab) {
-                    contentHeader.textContent = activeTab.header || activeTab.title;
-                    populateContent(activeTab, state);
-                }
-            } else {
-                modStatus.style.visibility = 'hidden';
-            }
+            menuOptionsList.innerHTML = '';
+            state.tabs.forEach((tabData, tabIndex) => {
+                const menuOption = document.createElement('li');
+                menuOption.className = 'menu-option';
+                menuOption.setAttribute('data-index', tabIndex);
+                if (tabIndex === state.activeTab) {
+                    menuOption.classList.add('selected');
+                }
+                menuOption.textContent = tabData.title || `Tab ${tabIndex + 1}`;
+                
+                menuOptionsList.appendChild(menuOption);
+            });
+            
+            isContentPanelOpen = state.isContentPanelOpen;
+            if (isContentPanelOpen) {
+                modStatus.style.visibility = 'visible';
+                const activeTab = state.tabs[state.activeTab];
+                if (activeTab) {
+                    contentHeader.textContent = activeTab.header || activeTab.title;
+                    populateContent(activeTab, state);
+                }
+            } else {
+                modStatus.style.visibility = 'hidden';
+            }
 
-            attachEventListeners();
-            updateIndicatorPosition();
-        }
+            attachEventListeners();
+            updateIndicatorPosition();
+        }
 
-        function attachEventListeners() {
-            const menuOptions = document.querySelectorAll('.menu-option');
-            menuOptions.forEach((option, index) => {
-                option.addEventListener('mouseenter', () => updateSelection(index));
-                option.addEventListener('click', () => {
-                    if (window.parent) {
-                        window.parent.postMessage({ action: 'select', tabIndex: index, isContentPanel: false }, '*');
-                    }
-                });
-            });
-            
-            const contentItems = document.querySelectorAll('.status-item, .input-group');
-            contentItems.forEach((item, index) => {
-                item.addEventListener('mouseenter', () => {
-                    contentItems.forEach(i => i.classList.remove('selected'));
-                    item.classList.add('selected');
-                });
-                item.addEventListener('click', () => {
-                    if (window.parent) {
-                        window.parent.postMessage({ action: 'select', itemIndex: index, isContentPanel: true }, '*');
-                    }
-                });
-            });
-        }
+        function attachEventListeners() {
+            const menuOptions = document.querySelectorAll('.menu-option');
+            menuOptions.forEach((option, index) => {
+                option.addEventListener('mouseenter', () => updateSelection(index));
+                option.addEventListener('click', () => {
+                    if (window.parent) {
+                        window.parent.postMessage({ action: 'select', tabIndex: index, isContentPanel: false }, '*');
+                    }
+                });
+            });
+            
+            const contentItems = document.querySelectorAll('.status-item, .input-group');
+            contentItems.forEach((item, index) => {
+                item.addEventListener('mouseenter', () => {
+                    contentItems.forEach(i => i.classList.remove('selected'));
+                    item.classList.add('selected');
+                });
+                item.addEventListener('click', () => {
+                    if (window.parent) {
+                        window.parent.postMessage({ action: 'select', itemIndex: index, isContentPanel: true }, '*');
+                    }
+                });
+            });
+        }
 
-        function updateSelection(index) {
-            const menuOptions = document.querySelectorAll('.menu-option');
-            menuOptions.forEach((option, i) => option.classList.toggle('selected', i === index));
-            currentSelection = index;
-            updateIndicatorPosition();
-        }
+        function updateSelection(index) {
+            const menuOptions = document.querySelectorAll('.menu-option');
+            menuOptions.forEach((option, i) => option.classList.toggle('selected', i === index));
+            currentSelection = index;
+            updateIndicatorPosition();
+        }
 
-        function updateIndicatorPosition() {
-            const menuOptions = document.querySelectorAll('.menu-option');
-            if (menuOptions.length === 0) return;
-            const selectedOption = menuOptions[currentSelection];
-            if (!selectedOption) return;
-            const containerRect = document.querySelector('.menu-options-container').getBoundingClientRect();
-            const optionRect = selectedOption.getBoundingClientRect();
-            const relativeTop = optionRect.top - containerRect.top;
-            selectionIndicator.style.top = relativeTop + 'px';
-            selectionIndicator.style.height = optionRect.height + 'px';
-        }
+        function updateIndicatorPosition() {
+            const menuOptions = document.querySelectorAll('.menu-option');
+            if (menuOptions.length === 0) return;
+            const selectedOption = menuOptions[currentSelection];
+            if (!selectedOption) return;
+            const containerRect = document.querySelector('.menu-options-container').getBoundingClientRect();
+            const optionRect = selectedOption.getBoundingClientRect();
+            const relativeTop = optionRect.top - containerRect.top;
+            selectionIndicator.style.top = relativeTop + 'px';
+            selectionIndicator.style.height = optionRect.height + 'px';
+        }
 
-        function startBannerFlicker() {
-            bannerLetters.forEach(letter => {
-                if (letter.textContent.trim() !== '') {
-                    setInterval(() => {
-                        if (Math.random() > 0.7) {
-                            const originalColor = letter.style.color;
-                            const originalShadow = letter.style.textShadow;
-                            
-                            letter.style.color = '#fff';
-                            letter.style.textShadow = '0 0 10px #fff, 0 0 20px #fff';
-                            
-                            setTimeout(() => {
-                                letter.style.color = originalColor;
-                                letter.style.textShadow = originalShadow;
-                            }, 50 + Math.random() * 100);
-                        }
-                    }, 100 + Math.random() * 400);
-                }
-            });
-        }
+        function startBannerFlicker() {
+            bannerLetters.forEach(letter => {
+                if (letter.textContent.trim() !== '') {
+                    setInterval(() => {
+                        if (Math.random() > 0.7) {
+                            const originalColor = letter.style.color;
+                            const originalShadow = letter.style.textShadow;
+                            
+                            letter.style.color = '#fff';
+                            letter.style.textShadow = '0 0 10px #fff, 0 0 20px #fff';
+                            
+                            setTimeout(() => {
+                                letter.style.color = originalColor;
+                                letter.style.textShadow = originalShadow;
+                            }, 50 + Math.random() * 100);
+                        }
+                    }, 100 + Math.random() * 400);
+                }
+            });
+        }
 
-        startBannerFlicker();
+        startBannerFlicker();
 
-        window.addEventListener("message", (event) => {
-            const { action, data } = event.data;
-            if (action === "update" || action === "show") {
-                if (data) {
-                    if (data.isContentPanelOpen !== isContentPanelOpen) {
-                        modStatus.style.visibility = data.isContentPanelOpen ? 'visible' : 'hidden';
-                        isContentPanelOpen = data.isContentPanelOpen;
-                    }
+        window.addEventListener("message", (event) => {
+            const { action, data } = event.data;
+            if (action === "update" || action === "show") {
+                if (data) {
+                    if (data.isContentPanelOpen !== isContentPanelOpen) {
+                        modStatus.style.visibility = data.isContentPanelOpen ? 'visible' : 'hidden';
+                        isContentPanelOpen = data.isContentPanelOpen;
+                    }
 
-                    updateMenuFromState(data);
-                    menuContainer.style.visibility = 'visible';
+                    updateMenuFromState(data);
+                    menuContainer.style.visibility = 'visible';
 
-                    if (action === "show" && !welcomeMessageShown) {
-                        welcomeMessageShown = true;
-                    }
-                }
-            }
-            if (action === 'hide') {
-                menuContainer.style.visibility = 'hidden';
-                modStatus.style.visibility = 'hidden';
-            }
-        });
-    </script>
+                    if (action === "show" && !welcomeMessageShown) {
+                        welcomeMessageShown = true;
+                    }
+                }
+            }
+            if (action === 'hide') {
+                menuContainer.style.visibility = 'hidden';
+                modStatus.style.visibility = 'hidden';
+            }
+        });
+
+        window.addEventListener('resize', updateIndicatorPosition);
+    </script>
 </body>
 </html>
