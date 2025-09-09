@@ -273,14 +273,23 @@
         }
 
         .status-item-input:hover {
-            background: rgba(138, 43, 226, 0.3) !important;
+            background: rgba(138, 43, 226, 0.2) !important;
             cursor: pointer;
         }
 
-        .status-item-input input:hover {
-            border-color: var(--accent-color);
-            background: rgba(0,0,0,0.6);
-            box-shadow: 0 0 0 1px rgba(138, 43, 226, 0.3);
+        .status-item-input:hover input {
+            border-color: var(--accent-color) !important;
+            background: rgba(0,0,0,0.6) !important;
+            box-shadow: 0 0 0 1px rgba(138, 43, 226, 0.4) !important;
+        }
+
+        /* Make sure input boxes are easily distinguishable when hovered */
+        .status-item-input {
+            transition: all 0.2s ease;
+        }
+
+        .status-item-input input {
+            transition: all 0.2s ease;
         }
 
         .status-on { color: #2ecc71; font-weight: 600; }
