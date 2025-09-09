@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jiggy Menu</title>
+    <title>Cooked Menu</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -22,341 +21,362 @@
             --transition-speed: 0.1s;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: var(--font);
-            background: transparent !important;
+            background-color: transparent !important;
             color: var(--primary-text);
-            overflow: hidden;
-            height: 100vh;
-            width: 100vw;
-            pointer-events: none;
-            display: block;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .menu-container {
-            pointer-events: all;
-            position: absolute;
-            top: 15vh;
-            left: 5vw;
-            width: 420px;
-            background: var(--bg-color);
-            border-radius: var(--border-radius);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
             display: flex;
-            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        #menu-container {
+            width: 320px;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            background-color: var(--bg-color);
             border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            visibility: hidden; /* Start hidden */
+            transition: opacity var(--transition-speed) ease-in-out;
+            pointer-events: all;
         }
         
-        #menu-container {
-            visibility: hidden;
-        }
-
-        .header-image {
-            width: 100%;
-            height: 100px;
-            background-image: url('https://i.imgur.com/fAvQmNB.png');
-            background-size: cover;
-            background-position: center;
+        #menu-title-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
             border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
         }
 
-        .breadcrumb-bar {
+        #menu-title-section .icon {
+            font-size: 24px;
+            color: var(--accent-color);
+            margin-right: 10px;
+        }
+        
+        #menu-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            text-shadow: 0 0 5px var(--accent-color);
+        }
+
+        #menu-content {
+            list-style: none;
+            max-height: 400px;
+            overflow-y: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        #menu-content::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .menu-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 15px;
-            background: rgba(0,0,0,0.3);
-            font-size: 14px;
+            padding: 12px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color var(--transition-speed) ease-in-out, transform var(--transition-speed) ease-in-out;
+            margin-bottom: 5px;
+        }
+
+        .menu-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .menu-item:hover, .menu-item.selected {
+            background-color: var(--highlight-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .menu-item:hover .item-label, .menu-item.selected .item-label,
+        .menu-item:hover .item-value, .menu-item.selected .item-value,
+        .menu-item:hover .item-icon, .menu-item.selected .item-icon {
+            color: var(--primary-text);
+        }
+
+        .item-label {
             font-weight: 500;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        #breadcrumb { color: var(--secondary-text); text-transform: uppercase; }
-        #option-counter { color: var(--primary-text); }
-
-        .menu-items {
-            list-style: none;
-            position: relative;
-            height: 410px;
+            flex-grow: 1;
+            white-space: nowrap;
             overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--primary-text);
+            transition: color var(--transition-speed) ease;
         }
         
-        #menu-items {
-            overflow: hidden;
-            list-style: none;
-            position: relative;
-            height: 410px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+        .item-value {
+            font-weight: 600;
+            color: var(--secondary-text);
+            margin-left: 10px;
+            white-space: nowrap;
         }
 
-        .menu-item {
-            display: flex;
-            align-items: center;
-            padding: 11px 15px;
-            font-size: 15px;
-            position: relative;
-            height: 41px;
-            transition: all 0.1s ease-in-out;
+        .item-icon {
+            color: var(--secondary-text);
+            font-size: 14px;
+            margin-right: 8px;
+            min-width: 14px;
+            text-align: center;
         }
         
-        .selection-highlight {
-            position: absolute;
-            left: 0;
-            width: 100%;
-            height: 41px;
-            background: var(--highlight-bg);
-            z-index: 1;
-            transition: top var(--transition-speed) ease-out;
-        }
-
-        .item-content {
-            display: flex;
-            width: 100%;
-            align-items: center;
-            z-index: 2;
-        }
-        
-        .item-label { flex-grow: 1; }
-        .item-value { color: var(--primary-text); font-weight: 500; }
-        
-        .toggle-indicator { font-weight: 600; }
-        .toggle-indicator.on { color: #2ecc71; }
-        .toggle-indicator.off { color: #ff4757; }
-
         .slider-bar {
-            width: 120px;
-            height: 8px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 4px;
+            width: 100%;
+            height: 4px;
+            background-color: var(--border-color);
+            border-radius: 2px;
             position: relative;
+            margin-top: 5px;
         }
+
         .slider-fill {
             height: 100%;
-            background: var(--primary-text);
-            border-radius: 4px;
+            background-color: var(--accent-color);
+            border-radius: 2px;
+            transition: width var(--transition-speed) ease-in-out;
         }
-        .slider-container { display: flex; align-items: center; gap: 10px; }
 
-        .footer {
-            padding: 10px 15px;
-            background: rgba(0,0,0,0.3);
-            border-top: 1px solid var(--border-color);
-            min-height: 20px;
-            font-size: 13px;
-            color: var(--secondary-text);
-        }
-        
-        #mod-status {
-            pointer-events: none;
+        #notification {
             position: absolute;
             top: 20px;
-            left: 20px;
-            background: transparent;
-            color: #fff;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--bg-color);
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            color: var(--primary-text);
             font-size: 14px;
-            z-index: 15;
+            opacity: 0;
             visibility: hidden;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 1000;
         }
 
-        #notification-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
-        .notification { background: var(--bg-color); border: 1px solid var(--border-color); color: var(--primary-text); padding: 10px 20px; border-radius: 8px; border-left: 4px solid var(--accent-color); box-shadow: 0 5px 15px rgba(0,0,0,0.3); opacity: 0; animation: slideIn 0.3s forwards, slideOut 0.3s 2.7s forwards; }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
-        
-        .input-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
-            display: flex; align-items: center; justify-content: center; z-index: 10000;
-            pointer-events: all;
+        #notification.show {
+            opacity: 1;
+            visibility: visible;
         }
-        .input-box {
-            background: var(--bg-color); padding: 25px; border-radius: var(--border-radius);
-            border: 1px solid var(--border-color); width: 400px; text-align: center;
-        }
-        .input-box h3 { margin-bottom: 15px; font-size: 18px; }
-        .input-box input {
-            width: 100%; padding: 12px; background: rgba(0,0,0,0.3);
-            border: 1px solid var(--border-color); color: var(--primary-text);
-            border-radius: 6px; font-size: 16px; text-align: center;
-        }
-        .input-box input:focus { outline: 2px solid var(--accent-color); }
-        .input-box small { color: var(--secondary-text); margin-top: 10px; display: block; }
     </style>
 </head>
 <body>
 
-<div id="mod-status">
-    <i class="fa-solid fa-cloud-arrow-up"></i>
-    <span id="mod-status-text">Synchronizing</span>
-</div>
-
-<div id="notification-container"></div>
-<div class="input-overlay hidden" id="input-overlay"></div>
-
-<div class="menu-container" id="menu-container">
-    <div class="header-image"></div>
-    <div class="breadcrumb-bar">
-        <span id="breadcrumb"></span>
-        <span id="option-counter"></span>
+<div id="menu-container">
+    <div id="menu-title-section">
+        <i class="fas fa-bars icon"></i>
+        <span id="menu-title">Cooked Menu</span>
     </div>
-    <ul class="menu-items" id="menu-items">
-        <div class="selection-highlight" id="selection-highlight"></div>
-    </ul>
-    <div class="footer" id="footer"></div>
+    <ul id="menu-content">
+        </ul>
 </div>
+
+<div id="notification"></div>
 
 <script>
-    const menuContainer = document.getElementById('menu-container');
-    const menuItemsList = document.getElementById('menu-items');
-    const breadcrumb = document.getElementById('breadcrumb');
-    const optionCounter = document.getElementById('option-counter');
-    const footer = document.getElementById('footer');
-    const highlight = document.getElementById('selection-highlight');
-    const modStatus = document.getElementById('mod-status');
-    const notificationContainer = document.getElementById('notification-container');
-    const inputOverlay = document.getElementById('input-overlay');
+    document.addEventListener('DOMContentLoaded', () => {
+        const menuContainer = document.getElementById('menu-container');
+        const menuContent = document.getElementById('menu-content');
+        const notification = document.getElementById('notification');
+        
+        let menus = {};
+        let optionStates = {};
+        let currentMenuId = 'main';
+        let selectedIndex = 0;
+        let isContentPanelOpen = false;
 
-    let menuState = {
-        currentMenu: null,
-        selectedItem: 0
-    };
-    const ITEM_HEIGHT = 41;
-    const MAX_VISIBLE_ITEMS = 10;
-
-    function renderMenu() {
-        if (!menuState.currentMenu || !menuState.currentMenu.items) {
-            console.warn("Macho Menu: No menu data to render.");
-            menuItemsList.innerHTML = '';
-            breadcrumb.innerText = 'Main Menu';
-            optionCounter.innerText = '0/0';
-            footer.innerText = 'No options available. Check your Lua script.';
-            return;
+        function showNotification(message) {
+            notification.textContent = message;
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 1500);
         }
 
-        const items = menuState.currentMenu.items;
-        menuItemsList.innerHTML = '';
-        
-        breadcrumb.innerText = menuState.currentMenu.title || '';
-        optionCounter.innerText = `${menuState.selectedItem + 1}/${items.length}`;
-        footer.innerText = items[menuState.selectedItem]?.description || '';
-        
-        let scrollOffset = Math.max(0, menuState.selectedItem - Math.floor(MAX_VISIBLE_ITEMS / 2));
-        scrollOffset = Math.min(scrollOffset, items.length - MAX_VISIBLE_ITEMS);
-        scrollOffset = Math.max(0, scrollOffset);
+        function renderMenu(menuId) {
+            menuContent.innerHTML = '';
+            const menuData = menus[menuId];
+            if (!menuData) return;
 
-        highlight.style.top = `${(menuState.selectedItem - scrollOffset) * ITEM_HEIGHT}px`;
+            const itemsToRender = menuData.items;
 
-        for (let i = scrollOffset; i < Math.min(items.length, scrollOffset + MAX_VISIBLE_ITEMS); i++) {
-            const itemData = items[i];
-            const itemEl = document.createElement('li');
-            itemEl.classList.add('menu-item');
+            itemsToRender.forEach((item, index) => {
+                const itemElement = document.createElement('li');
+                itemElement.className = 'menu-item';
+                itemElement.dataset.index = index;
+
+                let icon = '';
+                if (item.type === 'back') {
+                    icon = '<i class="fas fa-chevron-left item-icon"></i>';
+                } else if (item.type === 'submenu') {
+                    icon = '<i class="fas fa-chevron-right item-icon"></i>';
+                } else if (item.type === 'toggle') {
+                    const isEnabled = optionStates[item.stateId] || false;
+                    icon = `<i class="fas fa-${isEnabled ? 'check' : 'times'} item-icon" style="color: ${isEnabled ? 'var(--accent-color)' : 'var(--secondary-text)'};"></i>`;
+                } else {
+                    icon = '<i class="fas fa-circle item-icon"></i>';
+                }
+
+                let value = '';
+                if (item.type === 'slider') {
+                    const sliderValue = optionStates[item.stateId] || item.min;
+                    const percentage = ((sliderValue - item.min) / (item.max - item.min)) * 100;
+                    value = `
+                        <div class="slider-container">
+                            <span class="item-value">${sliderValue.toFixed(2)}</span>
+                            <div class="slider-bar"><div class="slider-fill" style="width: ${percentage}%;"></div></div>
+                        </div>
+                    `;
+                } else if (item.type === 'toggle') {
+                    value = `<span class="item-value">${(optionStates[item.stateId] || false) ? 'Enabled' : 'Disabled'}</span>`;
+                }
+
+                itemElement.innerHTML = `
+                    <div class="item-label">${icon}${item.label}</div>
+                    ${value}
+                `;
+                
+                if (index === selectedIndex) {
+                    itemElement.classList.add('selected');
+                }
+
+                menuContent.appendChild(itemElement);
+            });
+            updateSelection();
+        }
+
+        function updateSelection() {
+            const items = menuContent.querySelectorAll('.menu-item');
+            items.forEach((item, index) => {
+                if (index === selectedIndex) {
+                    item.classList.add('selected');
+                    item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+        }
+
+        function handleMenuInput(event) {
+            if (menuContainer.style.visibility === 'hidden') return;
             
-            let itemContent = `<div class="item-content">
-                                   <span class="item-label">${itemData.label || 'Unnamed Item'}</span>`;
-            if (itemData.type === 'toggle') {
-                itemContent += `<span class="toggle-indicator ${itemData.state ? 'on' : 'off'}">${itemData.state ? 'ON' : 'OFF'}</span>`;
-            } else if (itemData.type === 'slider') {
-                const fillWidth = ((itemData.value - itemData.min) / (itemData.max - itemData.min)) * 100;
-                itemContent += `<div class="slider-container">
-                                    <span class="item-value">${itemData.value.toFixed(0)}</span>
-                                    <div class="slider-bar"><div class="slider-fill" style="width: ${fillWidth}%;"></div></div>
-                                </div>`;
-            }
-            itemContent += `</div>`;
-            itemEl.innerHTML = itemContent;
-            menuItemsList.appendChild(itemEl);
-        }
-    }
+            const itemsToRender = menus[currentMenuId].items;
+            const currentItemData = itemsToRender[selectedIndex];
 
-    window.addEventListener("message", (event) => {
-        const { action, data } = event.data;
+            switch (event.key) {
+                case 'ArrowUp':
+                case 'w':
+                    selectedIndex = (selectedIndex - 1 + itemsToRender.length) % itemsToRender.length;
+                    break;
+                case 'ArrowDown':
+                case 's':
+                    selectedIndex = (selectedIndex + 1) % itemsToRender.length;
+                    break;
+                case 'Enter':
+                case 'd':
+                    if (currentItemData?.type === 'submenu') {
+                        currentMenuId = currentItemData.target;
+                        selectedIndex = 0;
+                        renderMenu(currentMenuId);
+                    } else if (currentItemData?.type === 'back') {
+                        currentMenuId = currentItemData.target;
+                        selectedIndex = 0;
+                        renderMenu(currentMenuId);
+                    } else if (currentItemData?.type === 'toggle') {
+                        optionStates[currentItemData.stateId] = !optionStates[currentItemData.stateId];
+                        showNotification(`${currentItemData.label}: ${optionStates[currentItemData.stateId] ? 'Enabled' : 'Disabled'}`);
+                        renderMenu(currentMenuId);
+                    } else if (currentItemData?.type === 'action') {
+                        showNotification(`${currentItemData.label} action triggered!`);
+                    } else if (currentItemData?.type === 'slider') {
+                        // Sliders don't have an enter action
+                    }
+                    break;
+                case 'ArrowLeft':
+                case 'a':
+                    if (currentItemData?.type === 'toggle') {
+                        optionStates[currentItemData.stateId] = false;
+                        showNotification(`${currentItemData.label}: Disabled`);
+                        renderMenu(currentMenuId);
+                    } else if (currentItemData?.type === 'slider') {
+                        let value = optionStates[currentItemData.stateId] || currentItemData.min;
+                        value = Math.max(currentItemData.min, value - currentItemData.step);
+                        optionStates[currentItemData.stateId] = parseFloat(value.toFixed(2));
+                        renderMenu(currentMenuId);
+                    }
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                    if (currentItemData?.type === 'toggle') {
+                        optionStates[currentItemData.stateId] = true;
+                        showNotification(`${currentItemData.label}: Enabled`);
+                        renderMenu(currentMenuId);
+                    } else if (currentItemData?.type === 'slider') {
+                        let value = optionStates[currentItemData.stateId] || currentItemData.min;
+                        value = Math.min(currentItemData.max, value + currentItemData.step);
+                        optionStates[currentItemData.stateId] = parseFloat(value.toFixed(2));
+                        renderMenu(currentMenuId);
+                    }
+                    break;
+            }
+            updateSelection();
+        }
         
-        if (action === "show") {
-            menuState = {
-                currentMenu: data,
-                selectedItem: 0
-            };
-            renderMenu();
-            menuContainer.style.visibility = 'visible';
-        } else if (action === "update") {
-            if (data && data.items) {
-                menuState = {
-                    currentMenu: data,
-                    selectedItem: 0
-                };
+        // Function to update the menu with state data from an external message
+        function updateMenuFromState(data) {
+            // Update the menu data and states based on the received data
+            if (data.menus) {
+                menus = data.menus;
             }
-            renderMenu();
-        } else if (action === "hide") {
-            menuContainer.style.visibility = 'hidden';
-        } else if (action === "highlight") {
-            if (data !== undefined && data.highlightedIndex !== undefined) {
-                menuState.selectedItem = data.highlightedIndex;
-                renderMenu();
+            if (data.optionStates) {
+                optionStates = data.optionStates;
             }
+            if (data.currentMenuId) {
+                currentMenuId = data.currentMenuId;
+            }
+            if (data.selectedIndex !== undefined) {
+                selectedIndex = data.selectedIndex;
+            }
+            renderMenu(currentMenuId);
         }
+
+        // Add the message listener from jiggy.html
+        window.addEventListener("message", (event) => {
+            const { action, data } = event.data;
+            if (action === "update" || action === "show") {
+                if (data) {
+                    if (data.isContentPanelOpen !== isContentPanelOpen) {
+                        // Assuming you want to show/hide the menu based on this
+                        menuContainer.style.visibility = data.isContentPanelOpen ? 'visible' : 'hidden';
+                        isContentPanelOpen = data.isContentPanelOpen;
+                    }
+
+                    updateMenuFromState(data);
+                    menuContainer.style.visibility = 'visible';
+                }
+            }
+            if (action === 'hide') {
+                menuContainer.style.visibility = 'hidden';
+            }
+        });
+
+        document.onkeydown = handleMenuInput;
+        // renderMenu('main'); // Commented out to prevent rendering until an external message is received.
     });
-
-    document.onkeydown = function(e) {
-        if (menuContainer.style.visibility !== 'visible') return;
-
-        const items = menuState.currentMenu.items;
-        if (!items || items.length === 0) return;
-
-        let postData = { action: '', data: {} };
-        switch(e.key) {
-            case 'ArrowUp':
-                menuState.selectedItem = (menuState.selectedItem - 1 + items.length) % items.length;
-                renderMenu();
-                postData.action = "highlight";
-                postData.data = { index: menuState.selectedItem };
-                break;
-            case 'ArrowDown':
-                menuState.selectedItem = (menuState.selectedItem + 1) % items.length;
-                renderMenu();
-                postData.action = "highlight";
-                postData.data = { index: menuState.selectedItem };
-                break;
-            case 'Enter':
-                postData.action = "select";
-                postData.data = { index: menuState.selectedItem };
-                break;
-            case 'Backspace':
-                postData.action = "back";
-                break;
-        }
-
-        if (postData.action !== '') {
-            fetch(`http://jiggy/menu-interaction`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json; charset=UTF-8' },
-                body: JSON.stringify(postData)
-            }).catch(console.error);
-        }
-    };
-
-    // This is the fetch handler that your Lua script is listening for
-    // You should have a `RegisterNUICallback` in your Lua.
-    fetch(`http://jiggy/ready`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json; charset=UTF-8' },
-        body: JSON.stringify({})
-    }).catch(console.error);
 </script>
 
 </body>
