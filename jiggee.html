@@ -6,23 +6,26 @@
     <title>Jiggy Menu</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-
         :root {
             --background-start: #0f0c29;
             --background-mid: #302b63;
             --background-end: #24243e;
-            --panel-bg: rgba(45, 0, 85, 0.75); /* Original menu background */
-            --primary-accent: #8A2BE2; /* Purple from original */
-            --secondary-accent: #00FFFF; /* Cyan from original */
-            --text-primary: #FFFFFE;
-            --text-secondary: #C8BFE7; /* Purplish-white from original */
-            --status-on: #39FF14; /* Green from original */
-            --status-off: #FF073A; /* Red from original */
-            --border-color: rgba(128, 0, 255, 0.5); /* Border from original */
-            --shadow-color: rgba(255, 0, 255, 0.5); /* Pink shadow from original */
-            --font-family: 'Poppins', sans-serif;
+            --panel-bg: rgba(15, 15, 35, 0.95);
+            --panel-border: rgba(138, 43, 226, 0.3);
+            --primary-accent: #8A2BE2;
+            --secondary-accent: #00FFFF;
+            --text-primary: #FFFFFF;
+            --text-secondary: #B8B8B8;
+            --status-on: #00FF88;
+            --status-off: #FF4757;
+            --border-color: rgba(138, 43, 226, 0.4);
+            --shadow-color: rgba(138, 43, 226, 0.6);
+            --hover-bg: rgba(138, 43, 226, 0.15);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Consolas', monospace;
         }
 
         * {
@@ -33,7 +36,7 @@
         }
 
         body {
-            font-family: var(--font-family);
+            font-family: var(--font-primary);
             background: transparent !important;
             color: var(--text-primary);
             overflow: hidden;
@@ -41,6 +44,9 @@
             width: 100vw;
             pointer-events: none;
             display: block;
+            font-weight: 400;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         /* --- Intro Screen Styles --- */
@@ -54,10 +60,9 @@
             align-items: center;
             text-align: center;
             z-index: 20;
-            /* Removed the radial gradient to make it transparent */
             background: transparent;
             transition: opacity 1s ease-out;
-            pointer-events: all; /* Keep pointer events for intro animation */
+            pointer-events: all;
         }
         
         #intro-container.hidden {
@@ -69,107 +74,131 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 1rem;
+            gap: 1.5rem;
         }
 
         .intro-welcome-message {
-            font-size: 2.5rem;
+            font-size: 3rem;
             font-weight: 700;
             white-space: nowrap;
             opacity: 0;
             transition: opacity 1s ease-out;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.5);
+            text-shadow: 0 0 20px rgba(138, 43, 226, 0.8), 0 0 40px rgba(138, 43, 226, 0.4);
+            letter-spacing: -0.02em;
         }
 
         .intro-secondary-message {
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 400;
             color: var(--text-secondary);
             white-space: nowrap;
             opacity: 0;
             transition: opacity 1s ease-out;
+            letter-spacing: 0.02em;
         }
         
         /* Character coloring from JS (maintained original values) */
-        .redish-pink-char { color: #FF00FF; text-shadow: 0 0 5px #FF00FF; }
-        .cyan-char { color: #00FFFF; text-shadow: 0 0 5px #00FFFF; }
-        .purple-char { color: #8A2BE2; text-shadow: 0 0 5px #8A2BE2; }
-        .purplish-white-char { color: #C8BFE7; text-shadow: 0 0 5px #C8BFE7; }
-        .white-char { color: #FFFFFF; text-shadow: 0 0 5px #FFFFFF; }
-
+        .redish-pink-char { color: #FF00FF; text-shadow: 0 0 8px #FF00FF; }
+        .cyan-char { color: #00FFFF; text-shadow: 0 0 8px #00FFFF; }
+        .purple-char { color: #8A2BE2; text-shadow: 0 0 8px #8A2BE2; }
+        .purplish-white-char { color: #C8BFE7; text-shadow: 0 0 8px #C8BFE7; }
+        .white-char { color: #FFFFFF; text-shadow: 0 0 8px #FFFFFF; }
 
         /* --- Base Panel Style --- */
         .panel {
             position: absolute;
             background: var(--panel-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            backdrop-filter: blur(2px); /* Maintain original blur */
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 0 0 10px var(--shadow-color); /* Added original shadow */
+            border: 1px solid var(--panel-border);
+            border-radius: 20px;
+            backdrop-filter: blur(20px) saturate(1.2);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                0 0 20px var(--shadow-color),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
             visibility: hidden;
             pointer-events: auto;
-            animation: fadeIn 0.3s ease-out;
+            animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-50%) scale(0.95); }
-            to { opacity: 1; transform: translateY(-50%) scale(1.0); }
+            from { 
+                opacity: 0; 
+                transform: translateY(-50%) scale(0.9) translateZ(0);
+                filter: blur(10px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(-50%) scale(1) translateZ(0);
+                filter: blur(0px);
+            }
         }
 
         /* --- Main Menu Styles --- */
         .menu-container {
-            /* Inherits from .panel */
             right: 50px;
             top: 50%;
             transform: translateY(-50%);
-            width: 320px;
-            height: 550px;
+            width: 340px;
+            height: 600px;
             z-index: 10;
         }
-        /* JS needs .menu-background, but we can hide it and style the parent */
+
         .menu-background { display: none; }
 
         .menu-header {
-            padding: 20px 24px;
+            padding: 24px 28px;
             text-align: center;
             border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(0, 255, 255, 0.05));
+            position: relative;
+        }
+
+        .menu-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-accent), transparent);
         }
 
         .menu-title {
-            font-size: 1.75rem;
-            font-weight: 700;
-            text-shadow: 0 0 15px #FF00FF; /* Original menu title shadow */
+            font-size: 2rem;
+            font-weight: 800;
+            text-shadow: 0 0 20px #FF00FF;
+            letter-spacing: -0.02em;
         }
 
         .menu-status {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: var(--text-secondary);
-            margin-top: 4px;
+            margin-top: 6px;
+            font-weight: 500;
+            opacity: 0.8;
         }
 
         .menu-options-container {
             position: relative;
             flex-grow: 1;
             overflow-y: auto;
-            padding: 12px;
-            /* Custom Scrollbar for modern look */
+            padding: 16px;
             scrollbar-width: thin;
-            scrollbar-color: var(--primary-accent) rgba(255,255,255,0.05);
+            scrollbar-color: var(--primary-accent) transparent;
         }
         
         .menu-options-container::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
         .menu-options-container::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
+            background: transparent;
         }
         .menu-options-container::-webkit-scrollbar-thumb {
-            background-color: var(--primary-accent);
+            background: linear-gradient(180deg, var(--primary-accent), var(--secondary-accent));
             border-radius: 10px;
-            border: 2px solid rgba(255,255,255,0.05);
         }
 
         .menu-options {
@@ -177,138 +206,289 @@
         }
 
         .menu-option {
-            padding: 12px 16px;
-            font-size: 0.95rem;
+            padding: 16px 20px;
+            font-size: 1rem;
             font-weight: 500;
             color: var(--text-secondary);
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
-            border-radius: 8px;
-            margin-bottom: 4px;
+            border-radius: 12px;
+            margin-bottom: 6px;
+            background: var(--glass-bg);
+            border: 1px solid transparent;
+            letter-spacing: 0.01em;
+        }
+
+        .menu-option::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 0;
+            background: linear-gradient(180deg, var(--primary-accent), var(--secondary-accent));
+            border-radius: 12px 0 0 12px;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .menu-option:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+            transform: translateX(4px);
+            border-color: rgba(138, 43, 226, 0.3);
+        }
+
+        .menu-option:hover::before {
+            width: 3px;
         }
 
         .menu-option.selected {
             color: var(--text-primary);
-            background: var(--primary-accent);
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(0, 255, 255, 0.1));
             font-weight: 600;
+            border-color: var(--primary-accent);
+            transform: translateX(4px);
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.3);
         }
-        /* JS needs #selectionIndicator, but we can hide it */
+
+        .menu-option.selected::before {
+            width: 3px;
+        }
+
         .selection-indicator { display: none; }
 
         /* --- Content Panel Styles --- */
         .mod-status {
-             /* Inherits from .panel */
             left: 50px;
             top: 50%;
             transform: translateY(-50%);
-            width: 350px;
-            height: 550px;
+            width: 380px;
+            height: 600px;
         }
 
         .mod-status-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            padding: 20px 24px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            padding: 24px 28px;
             text-align: center;
             border-bottom: 1px solid var(--border-color);
-            color: var(--secondary-accent); /* Cyan from original */
-            text-shadow: 0 0 5px var(--secondary-accent); /* Original title shadow */
+            color: var(--secondary-accent);
+            text-shadow: 0 0 10px var(--secondary-accent);
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(138, 43, 226, 0.05));
+            position: relative;
+            letter-spacing: 0.02em;
+        }
+
+        .mod-status-title::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--secondary-accent), transparent);
         }
 
         #status-list {
             flex-grow: 1;
             overflow-y: auto;
-            padding: 16px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            /* Custom Scrollbar for modern look */
+            gap: 10px;
             scrollbar-width: thin;
-            scrollbar-color: var(--secondary-accent) rgba(255,255,255,0.05);
+            scrollbar-color: var(--secondary-accent) transparent;
         }
+        
         #status-list::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
         #status-list::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
+            background: transparent;
         }
         #status-list::-webkit-scrollbar-thumb {
-            background-color: var(--secondary-accent);
+            background: linear-gradient(180deg, var(--secondary-accent), var(--primary-accent));
             border-radius: 10px;
-            border: 2px solid rgba(255,255,255,0.05);
         }
 
         .status-item, .input-group {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 16px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 8px;
-            font-size: 0.9rem;
-            transition: background 0.2s ease;
+            padding: 16px 20px;
+            background: var(--glass-bg);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid transparent;
             color: var(--text-primary);
+            font-weight: 500;
+            position: relative;
+        }
+        
+        .status-item::before, .input-group::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 0;
+            background: linear-gradient(180deg, var(--secondary-accent), var(--primary-accent));
+            border-radius: 12px 0 0 12px;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .status-item:hover, .input-group:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(4px);
+            border-color: rgba(0, 255, 255, 0.3);
+        }
+
+        .status-item:hover::before, .input-group:hover::before {
+            width: 3px;
         }
         
         .status-item.selected, .input-group.selected {
-             background: rgba(128, 0, 255, 0.2); /* Original selection background */
-             border: 1px solid var(--secondary-accent);
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.15), rgba(138, 43, 226, 0.1));
+            border-color: var(--secondary-accent);
+            transform: translateX(4px);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+        }
+
+        .status-item.selected::before, .input-group.selected::before {
+            width: 3px;
         }
 
         /* Status colors */
-        .status-on, .status-started { color: var(--status-on); font-weight: 600; text-shadow: 0 0 5px var(--status-on); }
-        .status-off, .status-stopped { color: var(--status-off); font-weight: 600; text-shadow: 0 0 5px var(--status-off); }
-        .status-unknown { color: #FFFF33; font-weight: 600; text-shadow: 0 0 5px #FFFF33; } /* Yellow from original */
+        .status-on, .status-started { 
+            color: var(--status-on); 
+            font-weight: 700; 
+            text-shadow: 0 0 8px var(--status-on);
+            background: rgba(0, 255, 136, 0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .status-off, .status-stopped { 
+            color: var(--status-off); 
+            font-weight: 700; 
+            text-shadow: 0 0 8px var(--status-off);
+            background: rgba(255, 71, 87, 0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .status-unknown { 
+            color: #FFD700; 
+            font-weight: 700; 
+            text-shadow: 0 0 8px #FFD700;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
         
         /* Input Field styles */
         .input-group {
             flex-direction: column;
             align-items: flex-start;
-            gap: 8px;
+            gap: 10px;
         }
 
         .input-group label {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             font-weight: 600;
             color: var(--text-secondary);
             text-transform: uppercase;
+            letter-spacing: 0.1em;
         }
 
         .input-field {
             width: 100%;
-            padding: 8px 12px;
-            background: rgba(0, 0, 0, 0.5); /* Original input background */
-            border: 1px solid #FF00FF; /* Original input border */
-            border-radius: 6px;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
             color: var(--text-primary);
             font-size: 0.9rem;
-            font-family: 'Courier New', monospace; /* Keep mono for code-like input */
-            transition: all 0.2s ease;
+            font-family: var(--font-mono);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
         }
 
         .input-field:focus {
             outline: none;
             border-color: var(--secondary-accent);
-            box-shadow: 0 0 8px var(--secondary-accent); /* Original focus shadow */
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.8);
         }
 
         /* --- Watermark Banner --- */
         .jiggy-banner {
             position: absolute;
-            bottom: 20px;
-            left: 20px;
-            font-size: 1.25rem;
-            font-weight: 700;
+            top: 30px;
+            left: 30px;
+            font-size: 2.5rem;
+            font-weight: 800;
             pointer-events: auto;
-            opacity: 0.8;
-            text-shadow: 0 0 5px rgba(128, 0, 255, 0.5); /* Original banner shadow */
+            opacity: 0.9;
+            text-shadow: 0 0 20px rgba(138, 43, 226, 0.8);
+            letter-spacing: -0.02em;
+            z-index: 15;
         }
         
-        .jiggy-banner .pink { color: #FF00FF; } /* Original pink */
-        .jiggy-banner .cyan { color: #00FFFF; } /* Original cyan */
+        .jiggy-banner .pink { color: #FF00FF; }
+        .jiggy-banner .cyan { color: #00FFFF; }
+
+        /* Smooth scrolling for panels */
+        .menu-options-container,
+        #status-list {
+            scroll-behavior: smooth;
+        }
+
+        /* Enhanced glow effects */
+        .menu-container.panel {
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.5),
+                0 0 30px rgba(138, 43, 226, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .mod-status.panel {
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.5),
+                0 0 30px rgba(0, 255, 255, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        /* Responsive adjustments */
+        @media (max-height: 800px) {
+            .menu-container,
+            .mod-status {
+                height: 500px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .menu-container {
+                width: 300px;
+                right: 30px;
+            }
+            
+            .mod-status {
+                width: 320px;
+                left: 30px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -513,7 +693,7 @@
                 const isResourceState = (tabData.key === 'resources' && item.state !== undefined); // Check if it's a resource state
 
                 if (isToggleOrState || isResourceState) { // Apply to toggles, or any item in 'resources' with a state
-                    const statusClass = item.state ? (item.state === 'ON' ? 'status-on' : item.state === 'OFF' ? 'status-off' : 'status-unknown') : '';
+                    const statusClass = item.state ? (item.state.toLowerCase() === 'on' || item.state.toLowerCase() === 'started' ? 'status-on' : item.state.toLowerCase() === 'off' || item.state.toLowerCase() === 'stopped' ? 'status-off' : 'status-unknown') : '';
                     const statusText = item.state ? item.state : '';
                     itemHTML = `<span>${safeEncode(item.label || 'Unknown')}</span><span class="${statusClass}">${safeEncode(statusText)}</span>`;
                 } else if (item.type === 'input') {
@@ -606,30 +786,27 @@
             if (menuOptions.length === 0) return;
             const selectedOption = menuOptions[currentSelection];
             if (!selectedOption) return;
-            const containerRect = document.querySelector('.menu-options-container').getBoundingClientRect();
-            const optionRect = selectedOption.getBoundingClientRect();
-            const relativeTop = optionRect.top - containerRect.top;
-            selectionIndicator.style.top = relativeTop + 'px';
-            selectionIndicator.style.height = optionRect.height + 'px';
+            // Scroll the selected item into view if it's not visible
+            selectedOption.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
         function startBannerFlicker() {
             bannerLetters.forEach(letter => {
                 if (letter.textContent.trim() !== '') {
                     setInterval(() => {
-                        if (Math.random() > 0.7) {
+                        if (Math.random() > 0.85) { // less frequent flicker
                             const originalColor = letter.style.color;
                             const originalShadow = letter.style.textShadow;
                             
                             letter.style.color = '#fff';
-                            letter.style.textShadow = '0 0 10px #fff, 0 0 20px #fff';
+                            letter.style.textShadow = '0 0 15px #fff, 0 0 25px #fff';
                             
                             setTimeout(() => {
                                 letter.style.color = originalColor;
                                 letter.style.textShadow = originalShadow;
-                            }, 50 + Math.random() * 100);
+                            }, 60 + Math.random() * 100);
                         }
-                    }, 100 + Math.random() * 400);
+                    }, 100 + Math.random() * 500);
                 }
             });
         }
