@@ -13,7 +13,7 @@
             --bg-color: rgba(10, 10, 10, 0.92);
             --primary-text: #ffffff;
             --secondary-text: #b0b0b0;
-            --accent-color: #8A2BE2;
+            --accent-color: #8A2BE2; /* A strong purple like Fragment */
             --highlight-bg: #8A2BE2;
             --border-color: rgba(255, 255, 255, 0.15);
             --font: 'Inter', sans-serif;
@@ -50,7 +50,7 @@
         .header-image {
             width: 100%;
             height: 100px;
-            background-image: url('https://i.imgur.com/LBBkt5B.png');
+            background-image: url('https://i.imgur.com/fAvQmNB.png');
             background-size: cover;
             background-position: center;
             border-bottom: 1px solid var(--border-color);
@@ -263,7 +263,16 @@
             main: {
                 title: 'Home',
                 items: [
-                    { label: 'The Menu Failed To Load.', target: 'self', description: 'The Menu Failed To Load..' },
+                    { label: 'Self Options', target: 'self', description: 'Modify your own player.' },
+                    { label: 'Weapon Options', target: 'weapon', description: 'Modify weapons and ammo.' },
+                    { label: 'Online Players', target: 'online', description: 'Interact with other players.' },
+                    { label: 'Car Options', target: 'car', description: 'Modify and spawn vehicles.' },
+                    { label: 'Teleport Options', target: 'teleport', description: 'Move around the map quickly.' },
+                    { label: 'Server Trolling', target: 'trolling', description: 'Cause chaos for everyone.' },
+                    { label: 'Dynamic Triggers', target: 'dynamic_triggers', description: 'Scan for server events.' },
+                    { label: 'Server Triggers', target: 'server_triggers', description: 'Execute server events.' },
+                    { label: 'Anticheat Bypasses', target: 'anticheat', description: 'Disable server-side anticheats.' },
+                    { label: 'Menu Options', target: 'settings', description: 'Customize the menu.' }
                 ]
             }
         };
@@ -471,10 +480,20 @@
 
             items.forEach((item, i) => item.classList.toggle('selected', i === selectedIndex));
             
-            const firstVisible = Math.max(0, selectedIndex - Math.floor(MAX_VISIBLE_ITEMS / 2));
-            const scrollTop = firstVisible * ITEM_HEIGHT;
-            menuItemsEl.scrollTop = scrollTop;
+            // Handle scrolling to keep selected item visible
+            const selectedItem = items[selectedIndex];
+            const containerRect = menuItemsEl.getBoundingClientRect();
+            const itemRect = selectedItem.getBoundingClientRect();
+            
+            // Check if item is outside the visible area and scroll if needed
+            if (itemRect.top < containerRect.top) {
+                selectedItem.scrollIntoView({ block: 'start', behavior: 'smooth' });
+            } else if (itemRect.bottom > containerRect.bottom) {
+                selectedItem.scrollIntoView({ block: 'end', behavior: 'smooth' });
+            }
 
+            // Update highlight position relative to scroll
+            const scrollTop = menuItemsEl.scrollTop;
             highlightEl.style.top = `${(selectedIndex * ITEM_HEIGHT) - scrollTop}px`;
             
             counterEl.textContent = `${selectedIndex + 1} / ${items.length}`;
@@ -541,7 +560,7 @@
 
                     if (action === "show" && !welcomeMessageShown) {
                         welcomeMessageShown = true;
-                        showNotification("Menu loaded successfully");
+                        showNotification("Jiggy Menu loaded successfully");
                     }
                 }
             }
