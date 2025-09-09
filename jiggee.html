@@ -14,7 +14,7 @@
             --bg-color: rgba(10, 10, 10, 0.92);
             --primary-text: #ffffff;
             --secondary-text: #b0b0b0;
-            --accent-color: #8A2BE2; 
+            --accent-color: #8A2BE2; /* A strong purple like Fragment */
             --highlight-bg: #8A2BE2;
             --border-color: rgba(255, 255, 255, 0.15);
             --font: 'Inter', sans-serif;
@@ -269,6 +269,14 @@
         menuItemsList.innerHTML = '';
         const items = menuData.items;
         
+        if (!items || items.length === 0) {
+            console.warn("Macho Menu: No menu items to display.");
+            menuItemsList.innerHTML = `<li><div class="item-content"><span class="item-label">No Options Available</span></div></li>`;
+            optionCounter.innerText = "0/0";
+            footer.innerText = "Check your Lua file for errors.";
+            return;
+        }
+        
         breadcrumb.innerText = menuData.title;
         optionCounter.innerText = `${selectedIndex + 1}/${items.length}`;
         footer.innerText = items[selectedIndex]?.description || "";
@@ -351,6 +359,7 @@
     
     function updateMenuFromState(data) {
         if (!data || !data.menuData) {
+            console.error("Macho Menu Error: Received data is empty or invalid.", data);
             return;
         }
 
@@ -423,6 +432,8 @@
 
     window.addEventListener("message", (event) => {
         const { action, data } = event.data;
+        console.log("Macho Menu Received Message:", event.data); // CRITICAL DEBUGGING LINE
+        
         if (action === "update" || action === "show") {
             if (data) {
                 if (data.isContentPanelOpen !== isContentPanelOpen) {
