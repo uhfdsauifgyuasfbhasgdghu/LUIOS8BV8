@@ -10,12 +10,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     
     <style>
-        /* CSS from New Text Document.txt */
+        /* CSS from New Text Document.txt - this is the core UI */
         :root {
             --bg-color: rgba(10, 10, 10, 0.92);
             --primary-text: #ffffff;
             --secondary-text: #b0b0b0;
-            --accent-color: #8A2BE2; /* A strong purple like Fragment */
+            --accent-color: #8A2BE2;
             --highlight-bg: #8A2BE2;
             --border-color: rgba(255, 255, 255, 0.15);
             --font: 'Inter', sans-serif;
@@ -86,7 +86,7 @@
             padding: 12px 15px;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 6px;
-            transition: background var(--transition-speed) ease-in-out;
+            transition: background var(--transition-speed) ease-in-out, transform 0.1s;
             cursor: pointer;
             outline: none;
             border: 1px solid transparent;
@@ -186,7 +186,7 @@
             100% { opacity: 0; transform: translateY(-20px); }
         }
 
-        /* CSS from jiggee.html */
+        /* CSS from jiggee.html for the banner only */
         .jiggy-banner {
             position: absolute;
             top: 0;
@@ -201,8 +201,9 @@
             padding-top: 10vh;
             z-index: 20;
             pointer-events: none;
+            transition: opacity 1s ease-in-out;
         }
-
+        
         .jiggy-title {
             font-family: 'Inconsolata', 'Courier New', monospace;
             font-size: 4rem;
@@ -241,6 +242,7 @@
             display: flex;
             flex-direction: column;
             gap: 5px;
+            width: 100%;
         }
         .input-group label {
             font-size: 0.9rem;
@@ -290,10 +292,10 @@
             const menuContainer = document.querySelector('.menu-container');
             const menuItemsContainer = document.querySelector('.menu-items');
             const notificationContainer = document.querySelector('.notification-container');
+            const introContainer = document.getElementById('intro-container');
 
             let selectedIndex = 0;
             let currentMenuId = 'main';
-            let welcomeMessageShown = false;
 
             // Define the menu structure
             const menuData = {
@@ -369,11 +371,9 @@
                             break;
                         case 'input':
                             const inputValue = inputValues[item.stateId] || '';
-                            optionHtml = `
-                                <div class="input-group">
+                            optionHtml = `<div class="input-group">
                                     <input type="text" value="${inputValue}" placeholder="Enter value..." data-state-id="${item.stateId}">
-                                </div>
-                            `;
+                                </div>`;
                             break;
                         case 'submenu':
                         case 'back':
@@ -391,6 +391,19 @@
                     `;
                     itemElement.classList.add(itemClass);
                     menuItemsContainer.appendChild(itemElement);
+
+                    if (item.type === 'input') {
+                        const inputElement = itemElement.querySelector('input[type="text"]');
+                        if (inputElement) {
+                            inputElement.addEventListener('keyup', (e) => {
+                                if (e.key === 'Enter') {
+                                    inputValues[e.target.dataset.stateId] = e.target.value;
+                                    showNotification(`Value saved: ${e.target.value}`);
+                                    e.preventDefault(); // Prevents the enter key from triggering other menu actions
+                                }
+                            });
+                        }
+                    }
                 });
                 updateSelection(itemsToRender);
             }
@@ -401,12 +414,25 @@
                     item.classList.remove('selected');
                     if (index === selectedIndex) {
                         item.classList.add('selected');
-                        item.focus();
+                        const inputElement = item.querySelector('input[type="text"]');
+                        if (inputElement) {
+                            inputElement.focus();
+                            inputElement.selectionStart = inputElement.selectionEnd = inputElement.value.length;
+                        } else {
+                            item.focus();
+                        }
                     }
                 });
             }
 
             function handleMenuInput(event) {
+                if (event.target.tagName === 'INPUT') {
+                    if (event.key === 'Escape') {
+                        document.activeElement.blur();
+                    }
+                    return;
+                }
+
                 const itemsToRender = menuData[currentMenuId];
                 const currentItemData = itemsToRender[selectedIndex];
                 const menuItems = menuItemsContainer.querySelectorAll('.menu-item');
@@ -433,11 +459,8 @@
                     } else if (currentItemData?.type === 'action') {
                         if (currentItemData.action === 'exit') {
                             menuContainer.style.visibility = 'hidden';
-                            // You can add logic here to un-render the banner if needed
+                            introContainer.style.display = 'block';
                         }
-                    } else if (currentItemData?.type === 'input') {
-                        // For inputs, we don't handle 'Enter' press for value change,
-                        // as the user can just type directly. This is more of a visual item.
                     }
                 } else if (event.key === 'ArrowLeft') {
                     if (currentItemData?.type === 'toggle') {
@@ -466,24 +489,11 @@
             }
 
             document.onkeydown = handleMenuInput;
-            renderMenu('main');
 
-            // --- Start of merged JS from jiggee.html ---
-            // These variables and functions are from jiggee.html
-            const introContainer = document.getElementById('intro-container');
-            const introTitle = document.getElementById('intro-title');
-            const introText = document.getElementById('intro-text');
-            const introMessage = document.getElementById('intro-message');
-            const modStatus = document.createElement('div');
-            modStatus.className = 'jiggy-message';
-            modStatus.style.position = 'absolute';
-            modStatus.style.bottom = '20px';
-            modStatus.style.right = '20px';
-            document.body.appendChild(modStatus);
-            let isContentPanelOpen = false;
-
-            // This function is for the banner flicker effect
             function startBannerFlicker() {
+                const introTitle = document.getElementById('intro-title');
+                const introText = document.getElementById('intro-text');
+                const introMessage = document.getElementById('intro-message');
                 const elements = [introTitle, introText, introMessage];
                 elements.forEach(element => {
                     const originalText = element.textContent;
@@ -510,46 +520,15 @@
             }
 
             startBannerFlicker();
-
-            // This is the message listener to control the menu from an external source
-            window.addEventListener("message", (event) => {
-                const { action, data } = event.data;
-                if (action === "update" || action === "show") {
-                    if (data) {
-                        // The original jiggee.html had a way to control the menu state
-                        // The logic below adapts this to the new menu
-                        if (data.isContentPanelOpen !== isContentPanelOpen) {
-                            modStatus.style.visibility = data.isContentPanelOpen ? 'visible' : 'hidden';
-                            isContentPanelOpen = data.isContentPanelOpen;
-                        }
-
-                        // updateMenuFromState(data); // The original function, let's adapt it
-                        updateMenuFromState(data);
-                        menuContainer.style.visibility = 'visible';
-
-                        if (action === "show" && !welcomeMessageShown) {
-                            welcomeMessageShown = true;
-                        }
-                    }
-                }
-                if (action === 'hide') {
-                    menuContainer.style.visibility = 'hidden';
-                    modStatus.style.visibility = 'hidden';
-                }
-            });
-
-            // This is a new function to adapt the state from jiggee.html to the new menu system
-            function updateMenuFromState(stateData) {
-                // Here you can map the incoming state data to your optionStates object
-                // For example, if the incoming data has a 'feature1_enabled' property:
-                if (stateData.feature1_enabled !== undefined) {
-                    optionStates['feature1'] = stateData.feature1_enabled;
-                }
-                // You would need to add similar logic for other menu items as needed
-                renderMenu(currentMenuId);
-            }
+            setTimeout(() => {
+                introContainer.style.opacity = '0';
+                setTimeout(() => {
+                    introContainer.style.display = 'none';
+                    menuContainer.style.visibility = 'visible';
+                    renderMenu('main');
+                }, 1000);
+            }, 3000);
         });
     </script>
-
 </body>
 </html>
