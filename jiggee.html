@@ -13,7 +13,7 @@
             --bg-color: rgba(10, 10, 10, 0.92);
             --primary-text: #ffffff;
             --secondary-text: #b0b0b0;
-            --accent-color: #8A2BE2; /* A strong purple like Fragment */
+            --accent-color: #8A2BE2;
             --highlight-bg: #8A2BE2;
             --border-color: rgba(255, 255, 255, 0.15);
             --font: 'Inter', sans-serif;
@@ -74,6 +74,12 @@
             position: relative;
             height: 410px; /* FIXED HEIGHT: This prevents the menu from stretching. 41px * 10 items */
             overflow: hidden; /* JS will handle scrolling */
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        .menu-items::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
         }
 
         .menu-item {
@@ -151,8 +157,16 @@
             width: 100%; padding: 12px; background: rgba(0,0,0,0.3);
             border: 1px solid var(--border-color); color: var(--primary-text);
             border-radius: 6px; font-size: 16px; text-align: center;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
-        .input-box input:focus { outline: 2px solid var(--accent-color); }
+        .input-box input:focus { 
+            outline: none; 
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.2);
+        }
+        .input-box input:hover {
+            border-color: rgba(138, 43, 226, 0.6);
+        }
         .input-box small { color: var(--secondary-text); margin-top: 10px; display: block; }
 
         /* Status panel styles */
@@ -168,6 +182,12 @@
             border: 1px solid var(--border-color);
             visibility: hidden;
             overflow-y: auto;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        .status-panel::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
         }
 
         .status-header {
@@ -205,6 +225,21 @@
         .status-on { color: #2ecc71; font-weight: 600; }
         .status-off { color: #ff4757; font-weight: 600; }
         .status-unknown { color: #f39c12; font-weight: 600; }
+
+        .jiggy-status-banner {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: var(--bg-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-color);
+            visibility: visible;
+        }
     </style>
 </head>
 <body>
@@ -235,23 +270,7 @@
 </div>
 
 <div class="jiggy-status-banner" id="jiggy-status-banner">
-    <div class="jiggy-banner-title">JIGGY MENU</div>
-    <div class="banner-status-item">
-        <span>Status:</span>
-        <span class="banner-status-value">UNDETECTED</span>
-    </div>
-    <div class="banner-status-item">
-        <span>Version:</span>
-        <span class="banner-status-value">v2.1.0</span>
-    </div>
-    <div class="banner-status-item">
-        <span>Bypasses:</span>
-        <span class="banner-status-value">ACTIVE</span>
-    </div>
-    <div class="banner-status-item">
-        <span>Players:</span>
-        <span class="banner-status-value warning" id="player-count">0/32</span>
-    </div>
+    Jiggy Menu
 </div>
 
 <script>
