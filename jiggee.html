@@ -22,7 +22,6 @@
             --transition-speed: 0.1s;
         }
 
-        /* Custom scrollbar styles */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -42,7 +41,6 @@
             font-family: var(--font);
             background-color: transparent;
             color: var(--primary-text);
-            /* Allow body to scroll if needed, though menu is positioned absolutely */
             overflow-y: auto; 
             user-select: none;
         }
@@ -91,19 +89,11 @@
             list-style: none;
             position: relative;
             height: 410px;
-            /* Enable scrolling for this section */
             overflow-y: auto; 
             scrollbar-width: thin;
             -ms-overflow-style: -ms-autohiding-scrollbar;
         }
-
-        /* Remove the old scrollbar styles */
-        /*
-        .menu-items::-webkit-scrollbar {
-            display: none;
-        }
-        */
-
+        
         .menu-item {
             display: flex;
             align-items: center;
@@ -111,6 +101,7 @@
             font-size: 15px;
             position: relative;
             height: 41px;
+            cursor: pointer;
         }
         
         .selection-highlight {
@@ -121,6 +112,10 @@
             background: var(--highlight-bg);
             z-index: 1;
             transition: top var(--transition-speed) ease-out;
+        }
+
+        .menu-item:hover .selection-highlight {
+            opacity: 0.5;
         }
 
         .item-content {
@@ -193,7 +188,6 @@
         }
         .input-box small { color: var(--secondary-text); margin-top: 10px; display: block; }
 
-        /* Status panel styles */
         .status-panel {
             position: absolute;
             right: 50px;
@@ -205,18 +199,10 @@
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
             border: 1px solid var(--border-color);
             visibility: hidden;
-            /* Enable scrolling for this section */
             overflow-y: auto;
             scrollbar-width: thin;
             -ms-overflow-style: -ms-autohiding-scrollbar;
         }
-
-        /* Remove the old scrollbar styles */
-        /*
-        .status-panel::-webkit-scrollbar {
-            display: none;
-        }
-        */
 
         .status-header {
             padding: 15px;
@@ -524,6 +510,10 @@
                 content += `</div>`;
                 menuItemEl.innerHTML = content;
                 menuItemsEl.appendChild(menuItemEl);
+
+                menuItemEl.addEventListener('click', () => {
+                    handleAction(item);
+                });
             });
             
             selectedIndex = 0;
@@ -534,8 +524,11 @@
             const items = menuItemsEl.querySelectorAll('.menu-item');
             if (!items[selectedIndex]) return;
 
-            items.forEach((item, i) => item.classList.toggle('selected', i === selectedIndex));
+            items.forEach((item) => item.classList.remove('selected'));
             
+            const currentItem = items[selectedIndex];
+            currentItem.classList.add('selected');
+
             const itemTop = selectedIndex * ITEM_HEIGHT;
             const itemBottom = itemTop + ITEM_HEIGHT;
             const scrollTop = menuItemsEl.scrollTop;
@@ -547,11 +540,31 @@
                 menuItemsEl.scrollTop = itemBottom - containerHeight;
             }
 
-            highlightEl.style.top = `${itemTop - menuItemsEl.scrollTop}px`;
+            highlightEl.style.top = `${itemTop}px`;
             
             counterEl.textContent = `${selectedIndex + 1} / ${items.length}`;
             const currentItemData = itemsToRender[selectedIndex];
             footerEl.textContent = currentItemData?.description || '';
+        }
+
+        function handleAction(currentItemData) {
+            if (currentItemData.target) {
+                navigationStack.push(currentMenuId);
+                renderMenu(currentItemData.target);
+            } else if (currentItemData.type === 'button') {
+                showNotification(`Action: ${currentItemData.label}`);
+            } else if (currentItemData.type === 'toggle') {
+                optionStates[currentItemData.stateId] = !optionStates[currentItemData.stateId];
+                showNotification(`${currentItemData.label}: ${optionStates[currentItemData.stateId] ? 'Enabled' : 'Disabled'}`);
+                renderMenu(currentMenuId);
+            } else if (currentItemData.type === 'input') {
+                showInputPrompt(`Enter value for ${currentItemData.label}:`, currentItemData.placeholder, (result) => {
+                    if (result) showNotification(`Set ${currentItemData.label} to: ${result}`);
+                });
+            } else if (currentItemData.type === 'back') {
+                const parentMenu = navigationStack.pop();
+                renderMenu(parentMenu || 'main');
+            }
         }
 
         function handleMenuInput(e) {
@@ -573,23 +586,7 @@
                     selectedIndex = (selectedIndex + 1) % itemsToRender.length;
                     break;
                 case 'Enter':
-                    if (currentItemData.target) {
-                        navigationStack.push(currentMenuId);
-                        renderMenu(currentItemData.target);
-                    } else if (currentItemData.type === 'button') {
-                        showNotification(`Action: ${currentItemData.label}`);
-                    } else if (currentItemData.type === 'toggle') {
-                        optionStates[currentItemData.stateId] = !optionStates[currentItemData.stateId];
-                        showNotification(`${currentItemData.label}: ${optionStates[currentItemData.stateId] ? 'Enabled' : 'Disabled'}`);
-                        renderMenu(currentMenuId);
-                    } else if (currentItemData.type === 'input') {
-                        showInputPrompt(`Enter value for ${currentItemData.label}:`, currentItemData.placeholder, (result) => {
-                            if (result) showNotification(`Set ${currentItemData.label} to: ${result}`);
-                        });
-                    } else if (currentItemData.type === 'back') {
-                        const parentMenu = navigationStack.pop();
-                        renderMenu(parentMenu || 'main');
-                    }
+                    handleAction(currentItemData);
                     break;
                 case 'Backspace':
                     if (navigationStack.length > 0) {
@@ -618,6 +615,20 @@
             if (action === 'hide') {
                 menuContainer.style.visibility = 'hidden';
                 statusPanel.style.visibility = 'hidden';
+            }
+        });
+
+        menuItemsEl.addEventListener('mousemove', (e) => {
+            const items = menuItemsEl.querySelectorAll('.menu-item');
+            const newIndex = Array.from(items).findIndex(item => item.contains(e.target));
+            if (newIndex !== -1 && newIndex !== selectedIndex) {
+                selectedIndex = newIndex;
+                const menu = defaultMenuData[currentMenuId];
+                const itemsToRender = menu.items.map(item => item.target ? { ...item, type: 'submenu' } : item);
+                if (menu.parent) {
+                    itemsToRender.unshift({ type: 'back', label: 'Back', icon: 'fa-solid fa-arrow-left', description: 'Return to the previous menu.' });
+                }
+                updateSelection(itemsToRender);
             }
         });
         
