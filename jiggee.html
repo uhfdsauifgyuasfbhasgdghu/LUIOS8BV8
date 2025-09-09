@@ -244,15 +244,7 @@
             font-size: 24px;
             font-weight: 700;
             color: var(--accent-color);
-            visibility: hidden; /* Start as hidden and show with JS */
-            opacity: 0;
             transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-            transform: translateY(20px);
-        }
-
-        .jiggy-status-banner.visible {
-            visibility: visible;
-            opacity: 1;
             transform: translateY(0);
         }
     </style>
@@ -419,15 +411,6 @@
             });
         }
         
-        // Function to control banner visibility
-        function updateBannerVisibility(isVisible) {
-            if (isVisible) {
-                banner.classList.add('visible');
-            } else {
-                banner.classList.remove('visible');
-            }
-        }
-
         function updateMenuFromState(state) {
             if (!state || !state.tabs) return;
 
@@ -621,7 +604,6 @@
                 if (data) {
                     updateMenuFromState(data);
                     menuContainer.style.visibility = 'visible';
-                    updateBannerVisibility(true); // Show the banner
                     if (action === "show" && !welcomeMessageShown) {
                         welcomeMessageShown = true;
                         showNotification("Jiggy Menu loaded successfully");
@@ -632,7 +614,6 @@
             if (action === 'hide') {
                 menuContainer.style.visibility = 'hidden';
                 statusPanel.style.visibility = 'hidden';
-                updateBannerVisibility(false); // Hide the banner
             }
         });
         
