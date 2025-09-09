@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Cooked Menu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jiggy Menu</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -37,13 +38,14 @@
             position: absolute;
             top: 15vh;
             left: 5vw;
-            width: 420px; /* Wider for a more substantial feel */
+            width: 420px;
             background: var(--bg-color);
             border-radius: var(--border-radius);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
             border: 1px solid var(--border-color);
+            visibility: hidden;
         }
 
         .header-image {
@@ -71,9 +73,8 @@
         .menu-items {
             list-style: none;
             position: relative;
-            height: 410px; /* FIXED HEIGHT: This prevents the menu from stretching. 41px * 10 items */
+            height: 410px;
             overflow: hidden;
-            /* JS will handle scrolling */
         }
 
         .menu-item {
@@ -89,7 +90,7 @@
             position: absolute;
             left: 0;
             width: 100%;
-            height: 41px; /* Matches item height */
+            height: 41px;
             background: var(--highlight-bg);
             z-index: 1;
             transition: top var(--transition-speed) ease-out;
@@ -181,6 +182,8 @@
     const optionCounter = document.getElementById('option-counter');
     const footer = document.getElementById('footer');
     const highlight = document.getElementById('selection-highlight');
+    const inputOverlay = document.getElementById('input-overlay');
+    const notificationContainer = document.getElementById('notification-container');
 
     let menuState = null;
     let selectedIndex = 0;
@@ -188,19 +191,6 @@
     const MAX_VISIBLE_ITEMS = 10;
     const ITEM_HEIGHT = 41;
 
-    // This function will be called by the NUI message to update the menu
-    function updateMenuFromState(data) {
-        menuState = data;
-        if (!menuState) return;
-
-        menuContainer.style.visibility = 'visible';
-        
-        selectedIndex = data.selectedIndex || 0;
-        scrollOffset = data.scrollOffset || 0;
-
-        renderMenu(data.menuData);
-    }
-    
     function renderMenu(menuData) {
         menuItemsList.innerHTML = '';
         const items = menuData.items;
@@ -248,17 +238,66 @@
     }
 
     function PostNuiMessage(action, data) {
-        fetch(`https://menu-name/${action}`, {
+        // IMPORTANT: Make sure to replace 'jiggy-resource-name' with the actual name of your FiveM resource!
+        fetch(`https://jiggy-resource-name/${action}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json; charset=UTF-8' },
             body: JSON.stringify(data)
         });
     }
 
+    function showNotification(message) {
+        const notif = document.createElement('div');
+        notif.classList.add('notification');
+        notif.textContent = message;
+        notificationContainer.appendChild(notif);
+        setTimeout(() => notif.remove(), 3000);
+    }
+    
+    function showInputBox(prompt, initialValue, callback) {
+        const box = document.createElement('div');
+        box.classList.add('input-box');
+        box.innerHTML = `<h3>${prompt}</h3><input type="text" value="${initialValue}" id="input-field" /><small>Press Enter to submit, Backspace to cancel</small>`;
+        
+        inputOverlay.innerHTML = '';
+        inputOverlay.appendChild(box);
+        inputOverlay.classList.remove('hidden');
+
+        const inputField = document.getElementById('input-field');
+        inputField.focus();
+
+        function handleInput(e) {
+            if (e.key === 'Enter') {
+                callback(inputField.value);
+                inputOverlay.classList.add('hidden');
+                document.removeEventListener('keydown', handleInput);
+            } else if (e.key === 'Backspace') {
+                inputOverlay.classList.add('hidden');
+                document.removeEventListener('keydown', handleInput);
+            }
+        }
+        document.addEventListener('keydown', handleInput);
+    }
+    
+    function updateMenuFromState(data) {
+        if (!data || !data.menuData) {
+            return;
+        }
+
+        menuState = data;
+        menuContainer.style.visibility = 'visible';
+        
+        selectedIndex = data.selectedIndex || 0;
+        scrollOffset = data.scrollOffset || 0;
+
+        renderMenu(data.menuData);
+    }
+
     document.onkeydown = function(event) {
-        if (!menuState) return;
+        if (!menuState || !menuState.menuData || inputOverlay.classList.contains('hidden') === false) return;
 
         const items = menuState.menuData.items;
+        if (!items) return;
         
         switch(event.key) {
             case 'ArrowUp':
@@ -281,6 +320,13 @@
                     PostNuiMessage('changeMenu', { target: currentItem.target });
                 } else if (currentItem?.type === 'toggle') {
                     PostNuiMessage('toggleState', { stateId: currentItem.stateId });
+                } else if (currentItem?.type === 'slider') {
+                    PostNuiMessage('updateSlider', { stateId: currentItem.stateId });
+                } else if (currentItem?.type === 'input') {
+                    showInputBox(currentItem.prompt, currentItem.initial, (value) => {
+                        PostNuiMessage('inputResult', { action: currentItem.action, value: value });
+                    });
+                    return; // Prevent immediate rendering after input
                 }
                 break;
             case 'Backspace':
@@ -290,6 +336,16 @@
                     PostNuiMessage('hide');
                 }
                 break;
+            case 'ArrowLeft':
+                if (items[selectedIndex]?.type === 'slider') {
+                    PostNuiMessage('changeSlider', { stateId: items[selectedIndex].stateId, direction: -1 });
+                }
+                break;
+            case 'ArrowRight':
+                if (items[selectedIndex]?.type === 'slider') {
+                    PostNuiMessage('changeSlider', { stateId: items[selectedIndex].stateId, direction: 1 });
+                }
+                break;
         }
 
         PostNuiMessage('updateScrollAndIndex', {
@@ -297,7 +353,6 @@
             scrollOffset: scrollOffset
         });
         
-        // Render the menu immediately after a key press
         renderMenu(menuState.menuData);
     };
 
@@ -310,6 +365,9 @@
         }
         if (action === 'hide') {
             menuContainer.style.visibility = 'hidden';
+        }
+        if (action === 'notification') {
+            showNotification(data.message);
         }
     });
 
