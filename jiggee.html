@@ -2,34 +2,192 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Cooked Menu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jiggy Cooked Menu</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Courier+New:wght@400;700&family=Inconsolata:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     
     <style>
+        /* CSS from New Text Document.txt */
+        :root {
+            --bg-color: rgba(10, 10, 10, 0.92);
+            --primary-text: #ffffff;
+            --secondary-text: #b0b0b0;
+            --accent-color: #8A2BE2; /* A strong purple like Fragment */
+            --highlight-bg: #8A2BE2;
+            --border-color: rgba(255, 255, 255, 0.15);
+            --font: 'Inter', sans-serif;
+            --border-radius: 8px;
+            --transition-speed: 0.1s;
+        }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
             user-select: none;
         }
 
         body {
-            font-family: 'Courier New', 'Inconsolata', monospace;
-            background: transparent !important;
-            color: white;
+            font-family: var(--font);
+            background-color: transparent !important;
+            color: var(--primary-text);
             overflow: hidden;
             height: 100vh;
             width: 100vw;
             pointer-events: none;
-            display: block;
+        }
+        
+        .menu-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 450px;
+            padding: 25px;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+            pointer-events: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            visibility: hidden;
         }
 
+        .header {
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+        }
 
-        #intro-container {
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--accent-color);
+            text-shadow: 0 0 10px rgba(138, 43, 226, 0.5);
+        }
+
+        .menu-items {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            transition: background var(--transition-speed) ease-in-out;
+            cursor: pointer;
+            outline: none;
+            border: 1px solid transparent;
+        }
+
+        .menu-item.selected {
+            background: var(--highlight-bg);
+            box-shadow: 0 0 15px var(--highlight-bg);
+            transform: scale(1.02);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .menu-item-text {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--primary-text);
+        }
+
+        .menu-item-icon {
+            font-size: 1.2rem;
+            color: var(--accent-color);
+        }
+
+        .menu-option {
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: var(--secondary-text);
+        }
+
+        .toggle .menu-option {
+            color: #ff5252;
+            transition: color var(--transition-speed) ease-in-out;
+        }
+        .toggle.enabled .menu-option {
+            color: #4CAF50;
+        }
+
+        .slider {
+            width: 120px;
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 3px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .slider-fill {
+            height: 100%;
+            background: var(--highlight-bg);
+            border-radius: 3px;
+            transition: width var(--transition-speed) ease-in-out;
+        }
+
+        .slider-thumb {
+            width: 14px;
+            height: 14px;
+            background: var(--highlight-bg);
+            border: 2px solid var(--primary-text);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            transition: left var(--transition-speed) ease-in-out;
+        }
+
+        .notification-container {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: auto;
+            min-width: 250px;
+            align-items: flex-start;
+        }
+
+        .notification {
+            background: var(--bg-color);
+            color: var(--primary-text);
+            padding: 10px 15px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            font-size: 0.9rem;
+            animation: fadeInOut 2s ease-in-out forwards;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(20px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+
+        /* CSS from jiggee.html */
+        .jiggy-banner {
             position: absolute;
             top: 0;
             left: 0;
@@ -43,282 +201,355 @@
             padding-top: 10vh;
             z-index: 20;
             pointer-events: none;
-            transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out;
-            opacity: 1;
         }
 
-        .fade-out {
-            transform: translateY(-100px);
-            opacity: 0;
-        }
-
-        #intro-title-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .banner-letter {
-            font-family: 'Inconsolata', monospace;
-            font-size: 5vw;
-            font-weight: 700;
-            color: #fff;
+        .jiggy-title {
+            font-family: 'Inconsolata', 'Courier New', monospace;
+            font-size: 4rem;
+            color: white;
             text-shadow: 0 0 10px #fff, 0 0 20px #fff;
             white-space: pre;
-            line-height: 1;
-            transition: color 0.1s ease-in-out, text-shadow 0.1s ease-in-out;
-        }
-
-
-        #loading-container {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            width: 250px;
-            height: 20px;
-            background-color: rgba(0, 0, 0, 0.5);
-            border: 2px solid #555;
-            border-radius: 5px;
-            overflow: hidden;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            z-index: 20;
             pointer-events: none;
         }
 
-        #loading-bar {
-            width: 0;
-            height: 100%;
-            background-color: #00ff00;
-            transition: width 0.1s linear;
+        .jiggy-text {
+            font-family: 'Inconsolata', 'Courier New', monospace;
+            font-size: 2rem;
+            color: white;
+            text-shadow: 0 0 10px #fff, 0 0 20px #fff;
+            margin-top: 20px;
+            white-space: pre;
+            pointer-events: none;
         }
 
-        #loading-text {
-            position: absolute;
-            width: 100%;
-            text-align: center;
-            line-height: 20px;
-            font-size: 14px;
-            color: #eee;
-            text-shadow: 1px 1px 2px #000;
+        .jiggy-message {
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            color: white;
+            text-shadow: 0 0 5px #fff;
+            margin-top: 10px;
+            pointer-events: none;
         }
 
-        #menu-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 300px;
-            background: rgba(0, 0, 0, 0.85);
-            border: 1px solid #333;
-            border-radius: 5px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            padding: 10px;
-            pointer-events: all;
-            visibility: hidden;
-            transition: visibility 0.2s;
+        .jiggy-letter {
+            display: inline-block;
+            transition: color 0.1s, text-shadow 0.1s;
         }
 
-        #menu-header {
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            color: #00ff00;
-            margin-bottom: 10px;
-            text-shadow: 0 0 10px #00ff00;
-        }
-        
-        #mod-status {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(0, 0, 0, 0.85);
-            border: 1px solid #333;
-            border-radius: 5px;
-            padding: 10px;
-            font-size: 14px;
-            pointer-events: all;
-            z-index: 10;
-            transition: visibility 0.2s;
-            visibility: hidden;
-        }
-
-        #menu-list {
-            list-style: none;
-        }
-
-        .menu-item {
-            padding: 8px;
-            cursor: pointer;
-            border-bottom: 1px solid #333;
-            transition: background-color 0.2s, color 0.2s;
-        }
-
-        .menu-item:last-child {
-            border-bottom: none;
-        }
-
-        .menu-item.selected {
-            background-color: #00ff00;
-            color: #000;
-        }
-
-        .menu-item-text {
+        /* Styling for the new input boxes */
+        .input-group {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .input-group label {
+            font-size: 0.9rem;
+            color: var(--secondary-text);
+        }
+        .input-group input[type="text"] {
+            padding: 8px 10px;
+            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            color: var(--primary-text);
+            font-family: var(--font);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .input-group input[type="text"]:focus {
+            border-color: var(--accent-color);
         }
 
-        .menu-item-keybind {
-            font-size: 12px;
-            color: #888;
-        }
-        
-        .submenu-icon {
-            float: right;
-            color: #aaa;
-        }
     </style>
 </head>
-
 <body>
-    <div id="intro-container">
-        <div id="intro-title-container">
-            <span class="banner-letter">J</span><span class="banner-letter">I</span><span class="banner-letter">G</span><span class="banner-letter">G</span><span class="banner-letter">Y</span><span class="banner-letter"> </span><span class="banner-letter">M</span><span class="banner-letter">E</span><span class="banner-letter">N</span><span class="banner-letter">U</span>
+
+    <!-- This is the animated banner from jiggee.html -->
+    <div id="intro-container" class="jiggy-banner">
+        <div id="intro-title" class="jiggy-title">JIGGY</div>
+        <div id="intro-text" class="jiggy-text">A SCRIPT BY N7</div>
+        <div id="intro-message" class="jiggy-message">. . . Loading . . .</div>
+    </div>
+
+    <!-- This is the main menu from New Text Document.txt -->
+    <div class="menu-container">
+        <div class="header">
+            <h1>COOKED MENU</h1>
+        </div>
+        <div class="menu-items">
+            <!-- Menu items will be rendered here by JS -->
         </div>
     </div>
-    <div id="menu-container">
-        <div id="menu-header">JIGGY</div>
-        <ul id="menu-list">
-        </ul>
-    </div>
-    
-    <div id="mod-status">
-        <pre id="mod-status-text"></pre>
-    </div>
-    
+
+    <div class="notification-container"></div>
+
     <script>
-        const menuContainer = document.getElementById('menu-container');
-        const menuList = document.getElementById('menu-list');
-        const menuHeader = document.getElementById('menu-header');
-        const modStatus = document.getElementById('mod-status');
-        const modStatusText = document.getElementById('mod-status-text');
+        document.addEventListener('DOMContentLoaded', () => {
 
-        let currentMenuState = null;
-        let selectedIndex = 0;
-        let isContentPanelOpen = false;
-        let welcomeMessageShown = false;
+            const menuContainer = document.querySelector('.menu-container');
+            const menuItemsContainer = document.querySelector('.menu-items');
+            const notificationContainer = document.querySelector('.notification-container');
 
-        function updateMenuFromState(state) {
-            currentMenuState = state;
-            menuList.innerHTML = '';
-            selectedIndex = state.selectedIndex || 0;
-            
-            menuHeader.textContent = state.title || 'JIGGY';
+            let selectedIndex = 0;
+            let currentMenuId = 'main';
+            let welcomeMessageShown = false;
 
-            state.menuItems.forEach((item, index) => {
-                const li = document.createElement('li');
-                li.className = 'menu-item';
-                li.id = `item-${index}`;
-                
-                let itemText = item.label;
-                if (item.type === 'toggle') {
-                    const toggleState = item.value ? 'ON' : 'OFF';
-                    itemText = `${item.label} [${toggleState}]`;
-                } else if (item.type === 'slider') {
-                    itemText = `${item.label} [${item.value}]`;
-                }
+            // Define the menu structure
+            const menuData = {
+                main: [
+                    { label: 'Feature 1', type: 'toggle', stateId: 'feature1', icon: 'fa-solid fa-bolt' },
+                    { label: 'Feature 2', type: 'toggle', stateId: 'feature2', icon: 'fa-solid fa-shield-halved' },
+                    { label: 'Feature 3', type: 'toggle', stateId: 'feature3', icon: 'fa-solid fa-eye' },
+                    { label: 'Feature 4', type: 'slider', stateId: 'feature4', min: 0, max: 100, step: 10, icon: 'fa-solid fa-temperature-full' },
+                    { label: 'Feature 5', type: 'slider', stateId: 'feature5', min: 0.1, max: 1.0, step: 0.1, icon: 'fa-solid fa-volume-high' },
+                    { label: 'Sub-Menu', type: 'submenu', target: 'subMenu1', icon: 'fa-solid fa-bars' },
+                    { label: 'Input Boxes', type: 'submenu', target: 'inputsMenu', icon: 'fa-solid fa-keyboard' },
+                    { label: 'Exit', type: 'action', action: 'exit', icon: 'fa-solid fa-xmark' }
+                ],
+                subMenu1: [
+                    { label: 'Sub-Feature A', type: 'toggle', stateId: 'subfeatureA', icon: 'fa-solid fa-star' },
+                    { label: 'Sub-Feature B', type: 'toggle', stateId: 'subfeatureB', icon: 'fa-solid fa-heart' },
+                    { label: 'Back', type: 'back', icon: 'fa-solid fa-arrow-left' }
+                ],
+                inputsMenu: [
+                    { label: 'Text Input 1', type: 'input', stateId: 'input1' },
+                    { label: 'Text Input 2', type: 'input', stateId: 'input2' },
+                    { label: 'Back', type: 'back', icon: 'fa-solid fa-arrow-left' }
+                ]
+            };
 
-                if (item.type === 'submenu' && item.hasSubmenu) {
-                     li.innerHTML = `<div class="menu-item-text"><span>${itemText}</span><span class="submenu-icon"> &gt;</span></div>`;
-                } else {
-                    li.textContent = itemText;
-                }
-                
-                if (index === selectedIndex) {
-                    li.classList.add('selected');
-                }
+            const optionStates = {};
+            const inputValues = {};
+            const history = ['main'];
 
-                li.onclick = () => {
-                    window.parent.postMessage({
-                        action: 'selectItem',
-                        data: {
-                            index: index
-                        }
-                    }, '*');
-                };
-                
-                if (item.keybind) {
-                    const keybindSpan = document.createElement('span');
-                    keybindSpan.className = 'menu-item-keybind';
-                    keybindSpan.textContent = item.keybind;
-                    li.querySelector('.menu-item-text > span')?.appendChild(keybindSpan);
-                }
-                
-                menuList.appendChild(li);
-            });
-            
-            if (state.modStatus) {
-                 modStatusText.textContent = state.modStatus;
-                 modStatus.style.visibility = 'visible';
-            } else {
-                modStatus.style.visibility = 'hidden';
+            function showNotification(message) {
+                const notification = document.createElement('div');
+                notification.className = 'notification';
+                notification.textContent = message;
+                notificationContainer.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.style.animation = 'none';
+                    notification.style.opacity = '0';
+                    notification.style.transform = 'translateY(-20px)';
+                    setTimeout(() => notification.remove(), 500);
+                }, 1500);
             }
-        }
-        
-        function startBannerFlicker() {
-            const letters = document.querySelectorAll('.banner-letter');
-            letters.forEach(letter => {
-                const originalColor = letter.style.color;
-                const originalShadow = letter.style.textShadow;
-                
-                setInterval(() => {
-                    const shouldFlicker = Math.random() < 0.1;
-                    if (shouldFlicker) {
-                        const flickerCount = Math.floor(Math.random() * 5) + 1;
-                        for (let i = 0; i < flickerCount; i++) {
+
+            function renderMenu(menuId) {
+                menuItemsContainer.innerHTML = '';
+                const itemsToRender = menuData[menuId];
+                itemsToRender.forEach((item, index) => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'menu-item';
+                    itemElement.tabIndex = 0;
+                    itemElement.dataset.index = index;
+
+                    let optionHtml = '';
+                    let itemClass = '';
+                    const label = item.label;
+
+                    switch (item.type) {
+                        case 'toggle':
+                            const enabled = !!optionStates[item.stateId];
+                            itemClass = enabled ? 'enabled' : '';
+                            optionHtml = `<span class="menu-option">${enabled ? 'Enabled' : 'Disabled'}</span>`;
+                            break;
+                        case 'slider':
+                            const value = optionStates[item.stateId] || item.min;
+                            const percentage = ((value - item.min) / (item.max - item.min)) * 100;
+                            optionHtml = `
+                                <div class="slider" data-value="${value}" data-min="${item.min}" data-max="${item.max}">
+                                    <div class="slider-fill" style="width: ${percentage}%"></div>
+                                    <div class="slider-thumb" style="left: ${percentage}%"></div>
+                                </div>
+                                <span class="menu-option">${value.toFixed(2)}</span>
+                            `;
+                            break;
+                        case 'input':
+                            const inputValue = inputValues[item.stateId] || '';
+                            optionHtml = `
+                                <div class="input-group">
+                                    <input type="text" value="${inputValue}" placeholder="Enter value..." data-state-id="${item.stateId}">
+                                </div>
+                            `;
+                            break;
+                        case 'submenu':
+                        case 'back':
+                        case 'action':
+                            optionHtml = '';
+                            break;
+                    }
+
+                    itemElement.innerHTML = `
+                        <span class="menu-item-text">
+                            ${item.icon ? `<i class="${item.icon} menu-item-icon"></i>` : ''}
+                            ${label}
+                        </span>
+                        ${optionHtml}
+                    `;
+                    itemElement.classList.add(itemClass);
+                    menuItemsContainer.appendChild(itemElement);
+                });
+                updateSelection(itemsToRender);
+            }
+
+            function updateSelection(itemsToRender) {
+                const menuItems = menuItemsContainer.querySelectorAll('.menu-item');
+                menuItems.forEach((item, index) => {
+                    item.classList.remove('selected');
+                    if (index === selectedIndex) {
+                        item.classList.add('selected');
+                        item.focus();
+                    }
+                });
+            }
+
+            function handleMenuInput(event) {
+                const itemsToRender = menuData[currentMenuId];
+                const currentItemData = itemsToRender[selectedIndex];
+                const menuItems = menuItemsContainer.querySelectorAll('.menu-item');
+
+                if (event.key === 'ArrowUp' && selectedIndex > 0) {
+                    selectedIndex--;
+                } else if (event.key === 'ArrowDown' && selectedIndex < itemsToRender.length - 1) {
+                    selectedIndex++;
+                } else if (event.key === 'Enter') {
+                    if (currentItemData?.type === 'submenu') {
+                        history.push(currentMenuId);
+                        currentMenuId = currentItemData.target;
+                        selectedIndex = 0;
+                        renderMenu(currentMenuId);
+                    } else if (currentItemData?.type === 'back') {
+                        currentMenuId = history.pop() || 'main';
+                        selectedIndex = 0;
+                        renderMenu(currentMenuId);
+                    } else if (currentItemData?.type === 'toggle') {
+                        const newState = !optionStates[currentItemData.stateId];
+                        optionStates[currentItemData.stateId] = newState;
+                        showNotification(`${currentItemData.label}: ${newState ? 'Enabled' : 'Disabled'}`);
+                        renderMenu(currentMenuId);
+                    } else if (currentItemData?.type === 'action') {
+                        if (currentItemData.action === 'exit') {
+                            menuContainer.style.visibility = 'hidden';
+                            // You can add logic here to un-render the banner if needed
+                        }
+                    } else if (currentItemData?.type === 'input') {
+                        // For inputs, we don't handle 'Enter' press for value change,
+                        // as the user can just type directly. This is more of a visual item.
+                    }
+                } else if (event.key === 'ArrowLeft') {
+                    if (currentItemData?.type === 'toggle') {
+                        optionStates[currentItemData.stateId] = false;
+                        showNotification(`${currentItemData.label}: Disabled`);
+                        renderMenu(currentMenuId);
+                    } else if (currentItemData?.type === 'slider') {
+                        let value = optionStates[currentItemData.stateId] || currentItemData.min;
+                        value = Math.max(currentItemData.min, value - currentItemData.step);
+                        optionStates[currentItemData.stateId] = parseFloat(value.toFixed(2));
+                        renderMenu(currentMenuId);
+                    }
+                } else if (event.key === 'ArrowRight') {
+                    if (currentItemData?.type === 'toggle') {
+                        optionStates[currentItemData.stateId] = true;
+                        showNotification(`${currentItemData.label}: Enabled`);
+                        renderMenu(currentMenuId);
+                    } else if (currentItemData?.type === 'slider') {
+                        let value = optionStates[currentItemData.stateId] || currentItemData.min;
+                        value = Math.min(currentItemData.max, value + currentItemData.step);
+                        optionStates[currentItemData.stateId] = parseFloat(value.toFixed(2));
+                        renderMenu(currentMenuId);
+                    }
+                }
+                updateSelection(itemsToRender);
+            }
+
+            document.onkeydown = handleMenuInput;
+            renderMenu('main');
+
+            // --- Start of merged JS from jiggee.html ---
+            // These variables and functions are from jiggee.html
+            const introContainer = document.getElementById('intro-container');
+            const introTitle = document.getElementById('intro-title');
+            const introText = document.getElementById('intro-text');
+            const introMessage = document.getElementById('intro-message');
+            const modStatus = document.createElement('div');
+            modStatus.className = 'jiggy-message';
+            modStatus.style.position = 'absolute';
+            modStatus.style.bottom = '20px';
+            modStatus.style.right = '20px';
+            document.body.appendChild(modStatus);
+            let isContentPanelOpen = false;
+
+            // This function is for the banner flicker effect
+            function startBannerFlicker() {
+                const elements = [introTitle, introText, introMessage];
+                elements.forEach(element => {
+                    const originalText = element.textContent;
+                    element.innerHTML = originalText.split('').map(letter => `<span class="jiggy-letter">${letter}</span>`).join('');
+                });
+
+                const letters = document.querySelectorAll('.jiggy-letter');
+                letters.forEach(letter => {
+                    const originalColor = letter.style.color;
+                    const originalShadow = letter.style.textShadow;
+                    
+                    setInterval(() => {
+                        if (Math.random() < 0.2) {
+                            letter.style.color = '#fff';
+                            letter.style.textShadow = '0 0 10px #fff, 0 0 20px #fff';
+                            
                             setTimeout(() => {
-                                letter.style.color = '#333';
-                                letter.style.textShadow = 'none';
-                                
-                                setTimeout(() => {
-                                    letter.style.color = '#fff';
-                                    letter.style.textShadow = '0 0 10px #fff, 0 0 20px #fff';
-                                    
-                                    setTimeout(() => {
-                                        letter.style.color = originalColor;
-                                        letter.style.textShadow = originalShadow;
-                                    }, 50 + Math.random() * 100);
-                                }, 50 + Math.random() * 100);
-                            }, 100 + Math.random() * 400);
+                                letter.style.color = originalColor;
+                                letter.style.textShadow = originalShadow;
+                            }, 50 + Math.random() * 100);
+                        }
+                    }, 100 + Math.random() * 400);
+                });
+            }
+
+            startBannerFlicker();
+
+            // This is the message listener to control the menu from an external source
+            window.addEventListener("message", (event) => {
+                const { action, data } = event.data;
+                if (action === "update" || action === "show") {
+                    if (data) {
+                        // The original jiggee.html had a way to control the menu state
+                        // The logic below adapts this to the new menu
+                        if (data.isContentPanelOpen !== isContentPanelOpen) {
+                            modStatus.style.visibility = data.isContentPanelOpen ? 'visible' : 'hidden';
+                            isContentPanelOpen = data.isContentPanelOpen;
+                        }
+
+                        // updateMenuFromState(data); // The original function, let's adapt it
+                        updateMenuFromState(data);
+                        menuContainer.style.visibility = 'visible';
+
+                        if (action === "show" && !welcomeMessageShown) {
+                            welcomeMessageShown = true;
                         }
                     }
-                }, 100 + Math.random() * 400);
-            });
-        }
-
-        startBannerFlicker();
-
-        window.addEventListener("message", (event) => {
-            const { action, data } = event.data;
-            if (action === "update" || action === "show") {
-                if (data) {
-                    if (data.isContentPanelOpen !== isContentPanelOpen) {
-                        modStatus.style.visibility = data.isContentPanelOpen ? 'visible' : 'hidden';
-                        isContentPanelOpen = data.isContentPanelOpen;
-                    }
-
-                    updateMenuFromState(data);
-                    menuContainer.style.visibility = 'visible';
-
-                    if (action === "show" && !welcomeMessageShown) {
-                        welcomeMessageShown = true;
-                    }
                 }
-            }
-            if (action === 'hide') {
-                menuContainer.style.visibility = 'hidden';
-                modStatus.style.visibility = 'hidden';
+                if (action === 'hide') {
+                    menuContainer.style.visibility = 'hidden';
+                    modStatus.style.visibility = 'hidden';
+                }
+            });
+
+            // This is a new function to adapt the state from jiggee.html to the new menu system
+            function updateMenuFromState(stateData) {
+                // Here you can map the incoming state data to your optionStates object
+                // For example, if the incoming data has a 'feature1_enabled' property:
+                if (stateData.feature1_enabled !== undefined) {
+                    optionStates['feature1'] = stateData.feature1_enabled;
+                }
+                // You would need to add similar logic for other menu items as needed
+                renderMenu(currentMenuId);
             }
         });
     </script>
+
 </body>
 </html>
