@@ -1,765 +1,626 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jiggy Menu</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jiggy Menu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
 
-        body {
-            font-family: 'Inter', 'Fira Code', sans-serif;
-            background: transparent !important;
-            color: white;
-            overflow: hidden;
-            height: 100vh;
-            width: 100vw;
-            pointer-events: none;
-            display: block;
-        }
+        :root {
+            --background-start: #0f0c29;
+            --background-mid: #302b63;
+            --background-end: #24243e;
+            --panel-bg: rgba(20, 20, 35, 0.75);
+            --primary-accent: #7F5AF0; /* Vivid Purple */
+            --secondary-accent: #2CB67D; /* Bright Teal/Green */
+            --text-primary: #FFFFFE;
+            --text-secondary: #94A3B8; /* Slate 400 */
+            --status-on: #2CB67D;
+            --status-off: #EF4444; /* Red 500 */
+            --border-color: rgba(127, 90, 240, 0.2);
+            --shadow-color: rgba(127, 90, 240, 0.5);
+            --font-family: 'Poppins', sans-serif;
+        }
 
-        #intro-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            text-align: center;
-            padding-top: 10vh;
-            z-index: 20;
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(8px);
-            transition: opacity 1s ease-out;
-        }
-        
-        #intro-container.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
 
-        .message-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+        body {
+            font-family: var(--font-family);
+            background: transparent !important;
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            pointer-events: none;
+            display: block;
+        }
 
-        .intro-welcome-message {
-            font-size: 28px;
-            font-weight: 600;
-            text-shadow: 0 2px 10px rgba(255, 255, 255, 0.3);
-            white-space: nowrap;
-            margin-bottom: 12px;
-            opacity: 0;
-            transition: opacity 1s ease-out;
-            letter-spacing: 1px;
-        }
+        /* --- Intro Screen Styles --- */
+        #intro-container {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 20;
+            background: radial-gradient(circle, rgba(15, 12, 41, 0.95) 0%, rgba(10, 10, 20, 1) 100%);
+            transition: opacity 1s ease-out;
+        }
+        
+        #intro-container.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
 
-        .intro-secondary-message {
-            font-size: 14px;
-            font-weight: 400;
-            white-space: nowrap;
-            opacity: 0;
-            transition: opacity 1s ease-out;
-            color: rgba(255, 255, 255, 0.8);
-            letter-spacing: 0.5px;
-        }
+        .message-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
 
-        .text-line {
-            display: inline-block;
-            white-space: pre;
-        }
-        
-        .redish-pink-char { color: #FF00FF; text-shadow: 0 0 8px rgba(255, 0, 255, 0.4); }
-        .cyan-char { color: #00FFFF; text-shadow: 0 0 8px rgba(0, 255, 255, 0.4); }
-        .purple-char { color: #8A2BE2; text-shadow: 0 0 8px rgba(138, 43, 226, 0.4); }
-        .purplish-white-char { color: #C8BFE7; text-shadow: 0 0 8px rgba(200, 191, 231, 0.4); }
-        .white-char { color: #FFFFFF; text-shadow: 0 0 8px rgba(255, 255, 255, 0.3); }
+        .intro-welcome-message {
+            font-size: 2.5rem;
+            font-weight: 700;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 1s ease-out;
+        }
 
-        /* Clean Modern Menu */
-        .menu-container {
-            position: absolute;
-            right: 40px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 320px;
-            visibility: hidden;
-            pointer-events: auto;
-            z-index: 10;
-            height: 500px;
-        }
+        .intro-secondary-message {
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 1s ease-out;
+        }
+        
+        /* Character coloring from JS */
+        .redish-pink-char { color: #F72585; text-shadow: 0 0 8px #F72585; }
+        .cyan-char { color: #4CC9F0; text-shadow: 0 0 8px #4CC9F0; }
+        .purple-char { color: #7209B7; text-shadow: 0 0 8px #7209B7; }
+        .purplish-white-char { color: #E0E0E0; }
+        .white-char { color: #FFFFFF; }
 
-        .menu-background {
-            position: absolute;
-            inset: 0;
-            background: rgba(15, 15, 25, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            backdrop-filter: blur(20px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
 
-        .menu-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: white;
-            text-align: center;
-            padding: 20px 0 16px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            position: relative;
-            z-index: 2;
-            margin: 0 20px;
-            letter-spacing: 2px;
-        }
-        
-        .menu-title span {
-            display: inline-block;
-        }
+        /* --- Base Panel Style --- */
+        .panel {
+            position: absolute;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            visibility: hidden;
+            pointer-events: auto;
+            animation: fadeIn 0.3s ease-out;
+            display: flex;
+            flex-direction: column;
+        }
 
-        .menu-status {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.6);
-            text-align: center;
-            padding: 8px 0;
-            position: relative;
-            z-index: 2;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-50%) scale(0.95); }
+            to { opacity: 1; transform: translateY(-50%) scale(1.0); }
+        }
 
-        .menu-options-container {
-            position: relative;
-            height: calc(100% - 80px);
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
-            z-index: 2;
-            padding: 0 20px 20px 20px;
-        }
+        /* --- Main Menu Styles --- */
+        .menu-container {
+            /* Inherits from .panel */
+            right: 50px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 320px;
+            height: 550px;
+            z-index: 10;
+        }
+        /* JS needs .menu-background, but we can hide it and style the parent */
+        .menu-background { display: none; }
 
-        .menu-options-container::-webkit-scrollbar {
-            width: 2px;
-        }
+        .menu-header {
+            padding: 20px 24px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+        }
 
-        .menu-options-container::-webkit-scrollbar-track {
-            background: transparent;
-        }
+        .menu-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
 
-        .menu-options-container::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 1px;
-        }
+        .menu-status {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
 
-        .menu-options { 
-            list-style: none; 
-            padding: 10px 0; 
-            height: 100%;
-        }
+        .menu-options-container {
+            position: relative;
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+        
+        .menu-options-container::-webkit-scrollbar { display: none; }
+        .menu-options-container { scrollbar-width: none; -ms-overflow-style: none; }
 
-        .menu-option {
-            padding: 12px 16px;
-            font-size: 14px;
-            font-weight: 500;
-            color: rgba(255, 255, 255, 0.7);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-            border-radius: 8px;
-            margin-bottom: 4px;
-            letter-spacing: 0.5px;
-        }
+        .menu-options {
+            list-style: none;
+        }
 
-        .menu-option:hover {
-            background: rgba(255, 255, 255, 0.05);
-            color: #00FFFF;
-            text-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
-            transform: translateX(4px);
-        }
+        .menu-option {
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            border-radius: 8px;
+            margin-bottom: 4px;
+        }
 
-        .menu-option.selected {
-            background: linear-gradient(90deg, rgba(255, 0, 255, 0.15), rgba(0, 255, 255, 0.15));
-            color: white;
-            border-left: 3px solid #FF00FF;
-            padding-left: 13px;
-            text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
-        }
+        .menu-option.selected {
+            color: var(--text-primary);
+            background: var(--primary-accent);
+            font-weight: 600;
+        }
+        /* JS needs #selectionIndicator, but we can hide it */
+        .selection-indicator { display: none; }
 
-        .mod-status {
-            position: absolute;
-            left: 40px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(15, 15, 25, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            backdrop-filter: blur(20px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            padding: 20px;
-            width: 280px;
-            height: 420px; 
-            font-size: 13px;
-            line-height: 1.6;
-            visibility: hidden;
-            pointer-events: auto;
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
-        }
+        /* --- Content Panel Styles --- */
+        .mod-status {
+             /* Inherits from .panel */
+            left: 50px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 350px;
+            height: 550px;
+        }
 
-        .mod-status::-webkit-scrollbar {
-            width: 2px;
-        }
+        .mod-status-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 20px 24px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--primary-accent);
+        }
 
-        .mod-status::-webkit-scrollbar-track {
-            background: transparent;
-        }
+        #status-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        #status-list::-webkit-scrollbar { display: none; }
+        #status-list { scrollbar-width: none; -ms-overflow-style: none; }
 
-        .mod-status::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 1px;
-        }
+        .status-item, .input-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: background 0.2s ease;
+            border: 1px solid transparent;
+        }
+        
+        .status-item.selected, .input-group.selected {
+             background: rgba(127, 90, 240, 0.2);
+             border: 1px solid var(--primary-accent);
+        }
 
-        .mod-status-title {
-            color: #00FFFF;
-            font-weight: 700;
-            font-size: 14px;
-            margin-bottom: 16px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 8px;
-            text-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
+        /* Status colors */
+        .status-on, .status-started { color: var(--status-on); font-weight: 600; }
+        .status-off, .status-stopped { color: var(--status-off); font-weight: 600; }
+        .status-unknown { color: #FBBF24; font-weight: 600; } /* Amber 400 */
+        
+        /* Input Field styles */
+        .input-group {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
 
-        .status-item { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            margin-bottom: 6px; 
-            padding: 8px 12px;
-            transition: all 0.2s ease;
-            border-radius: 6px;
-            font-weight: 500;
-        }
+        .input-group label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
 
-        .status-item:hover {
-            background: rgba(255, 255, 255, 0.05);
-            transform: translateX(2px);
-        }
+        .input-field {
+            width: 100%;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-family: 'Courier New', monospace; /* Keep mono for code-like input */
+            transition: all 0.2s ease;
+        }
 
-        .status-item.selected {
-            background: rgba(255, 0, 255, 0.1);
-            border-left: 2px solid #FF00FF;
-            padding-left: 10px;
-        }
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary-accent);
+            box-shadow: 0 0 0 3px rgba(127, 90, 240, 0.5);
+        }
 
-        .status-on, .status-started { 
-            color: #39FF14; 
-            font-weight: 600; 
-            text-shadow: 0 0 6px rgba(57, 255, 20, 0.4);
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .status-off, .status-stopped { 
-            color: #FF073A; 
-            font-weight: 600; 
-            text-shadow: 0 0 6px rgba(255, 7, 58, 0.4);
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .status-unknown { 
-            color: #FFFF33; 
-            font-weight: 600; 
-            text-shadow: 0 0 6px rgba(255, 255, 51, 0.4);
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .selection-indicator {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 3px;
-            height: 100%;
-            background: linear-gradient(180deg, #FF00FF, #00FFFF);
-            transition: all 0.3s ease;
-            z-index: 3;
-            border-radius: 0 2px 2px 0;
-            opacity: 0;
-        }
-
-        .menu-option.selected ~ .selection-indicator,
-        .menu-option:hover ~ .selection-indicator {
-            opacity: 1;
-        }
-
-        .jiggy-banner {
-            position: absolute;
-            bottom: 50px;
-            left: 30px;
-            font-size: 18px;
-            font-weight: 700;
-            white-space: nowrap;
-            pointer-events: auto;
-            letter-spacing: 2px;
-            background: rgba(15, 15, 25, 0.8);
-            backdrop-filter: blur(15px);
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-        }
-        
-        .jiggy-banner span {
-            display: inline-block;
-            transition: all 0.3s ease;
-        }
-
-        .jiggy-banner:hover span {
-            transform: scale(1.1);
-        }
-
-        .jiggy-banner .pink { 
-            color: #FF00FF; 
-            text-shadow: 0 0 6px rgba(255, 0, 255, 0.4); 
-        }
-        .jiggy-banner .cyan { 
-            color: #00FFFF; 
-            text-shadow: 0 0 6px rgba(0, 255, 255, 0.4); 
-        }
-
-        .input-group {
-            padding: 10px 12px;
-            background: rgba(255, 255, 255, 0.03);
-            transition: all 0.2s ease;
-            border-radius: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 8px;
-        }
-        
-        .input-group.selected {
-            background: rgba(255, 0, 255, 0.1);
-            border: 1px solid rgba(255, 0, 255, 0.3);
-            transform: scale(1.02);
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 6px;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 10px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 6px 10px;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-            color: #fff;
-            font-size: 12px;
-            font-family: 'Fira Code', monospace;
-            font-weight: 400;
-            transition: all 0.2s ease;
-        }
-
-        .input-field:focus {
-            outline: none;
-            border-color: #00FFFF;
-            box-shadow: 0 0 8px rgba(0, 255, 255, 0.2);
-            background: rgba(0, 0, 0, 0.6);
-        }
-
-        /* Subtle animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .menu-container[style*="visible"] {
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        .mod-status[style*="visible"] {
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        /* Clean minimal scrollbar for Firefox */
-        .menu-options-container,
-        .mod-status {
-            scrollbar-width: thin;
-            scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
-        }
-    </style>
+        /* --- Watermark Banner --- */
+        .jiggy-banner {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            pointer-events: auto;
+            opacity: 0.8;
+        }
+        
+        .jiggy-banner .pink { color: var(--primary-accent); }
+        .jiggy-banner .cyan { color: var(--secondary-accent); }
+    </style>
 </head>
 <body>
-    <div id="intro-container">
-        <div class="message-container">
-            <div class="intro-welcome-message" id="intro-welcome-message">
-                <span class="text-line" id="intro-welcome-message-text"></span>
-            </div>
-            <div class="intro-secondary-message" id="intro-secondary-message">
-                <span class="text-line" id="intro-secondary-message-text"></span>
-            </div>
-        </div>
-    </div>
+    <div id="intro-container">
+        <div class="message-container">
+            <div class="intro-welcome-message" id="intro-welcome-message">
+                <span class="text-line" id="intro-welcome-message-text"></span>
+            </div>
+            <div class="intro-secondary-message" id="intro-secondary-message">
+                <span class="text-line" id="intro-secondary-message-text"></span>
+            </div>
+        </div>
+    </div>
 
-    <div class="menu-container" id="menu-container">
-        <div class="menu-background"></div>
-        <div class="menu-title" id="menu-title">
-            <span style="color:#FF00FF">J</span><span style="color:#00FFFF">i</span><span style="color:#FF00FF">g</span><span style="color:#00FFFF">g</span><span style="color:#FF00FF">y</span>
-            <span style="color:#FF00FF"> </span>
-            <span style="color:#00FFFF">M</span><span style="color:#FF00FF">e</span><span style="color:#00FFFF">n</span><span style="color:#FF00FF">u</span>
-            <span style="color:#FF00FF"> </span>
-            <span style="color:#00FFFF">LUA</span>
-        </div>
-        <div class="menu-status" id="menu-status">By Anonymous</div>
-        <div class="menu-options-container">
-            <div class="selection-indicator" id="selectionIndicator"></div>
-            <ul class="menu-options" id="menuOptions"></ul>
-        </div>
-    </div>
+    <div class="menu-container panel" id="menu-container">
+        <div class="menu-background"></div> <div class="menu-header">
+            <div class="menu-title" id="menu-title">
+                <span style="color:#7F5AF0">J</span><span style="color:#2CB67D">i</span><span style="color:#7F5AF0">g</span><span style="color:#2CB67D">g</span><span style="color:#7F5AF0">y</span>
+                <span style="color:#7F5AF0"> </span>
+                <span style="color:#FFFFFE">M</span><span style="color:#FFFFFE">e</span><span style="color:#FFFFFE">n</span><span style="color:#FFFFFE">u</span>
+            </div>
+            <div class="menu-status" id="menu-status">By Anonymous</div>
+        </div>
+        <div class="menu-options-container">
+            <div class="selection-indicator" id="selectionIndicator"></div> <ul class="menu-options" id="menuOptions"></ul>
+        </div>
+    </div>
 
-    <div class="mod-status" id="mod-status">
-        <div class="mod-status-title" id="contentHeader">MOD STATUS</div>
-        <div id="status-list"></div>
-    </div>
+    <div class="mod-status panel" id="mod-status">
+        <div class="mod-status-title" id="contentHeader">MOD STATUS</div>
+        <div id="status-list"></div>
+    </div>
 
-    <div class="jiggy-banner" id="jiggy-banner">
-        <span class="pink">J</span><span class="cyan">i</span><span class="pink">G</span><span class="cyan">g</span><span class="pink">Y</span>
-        <span class="pink"> </span>
-        <span class="cyan">M</span><span class="pink">e</span><span class="cyan">N</span><span class="pink">u</span>
-        <span class="cyan"> </span>
-        <span class="pink">L</span><span class="cyan">U</span><span class="pink">A</span>
-    </div>
+    <div class="jiggy-banner" id="jiggy-banner">
+        <span class="pink">J</span><span class="cyan">i</span><span class="pink">G</span><span class="cyan">g</span><span class="pink">Y</span>
+        <span class="pink">&nbsp;</span>
+        <span class="cyan">M</span><span class="pink">e</span><span class="cyan">N</span><span class="pink">u</span>
+    </div>
 
-    <script>
-        // Intro Screen Script
-        document.addEventListener("DOMContentLoaded", () => {
-            const introContainer = document.getElementById('intro-container');
-            const introWelcomeMessage = document.getElementById('intro-welcome-message');
-            const introWelcomeMessageText = document.getElementById('intro-welcome-message-text');
-            const introSecondaryMessage = document.getElementById('intro-secondary-message');
-            const introSecondaryMessageText = document.getElementById('intro-secondary-message-text');
+    <script>
+        // Intro Screen Script
+        document.addEventListener("DOMContentLoaded", () => {
+            const introContainer = document.getElementById('intro-container');
+            const introWelcomeMessage = document.getElementById('intro-welcome-message');
+            const introWelcomeMessageText = document.getElementById('intro-welcome-message-text');
+            const introSecondaryMessage = document.getElementById('intro-secondary-message');
+            const introSecondaryMessageText = document.getElementById('intro-secondary-message-text');
 
-            const message1 = "Hello there, Welcome to Jiggy Menu LUA";
-            const message2 = "All updates on discord jiggymenulua";
-            const scrambleChars = "0123456789!@#$%^&*()_+-=[]{}|;':,./<>?~`";
-            
-            const message1Data = Array.from(message1).map(char => ({ char: char, typed: false, scrambleCount: 0 }));
-            const message2Data = Array.from(message2).map(char => ({ char: char, typed: false, scrambleCount: 0 }));
-            
-            const scrambleSpeed = 5;
-            let animationFrame = 0;
+            const message1 = "Hello there, Welcome to Jiggy Menu LUA";
+            const message2 = "All updates on discord jiggymenulua";
+            const scrambleChars = "0123456789!@#$%^&*()_+-=[]{}|;':,./<>?~`";
+            
+            const message1Data = Array.from(message1).map(char => ({ char: char, typed: false, scrambleCount: 0 }));
+            const message2Data = Array.from(message2).map(char => ({ char: char, typed: false, scrambleCount: 0 }));
+            
+            const scrambleSpeed = 5;
+            let animationFrame = 0;
 
-            function getRandomChar() {
-                return scrambleChars[Math.floor(Math.random() * scrambleChars.length)];
-            }
-            
-            function getCharacterClass(message, index) {
-                const parts = message.split(' ');
-                let charCount = 0;
-                let currentWord = '';
-                for (let i = 0; i < parts.length; i++) {
-                    if (index >= charCount && index < charCount + parts[i].length) {
-                        currentWord = parts[i];
-                        break;
-                    }
-                    charCount += parts[i].length + 1;
-                }
+            function getRandomChar() {
+                return scrambleChars[Math.floor(Math.random() * scrambleChars.length)];
+            }
+            
+            function getCharacterClass(message, index) {
+                const parts = message.split(' ');
+                let charCount = 0;
+                let currentWord = '';
+                for (let i = 0; i < parts.length; i++) {
+                    if (index >= charCount && index < charCount + parts[i].length) {
+                        currentWord = parts[i];
+                        break;
+                    }
+                    charCount += parts[i].length + 1;
+                }
 
-                if (currentWord === 'Hello') return 'redish-pink-char';
-                if (currentWord === 'there,') return 'cyan-char';
-                if (currentWord === 'Welcome' || currentWord === 'to') return 'purple-char';
-                
-                if (currentWord === 'Jiggy') {
-                    const charIndexInWord = index - message.indexOf('Jiggy');
-                    return charIndexInWord % 2 === 0 ? 'redish-pink-char' : 'cyan-char';
-                }
-                
-                if (currentWord === 'Menu') {
-                    const charIndexInWord = index - message.indexOf('Menu');
-                    return charIndexInWord % 2 === 0 ? 'redish-pink-char' : 'cyan-char';
-                }
-                
-                if (currentWord === 'All' || currentWord === 'updates' || currentWord === 'on' || currentWord === 'discord') return 'purplish-white-char';
-                
-                if (currentWord === 'jiggymenulua') return 'purple-char';
+                if (currentWord === 'Hello') return 'redish-pink-char';
+                if (currentWord === 'there,') return 'cyan-char';
+                if (currentWord === 'Welcome' || currentWord === 'to') return 'purple-char';
+                
+                if (currentWord === 'Jiggy') {
+                    const charIndexInWord = index - message.indexOf('Jiggy');
+                    return charIndexInWord % 2 === 0 ? 'redish-pink-char' : 'cyan-char';
+                }
+                
+                if (currentWord === 'Menu') {
+                    const charIndexInWord = index - message.indexOf('Jiggy');
+                    return charIndexInWord % 2 === 0 ? 'redish-pink-char' : 'cyan-char';
+                }
+                
+                if (currentWord === 'All' || currentWord === 'updates' || currentWord === 'on' || currentWord === 'discord') return 'purplish-white-char';
+                
+                if (currentWord === 'jiggymenulua') return 'purple-char';
 
-                return 'white-char';
-            }
+                return 'white-char';
+            }
 
-            function updateDisplay(messageData, element, message) {
-                element.innerHTML = '';
-                let tempHTML = '';
-                for (let i = 0; i < messageData.length; i++) {
-                    const charData = messageData[i];
-                    const charClass = getCharacterClass(message, i);
-                    
-                    if (charData.typed) {
-                        tempHTML += `<span class="${charClass}">${charData.char}</span>`;
-                    } else if (charData.char === ' ') {
-                        tempHTML += `<span> </span>`;
-                    } else {
-                        tempHTML += `<span class="${charClass}">${getRandomChar()}</span>`;
-                    }
-                }
-                element.innerHTML = tempHTML;
-            }
+            function updateDisplay(messageData, element, message) {
+                element.innerHTML = '';
+                let tempHTML = '';
+                for (let i = 0; i < messageData.length; i++) {
+                    const charData = messageData[i];
+                    const charClass = getCharacterClass(message, i);
+                    
+                    if (charData.typed) {
+                        tempHTML += `<span class="${charClass}">${charData.char}</span>`;
+                    } else if (charData.char === ' ') {
+                        tempHTML += `<span> </span>`;
+                    } else {
+                        tempHTML += `<span class="${charClass}">${getRandomChar()}</span>`;
+                    }
+                }
+                element.innerHTML = tempHTML;
+            }
 
-            function animate() {
-                let allCompleted = true;
-                
-                for (let i = 0; i < message1Data.length; i++) {
-                    if (!message1Data[i].typed) {
-                        allCompleted = false;
-                        if (animationFrame % scrambleSpeed === 0) {
-                             if (message1Data[i].scrambleCount < scrambleSpeed) {
-                                 message1Data[i].scrambleCount++;
-                             } else {
-                                 message1Data[i].typed = true;
-                                 break;
-                             }
-                        }
-                    }
-                }
-                updateDisplay(message1Data, introWelcomeMessageText, message1);
+            function animate() {
+                let allCompleted = true;
+                
+                for (let i = 0; i < message1Data.length; i++) {
+                    if (!message1Data[i].typed) {
+                        allCompleted = false;
+                        if (animationFrame % scrambleSpeed === 0) {
+                                if (message1Data[i].scrambleCount < scrambleSpeed) {
+                                    message1Data[i].scrambleCount++;
+                                } else {
+                                    message1Data[i].typed = true;
+                                    break;
+                                }
+                        }
+                    }
+                }
+                updateDisplay(message1Data, introWelcomeMessageText, message1);
 
-                for (let i = 0; i < message2Data.length; i++) {
-                    if (!message2Data[i].typed) {
-                        allCompleted = false;
-                        if (animationFrame % scrambleSpeed === 0) {
-                             if (message2Data[i].scrambleCount < scrambleSpeed) {
-                                 message2Data[i].scrambleCount++;
-                             } else {
-                                 message2Data[i].typed = true;
-                                 break;
-                             }
-                        }
-                    }
-                }
-                updateDisplay(message2Data, introSecondaryMessageText, message2);
+                for (let i = 0; i < message2Data.length; i++) {
+                    if (!message2Data[i].typed) {
+                        allCompleted = false;
+                        if (animationFrame % scrambleSpeed === 0) {
+                                if (message2Data[i].scrambleCount < scrambleSpeed) {
+                                    message2Data[i].scrambleCount++;
+                                } else {
+                                    message2Data[i].typed = true;
+                                    break;
+                                }
+                        }
+                    }
+                }
+                updateDisplay(message2Data, introSecondaryMessageText, message2);
 
-                if (allCompleted) {
-                    clearInterval(typingInterval);
-                    setTimeout(() => {
-                        introContainer.classList.add('hidden');
-                    }, 2000);
-                } else {
-                    animationFrame++;
-                }
-            }
-            
-            introWelcomeMessage.style.opacity = '1';
-            introSecondaryMessage.style.opacity = '1';
-            const typingInterval = setInterval(animate, 20);
-        });
+                if (allCompleted) {
+                    clearInterval(typingInterval);
+                    setTimeout(() => {
+                        introContainer.classList.add('hidden');
+                    }, 2000);
+                } else {
+                    animationFrame++;
+                }
+            }
+            
+            introWelcomeMessage.style.opacity = '1';
+            introSecondaryMessage.style.opacity = '1';
+            const typingInterval = setInterval(animate, 20);
+        });
 
-        let currentSelection = 0;
-        let currentState = null;
-        let isContentPanelOpen = false;
-        let welcomeMessageShown = false;
+        let currentSelection = 0;
+        let currentState = null;
+        let isContentPanelOpen = false;
+        let welcomeMessageShown = false;
 
-        const menuContainer = document.getElementById('menu-container');
-        const modStatus = document.getElementById('mod-status');
-        const menuOptionsList = document.getElementById('menuOptions');
-        const contentHeader = document.getElementById('contentHeader');
-        const contentList = document.getElementById('status-list');
-        const selectionIndicator = document.getElementById('selectionIndicator');
-        const bannerLetters = document.querySelectorAll('.jiggy-banner span');
+        const menuContainer = document.getElementById('menu-container');
+        const modStatus = document.getElementById('mod-status');
+        const menuOptionsList = document.getElementById('menuOptions');
+        const contentHeader = document.getElementById('contentHeader');
+        const contentList = document.getElementById('status-list');
+        const selectionIndicator = document.getElementById('selectionIndicator');
+        const bannerLetters = document.querySelectorAll('.jiggy-banner span');
 
-        const neonColors = ['#00FFFF', '#FF00FF', '#39FF14', '#FFD700', '#FF073A'];
+        const neonColors = ['#00FFFF', '#FF00FF', '#39FF14', '#FFD700', '#FF073A'];
 
-        function safeEncode(text) {
-            if (!text || typeof text !== 'string') return '';
-            return text.replace(/&/g, '&amp;')
-                       .replace(/</g, '&lt;')
-                       .replace(/>/g, '&gt;')
-                       .replace(/"/g, '&quot;')
-                       .replace(/'/g, '&#39;');
-        }
-        
-        function populateContent(tabData, state) {
-            contentList.innerHTML = '';
-            if (!tabData || !tabData.items || !Array.isArray(tabData.items)) return;
+        function safeEncode(text) {
+            if (!text || typeof text !== 'string') return '';
+            return text.replace(/&/g, '&amp;')
+                       .replace(/</g, '&lt;')
+                       .replace(/>/g, '&gt;')
+                       .replace(/"/g, '&quot;')
+                       .replace(/'/g, '&#39;');
+        }
+        
+        function populateContent(tabData, state) {
+            contentList.innerHTML = '';
+            if (!tabData || !tabData.items || !Array.isArray(tabData.items)) return;
 
-            tabData.items.forEach((item, index) => {
-                let element = document.createElement('div');
-                element.className = `status-item`;
-                if (state.selection.index === index) {
-                    element.classList.add('selected');
-                }
-                
-                let itemHTML;
-                const isToggleOrState = (item.type === 'toggle' || (item.label && (item.label.toLowerCase().includes('toggle') || item.label.toLowerCase().includes('enabled') || item.label.toLowerCase().includes('boost') || item.label.toLowerCase().includes('crasher'))));
-                const isResourceState = (tabData.key === 'resources' && item.state !== undefined);
+            tabData.items.forEach((item, index) => {
+                let element = document.createElement('div');
+                element.className = `status-item`;
+                if (state.selection.index === index) {
+                    element.classList.add('selected');
+                }
+                
+                let itemHTML;
+                const isToggleOrState = (item.type === 'toggle' || (item.label && (item.label.toLowerCase().includes('toggle') || item.label.toLowerCase().includes('enabled') || item.label.toLowerCase().includes('boost') || item.label.toLowerCase().includes('crasher'))));
+                const isResourceState = (tabData.key === 'resources' && item.state !== undefined);
 
-                if (isToggleOrState || isResourceState) {
-                    const statusClass = item.state ? (item.state === 'ON' ? 'status-on' : item.state === 'OFF' ? 'status-off' : 'status-unknown') : '';
-                    const statusText = item.state ? item.state : '';
-                    itemHTML = `<span>${safeEncode(item.label || 'Unknown')}</span><span class="${statusClass}">${safeEncode(statusText)}</span>`;
-                } else if (item.type === 'input') {
-                    const inputElement = `<input type="text" class="input-field" value="${safeEncode(item.value || '')}" readonly>`;
-                    itemHTML = `
-                        <div class="input-group ${state.selection.index === index ? 'selected' : ''}">
-                            <label>${safeEncode(item.label)}</label>
-                            ${inputElement}
-                        </div>`;
-                    element.classList.remove('status-item');
-                } else {
-                    itemHTML = `<span>${safeEncode(item.label || 'Unknown')}</span>`;
-                    element.style.color = neonColors[index % neonColors.length];
-                }
+                if (isToggleOrState || isResourceState) {
+                    const statusClass = item.state ? (item.state === 'ON' ? 'status-on' : item.state === 'OFF' ? 'status-off' : 'status-unknown') : '';
+                    const statusText = item.state ? item.state : '';
+                    itemHTML = `<span>${safeEncode(item.label || 'Unknown')}</span><span class="${statusClass}">${safeEncode(statusText)}</span>`;
+                } else if (item.type === 'input') {
+                    const inputElement = `<input type="text" class="input-field" value="${safeEncode(item.value || '')}" readonly>`;
+                    itemHTML = `
+                        <div class="input-group ${state.selection.index === index ? 'selected' : ''}">
+                            <label>${safeEncode(item.label)}</label>
+                            ${inputElement}
+                        </div>`;
+                    element.classList.remove('status-item');
+                } else {
+                    itemHTML = `<span>${safeEncode(item.label || 'Unknown')}</span>`;
+                    element.style.color = neonColors[index % neonColors.length];
+                }
 
-                element.innerHTML = itemHTML;
-                contentList.appendChild(element);
-            });
-        }
-        
-        function updateMenuFromState(state) {
-            if (!state || !state.tabs) return;
+                element.innerHTML = itemHTML;
+                contentList.appendChild(element);
+            });
+        }
+        
+        function updateMenuFromState(state) {
+            if (!state || !state.tabs) return;
 
-            currentState = state;
+            currentState = state;
 
-            menuOptionsList.innerHTML = '';
-            state.tabs.forEach((tabData, tabIndex) => {
-                const menuOption = document.createElement('li');
-                menuOption.className = 'menu-option';
-                menuOption.setAttribute('data-index', tabIndex);
-                if (tabIndex === state.activeTab) {
-                    menuOption.classList.add('selected');
-                }
-                menuOption.textContent = tabData.title || `Tab ${tabIndex + 1}`;
-                
-                menuOptionsList.appendChild(menuOption);
-            });
-            
-            isContentPanelOpen = state.isContentPanelOpen;
-            if (isContentPanelOpen) {
-                modStatus.style.visibility = 'visible';
-                const activeTab = state.tabs[state.activeTab];
-                if (activeTab) {
-                    contentHeader.textContent = activeTab.header || activeTab.title;
-                    populateContent(activeTab, state);
-                }
-            } else {
-                modStatus.style.visibility = 'hidden';
-            }
+            menuOptionsList.innerHTML = '';
+            state.tabs.forEach((tabData, tabIndex) => {
+                const menuOption = document.createElement('li');
+                menuOption.className = 'menu-option';
+                menuOption.setAttribute('data-index', tabIndex);
+                if (tabIndex === state.activeTab) {
+                    menuOption.classList.add('selected');
+                }
+                menuOption.textContent = tabData.title || `Tab ${tabIndex + 1}`;
+                
+                menuOptionsList.appendChild(menuOption);
+            });
+            
+            isContentPanelOpen = state.isContentPanelOpen;
+            if (isContentPanelOpen) {
+                modStatus.style.visibility = 'visible';
+                const activeTab = state.tabs[state.activeTab];
+                if (activeTab) {
+                    contentHeader.textContent = activeTab.header || activeTab.title;
+                    populateContent(activeTab, state);
+                }
+            } else {
+                modStatus.style.visibility = 'hidden';
+            }
 
-            attachEventListeners();
-            updateIndicatorPosition();
-        }
+            attachEventListeners();
+            updateIndicatorPosition();
+        }
 
-        function attachEventListeners() {
-            const menuOptions = document.querySelectorAll('.menu-option');
-            menuOptions.forEach((option, index) => {
-                option.addEventListener('mouseenter', () => updateSelection(index));
-                option.addEventListener('click', () => {
-                    if (window.parent) {
-                        window.parent.postMessage({ action: 'select', tabIndex: index, isContentPanel: false }, '*');
-                    }
-                });
-            });
-            
-            const contentItems = document.querySelectorAll('.status-item, .input-group');
-            contentItems.forEach((item, index) => {
-                item.addEventListener('mouseenter', () => {
-                    contentItems.forEach(i => i.classList.remove('selected'));
-                    item.classList.add('selected');
-                });
-                item.addEventListener('click', () => {
-                    if (window.parent) {
-                        window.parent.postMessage({ action: 'select', itemIndex: index, isContentPanel: true }, '*');
-                    }
-                });
-            });
-        }
+        function attachEventListeners() {
+            const menuOptions = document.querySelectorAll('.menu-option');
+            menuOptions.forEach((option, index) => {
+                option.addEventListener('mouseenter', () => updateSelection(index));
+                option.addEventListener('click', () => {
+                    if (window.parent) {
+                        window.parent.postMessage({ action: 'select', tabIndex: index, isContentPanel: false }, '*');
+                    }
+                });
+            });
+            
+            const contentItems = document.querySelectorAll('.status-item, .input-group');
+            contentItems.forEach((item, index) => {
+                item.addEventListener('mouseenter', () => {
+                    contentItems.forEach(i => i.classList.remove('selected'));
+                    item.classList.add('selected');
+                });
+                item.addEventListener('click', () => {
+                    if (window.parent) {
+                        window.parent.postMessage({ action: 'select', itemIndex: index, isContentPanel: true }, '*');
+                    }
+                });
+            });
+        }
 
-        function updateSelection(index) {
-            const menuOptions = document.querySelectorAll('.menu-option');
-            menuOptions.forEach((option, i) => option.classList.toggle('selected', i === index));
-            currentSelection = index;
-            updateIndicatorPosition();
-        }
+        function updateSelection(index) {
+            const menuOptions = document.querySelectorAll('.menu-option');
+            menuOptions.forEach((option, i) => option.classList.toggle('selected', i === index));
+            currentSelection = index;
+            updateIndicatorPosition();
+        }
 
-        function updateIndicatorPosition() {
-            const menuOptions = document.querySelectorAll('.menu-option');
-            if (menuOptions.length === 0) return;
-            const selectedOption = menuOptions[currentSelection];
-            if (!selectedOption) return;
-            const containerRect = document.querySelector('.menu-options-container').getBoundingClientRect();
-            const optionRect = selectedOption.getBoundingClientRect();
-            const relativeTop = optionRect.top - containerRect.top;
-            selectionIndicator.style.top = relativeTop + 'px';
-            selectionIndicator.style.height = optionRect.height + 'px';
-        }
+        function updateIndicatorPosition() {
+            const menuOptions = document.querySelectorAll('.menu-option');
+            if (menuOptions.length === 0) return;
+            const selectedOption = menuOptions[currentSelection];
+            if (!selectedOption) return;
+            const containerRect = document.querySelector('.menu-options-container').getBoundingClientRect();
+            const optionRect = selectedOption.getBoundingClientRect();
+            const relativeTop = optionRect.top - containerRect.top;
+            selectionIndicator.style.top = relativeTop + 'px';
+            selectionIndicator.style.height = optionRect.height + 'px';
+        }
 
-        function startBannerFlicker() {
-            bannerLetters.forEach(letter => {
-                if (letter.textContent.trim() !== '') {
-                    setInterval(() => {
-                        if (Math.random() > 0.7) {
-                            const originalColor = letter.style.color;
-                            const originalShadow = letter.style.textShadow;
-                            
-                            letter.style.color = '#fff';
-                            letter.style.textShadow = '0 0 10px #fff, 0 0 20px #fff';
-                            
-                            setTimeout(() => {
-                                letter.style.color = originalColor;
-                                letter.style.textShadow = originalShadow;
-                            }, 50 + Math.random() * 100);
-                        }
-                    }, 100 + Math.random() * 400);
-                }
-            });
-        }
+        function startBannerFlicker() {
+            bannerLetters.forEach(letter => {
+                if (letter.textContent.trim() !== '') {
+                    setInterval(() => {
+                        if (Math.random() > 0.7) {
+                            const originalColor = letter.style.color;
+                            const originalShadow = letter.style.textShadow;
+                            
+                            letter.style.color = '#fff';
+                            letter.style.textShadow = '0 0 10px #fff, 0 0 20px #fff';
+                            
+                            setTimeout(() => {
+                                letter.style.color = originalColor;
+                                letter.style.textShadow = originalShadow;
+                            }, 50 + Math.random() * 100);
+                        }
+                    }, 100 + Math.random() * 400);
+                }
+            });
+        }
 
-        startBannerFlicker();
+        startBannerFlicker();
 
-        window.addEventListener("message", (event) => {
-            const { action, data } = event.data;
-            if (action === "update" || action === "show") {
-                if (data) {
-                    if (data.isContentPanelOpen !== isContentPanelOpen) {
-                        modStatus.style.visibility = data.isContentPanelOpen ? 'visible' : 'hidden';
-                        isContentPanelOpen = data.isContentPanelOpen;
-                    }
+        window.addEventListener("message", (event) => {
+            const { action, data } = event.data;
+            if (action === "update" || action === "show") {
+                if (data) {
+                    if (data.isContentPanelOpen !== isContentPanelOpen) {
+                        modStatus.style.visibility = data.isContentPanelOpen ? 'visible' : 'hidden';
+                        isContentPanelOpen = data.isContentPanelOpen;
+                    }
 
-                    updateMenuFromState(data);
-                    menuContainer.style.visibility = 'visible';
+                    updateMenuFromState(data);
+                    menuContainer.style.visibility = 'visible';
 
-                    if (action === "show" && !welcomeMessageShown) {
-                        welcomeMessageShown = true;
-                    }
-                }
-            }
-            if (action === 'hide') {
-                menuContainer.style.visibility = 'hidden';
-                modStatus.style.visibility = 'hidden';
-            }
-        });
-
-        window.addEventListener('resize', updateIndicatorPosition);
-    </script>
+                    if (action === "show" && !welcomeMessageShown) {
+                        welcomeMessageShown = true;
+                    }
+                }
+            }
+            if (action === 'hide') {
+                menuContainer.style.visibility = 'hidden';
+                modStatus.style.visibility = 'hidden';
+            }
+        });
+    </script>
 </body>
 </html>
