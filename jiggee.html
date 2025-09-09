@@ -240,7 +240,13 @@
         }
 
         .status-item-external:hover {
-            background: rgba(138, 43, 226, 0.1);
+            background: rgba(138, 43, 226, 0.2);
+            cursor: pointer;
+        }
+
+        /* Add hover effect to main menu items */
+        .menu-item:hover {
+            background: rgba(138, 43, 226, 0.2);
             cursor: pointer;
         }
 
@@ -253,13 +259,14 @@
         }
 
         .status-item-input:hover {
-            background: rgba(138, 43, 226, 0.1);
+            background: rgba(138, 43, 226, 0.2);
             cursor: pointer;
         }
 
         .status-item-input input:hover {
-            border-color: rgba(138, 43, 226, 0.6);
+            border-color: var(--accent-color);
             background: rgba(0,0,0,0.6);
+            box-shadow: 0 0 0 1px rgba(138, 43, 226, 0.3);
         }
 
         .status-on { color: #2ecc71; font-weight: 600; }
