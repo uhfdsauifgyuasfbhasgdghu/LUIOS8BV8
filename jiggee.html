@@ -229,6 +229,7 @@
             font-size: 14px;
             position: relative;
             z-index: 2;
+            transition: background-color 0.2s ease;
         }
 
         .status-item-external:last-child {
@@ -240,13 +241,23 @@
         }
 
         .status-item-external:hover {
-            background: rgba(138, 43, 226, 0.2);
+            background: rgba(138, 43, 226, 0.3) !important;
             cursor: pointer;
         }
 
         /* Add hover effect to main menu items */
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 11px 15px;
+            font-size: 15px;
+            position: relative;
+            height: 41px;
+            transition: background-color 0.2s ease;
+        }
+
         .menu-item:hover {
-            background: rgba(138, 43, 226, 0.2);
+            background: rgba(138, 43, 226, 0.3) !important;
             cursor: pointer;
         }
 
@@ -256,10 +267,11 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             position: relative;
             z-index: 2;
+            transition: background-color 0.2s ease;
         }
 
         .status-item-input:hover {
-            background: rgba(138, 43, 226, 0.2);
+            background: rgba(138, 43, 226, 0.3) !important;
             cursor: pointer;
         }
 
