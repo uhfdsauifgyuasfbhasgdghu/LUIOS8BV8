@@ -22,6 +22,7 @@
             --transition-speed: 0.1s;
         }
 
+        /* Custom scrollbar styles */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -41,6 +42,7 @@
             font-family: var(--font);
             background-color: transparent;
             color: var(--primary-text);
+            /* Allow body to scroll if needed, though menu is positioned absolutely */
             overflow-y: auto; 
             user-select: none;
         }
@@ -89,6 +91,7 @@
             list-style: none;
             position: relative;
             height: 410px;
+            /* Enable scrolling for this section */
             overflow-y: auto; 
             scrollbar-width: thin;
             -ms-overflow-style: -ms-autohiding-scrollbar;
@@ -101,7 +104,7 @@
             font-size: 15px;
             position: relative;
             height: 41px;
-            cursor: pointer;
+            cursor: pointer; /* Add a pointer cursor to show it's clickable */
         }
         
         .selection-highlight {
@@ -115,7 +118,7 @@
         }
 
         .menu-item:hover .selection-highlight {
-            opacity: 0.5;
+            opacity: 0.5; /* Add opacity to hover state */
         }
 
         .item-content {
@@ -188,6 +191,7 @@
         }
         .input-box small { color: var(--secondary-text); margin-top: 10px; display: block; }
 
+        /* Status panel styles */
         .status-panel {
             position: absolute;
             right: 50px;
@@ -199,6 +203,7 @@
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
             border: 1px solid var(--border-color);
             visibility: hidden;
+            /* Enable scrolling for this section */
             overflow-y: auto;
             scrollbar-width: thin;
             -ms-overflow-style: -ms-autohiding-scrollbar;
@@ -224,10 +229,18 @@
             padding: 8px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             font-size: 14px;
+            position: relative;
+            cursor: pointer;
         }
 
         .status-item-external:last-child {
             border-bottom: none;
+        }
+
+        .status-item-external:hover {
+            background: rgba(138, 43, 226, 0.2);
+            margin: 0 -15px;
+            padding: 8px 15px;
         }
 
         .status-item-external.selected {
@@ -385,25 +398,9 @@
                 if (state.selection && state.selection.index === index) {
                     element.classList.add('selected');
                 }
-
-                const isToggleOrState = (item.type === 'toggle' || (item.label && (item.label.toLowerCase().includes('toggle') || item.label.toLowerCase().includes('enabled') || item.label.toLowerCase().includes('boost') || item.label.toLowerCase().includes('crasher'))));
-                const isResourceState = (tabData.key === 'resources' && item.state !== undefined);
-
-                if (isToggleOrState || isResourceState) {
-                    const statusClass = item.state ? (item.state === 'ON' ? 'status-on' : item.state === 'OFF' ? 'status-off' : 'status-unknown') : 'status-off';
-                    const statusText = item.state ? item.state : 'OFF';
-                    element.innerHTML = `<span>${safeEncode(item.label || 'Unknown')}</span><span class="${statusClass}">${safeEncode(statusText)}</span>`;
-                } else if (item.type === 'input') {
-                    element.innerHTML = `
-                        <div style="width: 100%;">
-                            <label style="display: block; margin-bottom: 5px; font-size: 12px; color: var(--secondary-text);">${safeEncode(item.label)}</label>
-                            <input type="text" style="width: 100%; padding: 5px; background: rgba(0,0,0,0.5); border: 1px solid var(--border-color); color: var(--primary-text); border-radius: 3px;" value="${safeEncode(item.value || '')}" readonly>
-                        </div>`;
-                    element.classList.remove('status-item-external');
-                    element.style.padding = '10px';
-                } else {
-                    element.innerHTML = `<span>${safeEncode(item.label || 'Unknown')}</span>`;
-                }
+                
+                // This logic is now removed as per your request
+                element.innerHTML = `<span>${safeEncode(item.label || 'Unknown')}</span>`;
 
                 element.addEventListener('click', () => {
                     if (window.parent) {
@@ -500,8 +497,7 @@
                 if (item.type === 'submenu' || item.type === 'player') {
                     content += `<i class="chevron fa-solid fa-angle-right"></i>`;
                 } else if (item.type === 'toggle') {
-                    const isChecked = optionStates[item.stateId] || false;
-                    content += `<div class="item-value"><span class="toggle-indicator ${isChecked ? 'on' : 'off'}">[ ${isChecked ? 'On' : 'Off'} ]</span></div>`;
+                    // Toggles are now removed from the menu as requested.
                 } else if (item.type === 'slider') {
                     const value = optionStates[item.stateId] || item.min;
                     const percent = ((value - item.min) / (item.max - item.min)) * 100;
@@ -509,6 +505,7 @@
                 }
                 content += `</div>`;
                 menuItemEl.innerHTML = content;
+                menuItemEl.setAttribute('data-index', index);
                 menuItemsEl.appendChild(menuItemEl);
 
                 menuItemEl.addEventListener('click', () => {
@@ -529,8 +526,9 @@
             const currentItem = items[selectedIndex];
             currentItem.classList.add('selected');
 
-            const itemTop = selectedIndex * ITEM_HEIGHT;
-            const itemBottom = itemTop + ITEM_HEIGHT;
+            // --- FIXED SCROLLING LOGIC ---
+            const itemTop = currentItem.offsetTop;
+            const itemBottom = itemTop + currentItem.offsetHeight;
             const scrollTop = menuItemsEl.scrollTop;
             const containerHeight = menuItemsEl.clientHeight;
             
@@ -539,6 +537,7 @@
             } else if (itemBottom > scrollTop + containerHeight) {
                 menuItemsEl.scrollTop = itemBottom - containerHeight;
             }
+            // -----------------------------
 
             highlightEl.style.top = `${itemTop}px`;
             
@@ -618,6 +617,7 @@
             }
         });
 
+        // Add event listeners for mouse actions on the menu items
         menuItemsEl.addEventListener('mousemove', (e) => {
             const items = menuItemsEl.querySelectorAll('.menu-item');
             const newIndex = Array.from(items).findIndex(item => item.contains(e.target));
