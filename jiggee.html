@@ -2,11 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jiggy Menu</title>
+    <title>Cooked Menu</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inconsolata:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     
     <style>
@@ -38,15 +37,13 @@
             position: absolute;
             top: 15vh;
             left: 5vw;
-            width: 420px;
+            width: 420px; /* Wider for a more substantial feel */
             background: var(--bg-color);
             border-radius: var(--border-radius);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
             border: 1px solid var(--border-color);
-            visibility: hidden; /* Start hidden */
-            pointer-events: all;
         }
 
         .header-image {
@@ -56,24 +53,6 @@
             background-size: cover;
             background-position: center;
             border-bottom: 1px solid var(--border-color);
-        }
-        
-        #menu-title-container {
-            position: absolute;
-            top: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10;
-        }
-
-        #menu-title {
-            font-family: 'Inconsolata', monospace;
-            font-size: 32px;
-            font-weight: 700;
-            color: #fff;
-            text-shadow: 0 0 5px #fff, 0 0 10px #fff;
-            letter-spacing: 2px;
-            cursor: default;
         }
 
         .breadcrumb-bar {
@@ -92,8 +71,9 @@
         .menu-items {
             list-style: none;
             position: relative;
-            height: 410px;
+            height: 410px; /* FIXED HEIGHT: This prevents the menu from stretching. 41px * 10 items */
             overflow: hidden;
+            /* JS will handle scrolling */
         }
 
         .menu-item {
@@ -103,16 +83,14 @@
             font-size: 15px;
             position: relative;
             height: 41px;
-            transition: background-color var(--transition-speed) ease-out;
         }
         
         .selection-highlight {
             position: absolute;
             left: 0;
             width: 100%;
-            height: 41px;
+            height: 41px; /* Matches item height */
             background: var(--highlight-bg);
-            opacity: 0.2;
             z-index: 1;
             transition: top var(--transition-speed) ease-out;
         }
@@ -184,227 +162,157 @@
 <div class="input-overlay hidden" id="input-overlay"></div>
 
 <div class="menu-container" id="menu-container">
-    <div class="header-image">
-        <div id="menu-title-container">
-            <h1 id="menu-title">jiggy menu</h1>
-        </div>
-    </div>
+    <div class="header-image"></div>
     <div class="breadcrumb-bar">
         <span id="breadcrumb"></span>
         <span id="option-counter"></span>
     </div>
     <ul class="menu-items" id="menu-items">
         <div class="selection-highlight" id="selection-highlight"></div>
-        <!-- Items are dynamically generated here based on incoming data -->
-    </ul>
+        </ul>
     <div class="footer" id="footer">
-        <!-- Description will go here -->
-    </div>
+        </div>
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const menuContainer = document.getElementById('menu-container');
-        const menuItemsEl = document.getElementById('menu-items');
-        const breadcrumbEl = document.getElementById('breadcrumb');
-        const counterEl = document.getElementById('option-counter');
-        const footerEl = document.getElementById('footer');
-        let highlightEl = document.getElementById('selection-highlight');
-        const notificationContainer = document.getElementById('notification-container');
-        const inputOverlay = document.getElementById('input-overlay');
-        const menuTitleEl = document.getElementById('menu-title');
+    const menuContainer = document.getElementById('menu-container');
+    const menuItemsList = document.getElementById('menu-items');
+    const breadcrumb = document.getElementById('breadcrumb');
+    const optionCounter = document.getElementById('option-counter');
+    const footer = document.getElementById('footer');
+    const highlight = document.getElementById('selection-highlight');
 
-        let menuState = {};
-        let selectedIndex = 0;
-        let menuIsVisible = false;
-        let optionStates = {}; // Will be controlled by incoming messages
+    let menuState = null;
+    let selectedIndex = 0;
+    let scrollOffset = 0;
+    const MAX_VISIBLE_ITEMS = 10;
+    const ITEM_HEIGHT = 41;
+
+    // This function will be called by the NUI message to update the menu
+    function updateMenuFromState(data) {
+        menuState = data;
+        if (!menuState) return;
+
+        menuContainer.style.visibility = 'visible';
         
-        const MAX_VISIBLE_ITEMS = 10;
-        const ITEM_HEIGHT = 41;
+        selectedIndex = data.selectedIndex || 0;
+        scrollOffset = data.scrollOffset || 0;
 
-        // Function from jiggee.html to create a cool flicker effect on the title
-        function startBannerFlicker() {
-            const letters = menuTitleEl.textContent.split('');
-            menuTitleEl.innerHTML = letters.map(letter => `<span style="display:inline-block;">${letter}</span>`).join('');
-            const letterElements = menuTitleEl.querySelectorAll('span');
+        renderMenu(data.menuData);
+    }
+    
+    function renderMenu(menuData) {
+        menuItemsList.innerHTML = '';
+        const items = menuData.items;
 
-            setInterval(() => {
-                const randomLetter = letterElements[Math.floor(Math.random() * letterElements.length)];
-                if (randomLetter) {
-                    const originalColor = randomLetter.style.color;
-                    const originalShadow = randomLetter.style.textShadow;
-                    
-                    randomLetter.style.color = 'rgba(255, 255, 255, 0.4)';
-                    randomLetter.style.textShadow = 'none';
+        breadcrumb.innerText = menuData.title;
+        optionCounter.innerText = `${selectedIndex + 1}/${items.length}`;
+        footer.innerText = items[selectedIndex]?.description || "";
 
-                    setTimeout(() => {
-                        randomLetter.style.color = '#fff';
-                        randomLetter.style.textShadow = '0 0 10px #fff, 0 0 20px #fff';
-                        
-                        setTimeout(() => {
-                            randomLetter.style.color = originalColor;
-                            randomLetter.style.textShadow = originalShadow;
-                        }, 50 + Math.random() * 100);
-                    }, 100 + Math.random() * 400);
-                }
-            }, 100 + Math.random() * 400);
-        }
+        highlight.style.top = `${(selectedIndex - scrollOffset) * ITEM_HEIGHT}px`;
 
-        // Functions from jiggy_menu.html for UI
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.textContent = message;
-            notificationContainer.appendChild(notification);
-            setTimeout(() => { notification.remove(); }, 3000);
-        }
+        const start = scrollOffset;
+        const end = Math.min(items.length, start + MAX_VISIBLE_ITEMS);
 
-        function showInputPrompt(title, placeholder, callback) {
-            inputOverlay.innerHTML = `
-                <div class="input-box">
-                    <h3>${title}</h3>
-                    <input type="text" id="prompt-input" placeholder="${placeholder}">
-                    <small>Press Enter to submit, Escape to cancel.</small>
-                </div>
+        for (let i = start; i < end; i++) {
+            const itemData = items[i];
+            const itemEl = document.createElement('li');
+            itemEl.classList.add('menu-item');
+            
+            let itemContent = `
+                <div class="item-content">
+                    <span class="item-label">${itemData.label || itemData.name}</span>
             `;
-            inputOverlay.classList.remove('hidden');
-            const inputField = document.getElementById('prompt-input');
-            inputField.focus();
 
-            const close = () => {
-                inputOverlay.classList.add('hidden');
-                document.onkeydown = handleMenuInput; // Restore menu navigation
-            };
-
-            const keyHandler = (e) => {
-                if (e.key === 'Enter') {
-                    callback(inputField.value);
-                    close();
-                } else if (e.key === 'Escape') {
-                    close();
-                }
-            };
-            document.onkeydown = keyHandler;
-        }
-
-        function renderMenu(menuData, newIndex) {
-            if (!menuData || !menuData.menu) return;
-
-            menuState = menuData;
-            selectedIndex = newIndex !== undefined ? newIndex : menuData.selectedIndex;
-            
-            breadcrumbEl.textContent = menuData.menu.header;
-            menuItemsEl.innerHTML = `<div class="selection-highlight" id="selection-highlight"></div>`;
-            highlightEl = document.getElementById('selection-highlight');
-
-            const itemsToRender = menuData.menu.items.map(item => {
-                // Re-map the structure from the incoming data to match our rendering logic
-                if (item.type === 'subMenu') return { ...item, type: 'submenu' };
-                return item;
-            });
-            
-            itemsToRender.forEach(item => {
-                const menuItemEl = document.createElement('li');
-                menuItemEl.className = 'menu-item';
-                
-                let content = `<div class="item-content">`;
-                content += `<span class="item-label">${item.label || item.name}</span>`;
-
-                if (item.type === 'submenu' || item.type === 'player') {
-                    content += `<i class="chevron fa-solid fa-angle-right"></i>`;
-                } else if (item.type === 'toggle') {
-                    const isChecked = item.state || false;
-                    content += `<div class="item-value"><span class="toggle-indicator ${isChecked ? 'on' : 'off'}">[ ${isChecked ? 'On' : 'Off'} ]</span></div>`;
-                } else if (item.type === 'slider') {
-                    const value = item.state || item.min;
-                    const percent = ((value - item.min) / (item.max - item.min)) * 100;
-                    content += `<div class="item-value slider-container"><div class="slider-bar"><div class="slider-fill" style="width: ${percent}%"></div></div></div>`;
-                } else if (item.type === 'input') {
-                    content += `<div class="item-value">${item.placeholder}</div>`;
-                } else if (item.type === 'header') {
-                    menuItemEl.classList.add('is-header');
-                    content = `<div class="item-content"><span class="item-label" style="font-weight: 700; color: var(--accent-color);">${item.label}</span></div>`;
-                }
-                content += `</div>`;
-                menuItemEl.innerHTML = content;
-                menuItemsEl.appendChild(menuItemEl);
-            });
-            
-            updateSelection(itemsToRender);
-        }
-        
-        function updateSelection(itemsToRender) {
-            const items = menuItemsEl.querySelectorAll('.menu-item');
-            if (!items[selectedIndex]) return;
-
-            items.forEach((item, i) => item.classList.toggle('selected', i === selectedIndex));
-            
-            const firstVisible = Math.max(0, selectedIndex - Math.floor(MAX_VISIBLE_ITEMS / 2));
-            const scrollTop = firstVisible * ITEM_HEIGHT;
-            menuItemsEl.scrollTop = scrollTop;
-
-            highlightEl.style.top = `${(selectedIndex * ITEM_HEIGHT) - scrollTop}px`;
-            
-            counterEl.textContent = `${selectedIndex + 1} / ${items.length}`;
-            const currentItemData = itemsToRender[selectedIndex];
-            footerEl.textContent = currentItemData?.description || '';
-        }
-
-        // This is the main input handler, now tied to the 'message' event logic
-        function handleMenuInput(e) {
-            e.preventDefault();
-            const itemsToRender = menuState.menu.items.map(item => {
-                if (item.type === 'subMenu') return { ...item, type: 'submenu' };
-                return item;
-            });
-
-            switch (e.key) {
-                case 'ArrowUp':
-                    selectedIndex = (selectedIndex - 1 + itemsToRender.length) % itemsToRender.length;
-                    break;
-                case 'ArrowDown':
-                    selectedIndex = (selectedIndex + 1) % itemsToRender.length;
-                    break;
-                case 'Enter':
-                    // Send a message back to the client to notify of the selection
-                    window.postMessage({
-                        action: 'menu_select',
-                        index: selectedIndex
-                    }, '*');
-                    break;
-                case 'Backspace':
-                    window.postMessage({
-                        action: 'menu_back'
-                    }, '*');
-                    break;
+            if (itemData.type === 'toggle') {
+                itemContent += `<span class="toggle-indicator ${itemData.state ? 'on' : 'off'}">${itemData.state ? 'ON' : 'OFF'}</span>`;
+            } else if (itemData.type === 'slider') {
+                const fillWidth = ((itemData.value - itemData.min) / (itemData.max - itemData.min)) * 100;
+                itemContent += `
+                    <div class="slider-container">
+                        <span class="item-value">${itemData.value.toFixed(2)}</span>
+                        <div class="slider-bar">
+                            <div class="slider-fill" style="width: ${fillWidth}%;"></div>
+                        </div>
+                    </div>
+                `;
+            } else if (itemData.type === 'input') {
+                itemContent += `<span class="item-value">${itemData.placeholder}</span>`;
             }
-            // Update the UI locally for smooth navigation
-            updateSelection(itemsToRender);
+            
+            itemContent += `</div>`;
+            itemEl.innerHTML = itemContent;
+            
+            menuItemsList.appendChild(itemEl);
         }
-        
-        // This is the core logic from jiggee.html
-        window.addEventListener("message", (event) => {
-            const { action, data } = event.data;
+    }
 
-            if (action === "update" || action === "show") {
-                if (data) {
-                    if (action === "show") {
-                        menuContainer.style.visibility = 'visible';
-                        menuIsVisible = true;
-                        document.onkeydown = handleMenuInput; // Enable keyboard input when visible
-                    }
-                    renderMenu(data, data.selectedIndex);
+    function PostNuiMessage(action, data) {
+        fetch(`https://menu-name/${action}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+            body: JSON.stringify(data)
+        });
+    }
+
+    document.onkeydown = function(event) {
+        if (!menuState) return;
+
+        const items = menuState.menuData.items;
+        
+        switch(event.key) {
+            case 'ArrowUp':
+                selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+                if (selectedIndex < scrollOffset) {
+                    scrollOffset = selectedIndex;
                 }
-            } else if (action === 'hide') {
-                menuContainer.style.visibility = 'hidden';
-                menuIsVisible = false;
-                document.onkeydown = null; // Disable keyboard input when hidden
-            }
+                break;
+            case 'ArrowDown':
+                selectedIndex = (selectedIndex + 1) % items.length;
+                if (selectedIndex >= scrollOffset + MAX_VISIBLE_ITEMS) {
+                    scrollOffset = selectedIndex - MAX_VISIBLE_ITEMS + 1;
+                }
+                break;
+            case 'Enter':
+                const currentItem = items[selectedIndex];
+                if (currentItem?.type === 'button') {
+                    PostNuiMessage('buttonPress', { action: currentItem.action, value: currentItem.value });
+                } else if (currentItem?.target) {
+                    PostNuiMessage('changeMenu', { target: currentItem.target });
+                } else if (currentItem?.type === 'toggle') {
+                    PostNuiMessage('toggleState', { stateId: currentItem.stateId });
+                }
+                break;
+            case 'Backspace':
+                if (menuState.menuData.parent) {
+                    PostNuiMessage('changeMenu', { target: menuState.menuData.parent });
+                } else {
+                    PostNuiMessage('hide');
+                }
+                break;
+        }
+
+        PostNuiMessage('updateScrollAndIndex', {
+            selectedIndex: selectedIndex,
+            scrollOffset: scrollOffset
         });
         
-        // Start the flicker effect on page load
-        startBannerFlicker();
+        // Render the menu immediately after a key press
+        renderMenu(menuState.menuData);
+    };
+
+    window.addEventListener("message", (event) => {
+        const { action, data } = event.data;
+        if (action === "update" || action === "show") {
+            if (data) {
+                updateMenuFromState(data);
+            }
+        }
+        if (action === 'hide') {
+            menuContainer.style.visibility = 'hidden';
+        }
     });
+
 </script>
 
 </body>
