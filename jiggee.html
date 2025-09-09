@@ -14,7 +14,7 @@
             --bg-color: rgba(10, 10, 10, 0.92);
             --primary-text: #ffffff;
             --secondary-text: #b0b0b0;
-            --accent-color: #8A2BE2; /* A strong purple like Fragment */
+            --accent-color: #8A2BE2;
             --highlight-bg: #8A2BE2;
             --border-color: rgba(255, 255, 255, 0.15);
             --font: 'Inter', sans-serif;
@@ -22,19 +22,30 @@
             --transition-speed: 0.1s;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: var(--font);
-            background-color: transparent;
-            color: var(--primary-text);
-            overflow: hidden;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
             user-select: none;
         }
 
-        .hidden { display: none !important; }
+        body {
+            font-family: var(--font);
+            background: transparent !important;
+            color: var(--primary-text);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            pointer-events: none;
+            display: block;
+        }
+
+        .hidden {
+            display: none !important;
+        }
 
         .menu-container {
+            pointer-events: all;
             position: absolute;
             top: 15vh;
             left: 5vw;
@@ -45,6 +56,26 @@
             display: flex;
             flex-direction: column;
             border: 1px solid var(--border-color);
+        }
+        
+        #menu-container {
+            visibility: hidden;
+        }
+
+        #intro-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            text-align: center;
+            padding-top: 10vh;
+            z-index: 20;
+            pointer-events: none;
             visibility: hidden;
         }
 
@@ -67,6 +98,7 @@
             font-weight: 500;
             border-bottom: 1px solid var(--border-color);
         }
+        
         #breadcrumb { color: var(--secondary-text); text-transform: uppercase; }
         #option-counter { color: var(--primary-text); }
 
@@ -76,6 +108,16 @@
             height: 410px;
             overflow: hidden;
         }
+        
+        #menu-items {
+            overflow: hidden;
+            list-style: none;
+            position: relative;
+            height: 410px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
 
         .menu-item {
             display: flex;
@@ -84,6 +126,7 @@
             font-size: 15px;
             position: relative;
             height: 41px;
+            transition: all 0.1s ease-in-out;
         }
         
         .selection-highlight {
@@ -132,6 +175,21 @@
             font-size: 13px;
             color: var(--secondary-text);
         }
+        
+        #mod-status {
+            pointer-events: none;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: transparent;
+            color: #fff;
+            font-size: 14px;
+            z-index: 15;
+            visibility: hidden;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
 
         #notification-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
         .notification { background: var(--bg-color); border: 1px solid var(--border-color); color: var(--primary-text); padding: 10px 20px; border-radius: 8px; border-left: 4px solid var(--accent-color); box-shadow: 0 5px 15px rgba(0,0,0,0.3); opacity: 0; animation: slideIn 0.3s forwards, slideOut 0.3s 2.7s forwards; }
@@ -142,6 +200,7 @@
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
             display: flex; align-items: center; justify-content: center; z-index: 10000;
+            pointer-events: all;
         }
         .input-box {
             background: var(--bg-color); padding: 25px; border-radius: var(--border-radius);
@@ -155,9 +214,21 @@
         }
         .input-box input:focus { outline: 2px solid var(--accent-color); }
         .input-box small { color: var(--secondary-text); margin-top: 10px; display: block; }
+
     </style>
 </head>
 <body>
+
+<div id="intro-container">
+    <div class="logo">
+        <h1 id="jiggy-text-h1">JIGGY</h1>
+    </div>
+</div>
+
+<div id="mod-status">
+    <i class="fa-solid fa-cloud-arrow-up"></i>
+    <span id="mod-status-text">Synchronizing</span>
+</div>
 
 <div id="notification-container"></div>
 <div class="input-overlay hidden" id="input-overlay"></div>
@@ -170,9 +241,8 @@
     </div>
     <ul class="menu-items" id="menu-items">
         <div class="selection-highlight" id="selection-highlight"></div>
-        </ul>
-    <div class="footer" id="footer">
-        </div>
+    </ul>
+    <div class="footer" id="footer"></div>
 </div>
 
 <script>
@@ -182,19 +252,24 @@
     const optionCounter = document.getElementById('option-counter');
     const footer = document.getElementById('footer');
     const highlight = document.getElementById('selection-highlight');
-    const inputOverlay = document.getElementById('input-overlay');
+    const introContainer = document.getElementById('intro-container');
+    const modStatus = document.getElementById('mod-status');
     const notificationContainer = document.getElementById('notification-container');
+    const inputOverlay = document.getElementById('input-overlay');
 
     let menuState = null;
     let selectedIndex = 0;
     let scrollOffset = 0;
+    let welcomeMessageShown = false;
+    let isContentPanelOpen = false;
+
     const MAX_VISIBLE_ITEMS = 10;
     const ITEM_HEIGHT = 41;
 
     function renderMenu(menuData) {
         menuItemsList.innerHTML = '';
         const items = menuData.items;
-
+        
         breadcrumb.innerText = menuData.title;
         optionCounter.innerText = `${selectedIndex + 1}/${items.length}`;
         footer.innerText = items[selectedIndex]?.description || "";
@@ -238,7 +313,7 @@
     }
 
     function PostNuiMessage(action, data) {
-        // IMPORTANT: Make sure to replace 'jiggy-resource-name' with the actual name of your FiveM resource!
+        // IMPORTANT: Replace 'jiggy-resource-name' with the actual name of your FiveM resource!
         fetch(`https://jiggy-resource-name/${action}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json; charset=UTF-8' },
@@ -285,7 +360,6 @@
         }
 
         menuState = data;
-        menuContainer.style.visibility = 'visible';
         
         selectedIndex = data.selectedIndex || 0;
         scrollOffset = data.scrollOffset || 0;
@@ -326,7 +400,7 @@
                     showInputBox(currentItem.prompt, currentItem.initial, (value) => {
                         PostNuiMessage('inputResult', { action: currentItem.action, value: value });
                     });
-                    return; // Prevent immediate rendering after input
+                    return;
                 }
                 break;
             case 'Backspace':
@@ -360,11 +434,21 @@
         const { action, data } = event.data;
         if (action === "update" || action === "show") {
             if (data) {
+                if (data.isContentPanelOpen !== isContentPanelOpen) {
+                    modStatus.style.visibility = data.isContentPanelOpen ? 'visible' : 'hidden';
+                    isContentPanelOpen = data.isContentPanelOpen;
+                }
                 updateMenuFromState(data);
+                menuContainer.style.visibility = 'visible';
+
+                if (action === "show" && !welcomeMessageShown) {
+                    welcomeMessageShown = true;
+                }
             }
         }
         if (action === 'hide') {
             menuContainer.style.visibility = 'hidden';
+            modStatus.style.visibility = 'hidden';
         }
         if (action === 'notification') {
             showNotification(data.message);
