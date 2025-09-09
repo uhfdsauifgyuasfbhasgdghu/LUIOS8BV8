@@ -362,8 +362,8 @@
         function showInputPrompt(title, placeholder, callback) {
             inputOverlay.innerHTML = `
                 <div class="input-box">
-                    <h3>${title}</h3>
-                    <input type="text" id="prompt-input" placeholder="${placeholder}">
+                    <h3>${safeEncode(title)}</h3>
+                    <input type="text" id="prompt-input" placeholder="${safeEncode(placeholder)}">
                     <small>Press Enter to submit, Escape to cancel.</small>
                 </div>
             `;
@@ -399,7 +399,6 @@
                     element.classList.add('selected');
                 }
                 
-                // This logic is now removed as per your request
                 element.innerHTML = `<span>${safeEncode(item.label || 'Unknown')}</span>`;
 
                 element.addEventListener('click', () => {
