@@ -148,6 +148,13 @@
             border-radius: 4px;
         }
         .slider-container { display: flex; align-items: center; gap: 10px; }
+        
+        .input-indicator {
+            color: var(--secondary-text);
+            margin-left: 8px;
+            font-size: 14px;
+        }
+
 
         .footer {
             padding: 10px 15px;
@@ -335,9 +342,25 @@
 
         const defaultMenuData = {
             main: {
-                title: 'Loading Jiggy...',
+                title: 'Jiggy',
                 items: [
-                    { label: 'Loading Menu', target: 'self', description: 'Please Wait While The Menu Loads.' },
+                    { label: 'Set Player Name', type: 'input', placeholder: 'Enter new name...', description: 'Change your player name.' },
+                    { label: 'Sub-Menu', target: 'sub1', description: 'Open a sub-menu.' },
+                ]
+            },
+            sub1: {
+                title: 'Sub Menu',
+                parent: 'main',
+                items: [
+                    { label: 'Sub-Sub-Menu', target: 'sub2', description: 'Open another sub-menu.' },
+                    { label: 'Button', type: 'button', description: 'Click to trigger an action.' }
+                ]
+            },
+            sub2: {
+                title: 'Sub-Sub-Menu',
+                parent: 'sub1',
+                items: [
+                    { label: 'Set Value', type: 'input', placeholder: 'Enter a value...', description: 'Change a value.' },
                 ]
             }
         };
@@ -501,7 +524,10 @@
                     const value = optionStates[item.stateId] || item.min;
                     const percent = ((value - item.min) / (item.max - item.min)) * 100;
                     content += `<div class="item-value slider-container"><div class="slider-bar"><div class="slider-fill" style="width: ${percent}%"></div></div></div>`;
+                } else if (item.type === 'input') {
+                    content += `<i class="input-indicator fa-solid fa-pen-to-square"></i>`;
                 }
+
                 content += `</div>`;
                 menuItemEl.innerHTML = content;
                 menuItemEl.setAttribute('data-index', index);
