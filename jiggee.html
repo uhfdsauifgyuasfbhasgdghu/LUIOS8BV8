@@ -114,6 +114,10 @@
         .item-label { flex-grow: 1; }
         .item-value { color: var(--primary-text); font-weight: 500; }
         
+        .toggle-indicator { font-weight: 600; }
+        .toggle-indicator.on { color: #2ecc71; }
+        .toggle-indicator.off { color: #ff4757; }
+
         .slider-bar {
             width: 120px;
             height: 8px;
@@ -499,6 +503,14 @@
                 } else {
                     element.className = 'status-item-external';
                     
+                    if (isToggleOrState || isResourceState) {
+                        const statusClass = item.state ? (item.state === 'ON' ? 'status-on' : item.state === 'SAFE' ? 'status-off' : 'status-unknown') : 'status-off';
+                        const statusText = item.state ? item.state : 'SAFE';
+                        element.innerHTML = `<span>${safeEncode(item.label || 'Unknown')}</span><span class="${statusClass}">${safeEncode(statusText)}</span>`;
+                    } else {
+                        element.innerHTML = `<span>${safeEncode(item.label || 'Unknown')}</span>`;
+                    }
+                }
 
                 element.addEventListener('click', () => {
                     statusSelectedIndex = index;
