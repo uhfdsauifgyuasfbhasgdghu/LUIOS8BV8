@@ -491,10 +491,9 @@
                 const isResourceState = (tabData.key === 'resources' && item.state !== undefined);
 
                 if (isToggleOrState || isResourceState) {
-                    const statusState = (item.state === 'on' || item.state === 'started') ? 'ON' : 'OFF';
-                    const statusClass = (item.state === 'on' || item.state === 'started') ? 'status-on' : 'status-off';
-                    itemHTML = `<span>${safeEncode(item.label || 'Unknown')}</span><span class="${statusClass}">${statusState}</span>`;
-                    element.style.color = neonColors[index % neonColors.length];
+                    const statusClass = item.state ? (item.state === 'ON' ? 'status-on' : item.state === 'OFF' ? 'status-off' : 'status-unknown') : '';
+                    const statusText = item.state ? item.state : '';
+                    itemHTML = `<span>${safeEncode(item.label || 'Unknown')}</span><span class="${statusClass}">${safeEncode(statusText)}</span>`;
                 } else if (item.type === 'input') {
                     const inputElement = `<input type="text" class="input-field" value="${safeEncode(item.value || '')}" readonly>`;
                     itemHTML = `
