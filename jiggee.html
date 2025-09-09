@@ -62,23 +62,6 @@
             visibility: hidden;
         }
 
-        #intro-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            text-align: center;
-            padding-top: 10vh;
-            z-index: 20;
-            pointer-events: none;
-            visibility: hidden;
-        }
-
         .header-image {
             width: 100%;
             height: 100px;
@@ -218,12 +201,6 @@
 </head>
 <body>
 
-<div id="intro-container">
-    <div class="logo">
-        <h1 id="jiggy-text-h1">JIGGY</h1>
-    </div>
-</div>
-
 <div id="mod-status">
     <i class="fa-solid fa-cloud-arrow-up"></i>
     <span id="mod-status-text">Synchronizing</span>
@@ -251,212 +228,135 @@
     const optionCounter = document.getElementById('option-counter');
     const footer = document.getElementById('footer');
     const highlight = document.getElementById('selection-highlight');
-    const introContainer = document.getElementById('intro-container');
     const modStatus = document.getElementById('mod-status');
     const notificationContainer = document.getElementById('notification-container');
     const inputOverlay = document.getElementById('input-overlay');
 
-    let menuState = null;
-    let selectedIndex = 0;
-    let scrollOffset = 0;
-    let welcomeMessageShown = false;
-    let isContentPanelOpen = false;
-
-    const MAX_VISIBLE_ITEMS = 10;
+    let menuState = {
+        currentMenu: null,
+        selectedItem: 0
+    };
     const ITEM_HEIGHT = 41;
+    const MAX_VISIBLE_ITEMS = 10;
 
-    function renderMenu(menuData) {
-        menuItemsList.innerHTML = '';
-        const items = menuData.items;
-        
-        if (!items || items.length === 0) {
-            console.warn("Macho Menu: No menu items to display.");
-            menuItemsList.innerHTML = `<li><div class="item-content"><span class="item-label">No Options Available</span></div></li>`;
-            optionCounter.innerText = "0/0";
-            footer.innerText = "Check your Lua file for errors.";
+    function renderMenu() {
+        if (!menuState.currentMenu || !menuState.currentMenu.items) {
+            console.warn("Macho Menu: No menu data to render.");
+            menuItemsList.innerHTML = '';
+            breadcrumb.innerText = 'Main Menu';
+            optionCounter.innerText = '0/0';
+            footer.innerText = 'No options available. Check your Lua script.';
             return;
         }
+
+        const items = menuState.currentMenu.items;
+        menuItemsList.innerHTML = '';
         
-        breadcrumb.innerText = menuData.title;
-        optionCounter.innerText = `${selectedIndex + 1}/${items.length}`;
-        footer.innerText = items[selectedIndex]?.description || "";
+        breadcrumb.innerText = menuState.currentMenu.title || '';
+        optionCounter.innerText = `${menuState.selectedItem + 1}/${items.length}`;
+        footer.innerText = items[menuState.selectedItem]?.description || '';
+        
+        let scrollOffset = Math.max(0, menuState.selectedItem - Math.floor(MAX_VISIBLE_ITEMS / 2));
+        scrollOffset = Math.min(scrollOffset, items.length - MAX_VISIBLE_ITEMS);
+        scrollOffset = Math.max(0, scrollOffset);
 
-        highlight.style.top = `${(selectedIndex - scrollOffset) * ITEM_HEIGHT}px`;
+        highlight.style.top = `${(menuState.selectedItem - scrollOffset) * ITEM_HEIGHT}px`;
 
-        const start = scrollOffset;
-        const end = Math.min(items.length, start + MAX_VISIBLE_ITEMS);
-
-        for (let i = start; i < end; i++) {
+        for (let i = scrollOffset; i < Math.min(items.length, scrollOffset + MAX_VISIBLE_ITEMS); i++) {
             const itemData = items[i];
             const itemEl = document.createElement('li');
             itemEl.classList.add('menu-item');
             
-            let itemContent = `
-                <div class="item-content">
-                    <span class="item-label">${itemData.label || itemData.name}</span>
-            `;
-
+            let itemContent = `<div class="item-content">
+                                   <span class="item-label">${itemData.label || 'Unnamed Item'}</span>`;
             if (itemData.type === 'toggle') {
                 itemContent += `<span class="toggle-indicator ${itemData.state ? 'on' : 'off'}">${itemData.state ? 'ON' : 'OFF'}</span>`;
             } else if (itemData.type === 'slider') {
                 const fillWidth = ((itemData.value - itemData.min) / (itemData.max - itemData.min)) * 100;
-                itemContent += `
-                    <div class="slider-container">
-                        <span class="item-value">${itemData.value.toFixed(2)}</span>
-                        <div class="slider-bar">
-                            <div class="slider-fill" style="width: ${fillWidth}%;"></div>
-                        </div>
-                    </div>
-                `;
-            } else if (itemData.type === 'input') {
-                itemContent += `<span class="item-value">${itemData.placeholder}</span>`;
+                itemContent += `<div class="slider-container">
+                                    <span class="item-value">${itemData.value.toFixed(0)}</span>
+                                    <div class="slider-bar"><div class="slider-fill" style="width: ${fillWidth}%;"></div></div>
+                                </div>`;
             }
-            
             itemContent += `</div>`;
             itemEl.innerHTML = itemContent;
-            
             menuItemsList.appendChild(itemEl);
         }
     }
 
-    function PostNuiMessage(action, data) {
-        // Since you are using a Macho Menu, this function is likely not needed.
-        // Communication is handled by the Macho framework itself.
-    }
-
-    function showNotification(message) {
-        const notif = document.createElement('div');
-        notif.classList.add('notification');
-        notif.textContent = message;
-        notificationContainer.appendChild(notif);
-        setTimeout(() => notif.remove(), 3000);
-    }
-    
-    function showInputBox(prompt, initialValue, callback) {
-        const box = document.createElement('div');
-        box.classList.add('input-box');
-        box.innerHTML = `<h3>${prompt}</h3><input type="text" value="${initialValue}" id="input-field" /><small>Press Enter to submit, Backspace to cancel</small>`;
-        
-        inputOverlay.innerHTML = '';
-        inputOverlay.appendChild(box);
-        inputOverlay.classList.remove('hidden');
-
-        const inputField = document.getElementById('input-field');
-        inputField.focus();
-
-        function handleInput(e) {
-            if (e.key === 'Enter') {
-                callback(inputField.value);
-                inputOverlay.classList.add('hidden');
-                document.removeEventListener('keydown', handleInput);
-            } else if (e.key === 'Backspace') {
-                inputOverlay.classList.add('hidden');
-                document.removeEventListener('keydown', handleInput);
-            }
-        }
-        document.addEventListener('keydown', handleInput);
-    }
-    
-    function updateMenuFromState(data) {
-        if (!data || !data.menuData) {
-            console.error("Macho Menu Error: Received data is empty or invalid.", data);
-            return;
-        }
-
-        menuState = data;
-        
-        selectedIndex = data.selectedIndex || 0;
-        scrollOffset = data.scrollOffset || 0;
-
-        renderMenu(data.menuData);
-    }
-
-    document.onkeydown = function(event) {
-        if (!menuState || !menuState.menuData || inputOverlay.classList.contains('hidden') === false) return;
-
-        const items = menuState.menuData.items;
-        if (!items) return;
-        
-        switch(event.key) {
-            case 'ArrowUp':
-                selectedIndex = (selectedIndex - 1 + items.length) % items.length;
-                if (selectedIndex < scrollOffset) {
-                    scrollOffset = selectedIndex;
-                }
-                break;
-            case 'ArrowDown':
-                selectedIndex = (selectedIndex + 1) % items.length;
-                if (selectedIndex >= scrollOffset + MAX_VISIBLE_ITEMS) {
-                    scrollOffset = selectedIndex - MAX_VISIBLE_ITEMS + 1;
-                }
-                break;
-            case 'Enter':
-                const currentItem = items[selectedIndex];
-                if (currentItem?.type === 'button') {
-                    // This function sends a message to the Lua script, this will not work with Macho
-                    // We need to implement a Macho-specific method if the `fetch` from the original Jiggy menu doesn't work.
-                } else if (currentItem?.target) {
-                    // This function changes the menu, also handled by Macho
-                } else if (currentItem?.type === 'toggle') {
-                    // This function changes a toggle state
-                } else if (currentItem?.type === 'slider') {
-                    // This function changes a slider value
-                } else if (currentItem?.type === 'input') {
-                    showInputBox(currentItem.prompt, currentItem.initial, (value) => {
-                         // This would also require a custom Macho-specific message
-                    });
-                    return;
-                }
-                break;
-            case 'Backspace':
-                if (menuState.menuData.parent) {
-                    // This is also handled by Macho
-                } else {
-                    // This is also handled by Macho
-                }
-                break;
-            case 'ArrowLeft':
-                if (items[selectedIndex]?.type === 'slider') {
-                    // This is also handled by Macho
-                }
-                break;
-            case 'ArrowRight':
-                if (items[selectedIndex]?.type === 'slider') {
-                    // This is also handled by Macho
-                }
-                break;
-        }
-        
-        renderMenu(menuState.menuData);
-    };
-
     window.addEventListener("message", (event) => {
         const { action, data } = event.data;
-        console.log("Macho Menu Received Message:", event.data); // CRITICAL DEBUGGING LINE
         
-        if (action === "update" || action === "show") {
-            if (data) {
-                if (data.isContentPanelOpen !== isContentPanelOpen) {
-                    modStatus.style.visibility = data.isContentPanelOpen ? 'visible' : 'hidden';
-                    isContentPanelOpen = data.isContentPanelOpen;
-                }
-                updateMenuFromState(data);
-                menuContainer.style.visibility = 'visible';
-
-                if (action === "show" && !welcomeMessageShown) {
-                    welcomeMessageShown = true;
-                }
+        if (action === "show") {
+            menuState = {
+                currentMenu: data,
+                selectedItem: 0
+            };
+            renderMenu();
+            menuContainer.style.visibility = 'visible';
+        } else if (action === "update") {
+            if (data && data.items) {
+                menuState = {
+                    currentMenu: data,
+                    selectedItem: 0
+                };
             }
-        }
-        if (action === 'hide') {
+            renderMenu();
+        } else if (action === "hide") {
             menuContainer.style.visibility = 'hidden';
-            modStatus.style.visibility = 'hidden';
-        }
-        if (action === 'notification') {
-            showNotification(data.message);
+        } else if (action === "highlight") {
+            if (data !== undefined && data.highlightedIndex !== undefined) {
+                menuState.selectedItem = data.highlightedIndex;
+                renderMenu();
+            }
         }
     });
 
+    document.onkeydown = function(e) {
+        if (menuContainer.style.visibility !== 'visible') return;
+
+        const items = menuState.currentMenu.items;
+        if (!items || items.length === 0) return;
+
+        let postData = { action: '', data: {} };
+        switch(e.key) {
+            case 'ArrowUp':
+                menuState.selectedItem = (menuState.selectedItem - 1 + items.length) % items.length;
+                renderMenu();
+                postData.action = "highlight";
+                postData.data = { index: menuState.selectedItem };
+                break;
+            case 'ArrowDown':
+                menuState.selectedItem = (menuState.selectedItem + 1) % items.length;
+                renderMenu();
+                postData.action = "highlight";
+                postData.data = { index: menuState.selectedItem };
+                break;
+            case 'Enter':
+                postData.action = "select";
+                postData.data = { index: menuState.selectedItem };
+                break;
+            case 'Backspace':
+                postData.action = "back";
+                break;
+        }
+
+        if (postData.action !== '') {
+            fetch(`http://jiggy/menu-interaction`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+                body: JSON.stringify(postData)
+            }).catch(console.error);
+        }
+    };
+
+    // This is the fetch handler that your Lua script is listening for
+    // You should have a `RegisterNUICallback` in your Lua.
+    fetch(`http://jiggy/ready`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+        body: JSON.stringify({})
+    }).catch(console.error);
 </script>
 
 </body>
