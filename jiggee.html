@@ -13,15 +13,15 @@
             --background-start: #0f0c29;
             --background-mid: #302b63;
             --background-end: #24243e;
-            --panel-bg: rgba(20, 20, 35, 0.75);
-            --primary-accent: #7F5AF0; /* Vivid Purple */
-            --secondary-accent: #2CB67D; /* Bright Teal/Green */
+            --panel-bg: rgba(45, 0, 85, 0.75); /* Original menu background */
+            --primary-accent: #8A2BE2; /* Purple from original */
+            --secondary-accent: #00FFFF; /* Cyan from original */
             --text-primary: #FFFFFE;
-            --text-secondary: #94A3B8; /* Slate 400 */
-            --status-on: #2CB67D;
-            --status-off: #EF4444; /* Red 500 */
-            --border-color: rgba(127, 90, 240, 0.2);
-            --shadow-color: rgba(127, 90, 240, 0.5);
+            --text-secondary: #C8BFE7; /* Purplish-white from original */
+            --status-on: #39FF14; /* Green from original */
+            --status-off: #FF073A; /* Red from original */
+            --border-color: rgba(128, 0, 255, 0.5); /* Border from original */
+            --shadow-color: rgba(255, 0, 255, 0.5); /* Pink shadow from original */
             --font-family: 'Poppins', sans-serif;
         }
 
@@ -54,8 +54,10 @@
             align-items: center;
             text-align: center;
             z-index: 20;
-            background: radial-gradient(circle, rgba(15, 12, 41, 0.95) 0%, rgba(10, 10, 20, 1) 100%);
+            /* Removed the radial gradient to make it transparent */
+            background: transparent;
             transition: opacity 1s ease-out;
+            pointer-events: all; /* Keep pointer events for intro animation */
         }
         
         #intro-container.hidden {
@@ -76,6 +78,7 @@
             white-space: nowrap;
             opacity: 0;
             transition: opacity 1s ease-out;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.5);
         }
 
         .intro-secondary-message {
@@ -87,12 +90,12 @@
             transition: opacity 1s ease-out;
         }
         
-        /* Character coloring from JS */
-        .redish-pink-char { color: #F72585; text-shadow: 0 0 8px #F72585; }
-        .cyan-char { color: #4CC9F0; text-shadow: 0 0 8px #4CC9F0; }
-        .purple-char { color: #7209B7; text-shadow: 0 0 8px #7209B7; }
-        .purplish-white-char { color: #E0E0E0; }
-        .white-char { color: #FFFFFF; }
+        /* Character coloring from JS (maintained original values) */
+        .redish-pink-char { color: #FF00FF; text-shadow: 0 0 5px #FF00FF; }
+        .cyan-char { color: #00FFFF; text-shadow: 0 0 5px #00FFFF; }
+        .purple-char { color: #8A2BE2; text-shadow: 0 0 5px #8A2BE2; }
+        .purplish-white-char { color: #C8BFE7; text-shadow: 0 0 5px #C8BFE7; }
+        .white-char { color: #FFFFFF; text-shadow: 0 0 5px #FFFFFF; }
 
 
         /* --- Base Panel Style --- */
@@ -101,8 +104,8 @@
             background: var(--panel-bg);
             border: 1px solid var(--border-color);
             border-radius: 16px;
-            backdrop-filter: blur(12px);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            backdrop-filter: blur(2px); /* Maintain original blur */
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 0 0 10px var(--shadow-color); /* Added original shadow */
             visibility: hidden;
             pointer-events: auto;
             animation: fadeIn 0.3s ease-out;
@@ -137,6 +140,7 @@
         .menu-title {
             font-size: 1.75rem;
             font-weight: 700;
+            text-shadow: 0 0 15px #FF00FF; /* Original menu title shadow */
         }
 
         .menu-status {
@@ -150,10 +154,23 @@
             flex-grow: 1;
             overflow-y: auto;
             padding: 12px;
+            /* Custom Scrollbar for modern look */
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-accent) rgba(255,255,255,0.05);
         }
         
-        .menu-options-container::-webkit-scrollbar { display: none; }
-        .menu-options-container { scrollbar-width: none; -ms-overflow-style: none; }
+        .menu-options-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .menu-options-container::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+        .menu-options-container::-webkit-scrollbar-thumb {
+            background-color: var(--primary-accent);
+            border-radius: 10px;
+            border: 2px solid rgba(255,255,255,0.05);
+        }
 
         .menu-options {
             list-style: none;
@@ -195,7 +212,8 @@
             padding: 20px 24px;
             text-align: center;
             border-bottom: 1px solid var(--border-color);
-            color: var(--primary-accent);
+            color: var(--secondary-accent); /* Cyan from original */
+            text-shadow: 0 0 5px var(--secondary-accent); /* Original title shadow */
         }
 
         #status-list {
@@ -205,9 +223,22 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
+            /* Custom Scrollbar for modern look */
+            scrollbar-width: thin;
+            scrollbar-color: var(--secondary-accent) rgba(255,255,255,0.05);
         }
-        #status-list::-webkit-scrollbar { display: none; }
-        #status-list { scrollbar-width: none; -ms-overflow-style: none; }
+        #status-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        #status-list::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+        #status-list::-webkit-scrollbar-thumb {
+            background-color: var(--secondary-accent);
+            border-radius: 10px;
+            border: 2px solid rgba(255,255,255,0.05);
+        }
 
         .status-item, .input-group {
             display: flex;
@@ -219,17 +250,18 @@
             font-size: 0.9rem;
             transition: background 0.2s ease;
             border: 1px solid transparent;
+            color: var(--text-primary);
         }
         
         .status-item.selected, .input-group.selected {
-             background: rgba(127, 90, 240, 0.2);
-             border: 1px solid var(--primary-accent);
+             background: rgba(128, 0, 255, 0.2); /* Original selection background */
+             border: 1px solid var(--secondary-accent);
         }
 
         /* Status colors */
-        .status-on, .status-started { color: var(--status-on); font-weight: 600; }
-        .status-off, .status-stopped { color: var(--status-off); font-weight: 600; }
-        .status-unknown { color: #FBBF24; font-weight: 600; } /* Amber 400 */
+        .status-on, .status-started { color: var(--status-on); font-weight: 600; text-shadow: 0 0 5px var(--status-on); }
+        .status-off, .status-stopped { color: var(--status-off); font-weight: 600; text-shadow: 0 0 5px var(--status-off); }
+        .status-unknown { color: #FFFF33; font-weight: 600; text-shadow: 0 0 5px #FFFF33; } /* Yellow from original */
         
         /* Input Field styles */
         .input-group {
@@ -248,8 +280,8 @@
         .input-field {
             width: 100%;
             padding: 8px 12px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--border-color);
+            background: rgba(0, 0, 0, 0.5); /* Original input background */
+            border: 1px solid #FF00FF; /* Original input border */
             border-radius: 6px;
             color: var(--text-primary);
             font-size: 0.9rem;
@@ -259,8 +291,8 @@
 
         .input-field:focus {
             outline: none;
-            border-color: var(--primary-accent);
-            box-shadow: 0 0 0 3px rgba(127, 90, 240, 0.5);
+            border-color: var(--secondary-accent);
+            box-shadow: 0 0 8px var(--secondary-accent); /* Original focus shadow */
         }
 
         /* --- Watermark Banner --- */
@@ -272,10 +304,11 @@
             font-weight: 700;
             pointer-events: auto;
             opacity: 0.8;
+            text-shadow: 0 0 5px rgba(128, 0, 255, 0.5); /* Original banner shadow */
         }
         
-        .jiggy-banner .pink { color: var(--primary-accent); }
-        .jiggy-banner .cyan { color: var(--secondary-accent); }
+        .jiggy-banner .pink { color: #FF00FF; } /* Original pink */
+        .jiggy-banner .cyan { color: #00FFFF; } /* Original cyan */
     </style>
 </head>
 <body>
@@ -291,16 +324,18 @@
     </div>
 
     <div class="menu-container panel" id="menu-container">
-        <div class="menu-background"></div> <div class="menu-header">
+        <div class="menu-background"></div> 
+        <div class="menu-header">
             <div class="menu-title" id="menu-title">
-                <span style="color:#7F5AF0">J</span><span style="color:#2CB67D">i</span><span style="color:#7F5AF0">g</span><span style="color:#2CB67D">g</span><span style="color:#7F5AF0">y</span>
-                <span style="color:#7F5AF0"> </span>
-                <span style="color:#FFFFFE">M</span><span style="color:#FFFFFE">e</span><span style="color:#FFFFFE">n</span><span style="color:#FFFFFE">u</span>
+                <span style="color:#FF00FF">J</span><span style="color:#00FFFF">i</span><span style="color:#FF00FF">g</span><span style="color:#00FFFF">g</span><span style="color:#FF00FF">y</span>
+                <span style="color:#FF00FF"> </span>
+                <span style="color:#00FFFF">M</span><span style="color:#FF00FF">e</span><span style="color:#00FFFF">n</span><span style="color:#FF00FF">u</span>
             </div>
             <div class="menu-status" id="menu-status">By Anonymous</div>
         </div>
         <div class="menu-options-container">
-            <div class="selection-indicator" id="selectionIndicator"></div> <ul class="menu-options" id="menuOptions"></ul>
+            <div class="selection-indicator" id="selectionIndicator"></div> 
+            <ul class="menu-options" id="menuOptions"></ul>
         </div>
     </div>
 
@@ -450,6 +485,7 @@
         const selectionIndicator = document.getElementById('selectionIndicator');
         const bannerLetters = document.querySelectorAll('.jiggy-banner span');
 
+        // Maintained original neon colors for content items where no state is present
         const neonColors = ['#00FFFF', '#FF00FF', '#39FF14', '#FFD700', '#FF073A'];
 
         function safeEncode(text) {
@@ -474,9 +510,9 @@
                 
                 let itemHTML;
                 const isToggleOrState = (item.type === 'toggle' || (item.label && (item.label.toLowerCase().includes('toggle') || item.label.toLowerCase().includes('enabled') || item.label.toLowerCase().includes('boost') || item.label.toLowerCase().includes('crasher'))));
-                const isResourceState = (tabData.key === 'resources' && item.state !== undefined);
+                const isResourceState = (tabData.key === 'resources' && item.state !== undefined); // Check if it's a resource state
 
-                if (isToggleOrState || isResourceState) {
+                if (isToggleOrState || isResourceState) { // Apply to toggles, or any item in 'resources' with a state
                     const statusClass = item.state ? (item.state === 'ON' ? 'status-on' : item.state === 'OFF' ? 'status-off' : 'status-unknown') : '';
                     const statusText = item.state ? item.state : '';
                     itemHTML = `<span>${safeEncode(item.label || 'Unknown')}</span><span class="${statusClass}">${safeEncode(statusText)}</span>`;
@@ -490,6 +526,7 @@
                     element.classList.remove('status-item');
                 } else {
                     itemHTML = `<span>${safeEncode(item.label || 'Unknown')}</span>`;
+                    // Only apply neon colors to items without state if they are not input fields
                     element.style.color = neonColors[index % neonColors.length];
                 }
 
