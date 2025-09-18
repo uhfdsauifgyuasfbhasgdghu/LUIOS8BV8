@@ -1,678 +1,757 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COOKED.LUA</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cooked Menu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: rgba(10, 10, 10, 0.92);
+            --primary-text: #ffffff;
+            --secondary-text: #b0b0b0;
+            --accent-color: #8A2BE2;
+            --highlight-bg: #8A2BE2;
+            --border-color: rgba(255, 255, 255, 0.15);
+            --font: 'Inter', sans-serif;
+            --border-radius: 8px;
+            --transition-speed: 0.1s;
+            --scrollbar-color: #5d229e; /* New, darker purple for scrollbar */
+        }
 
-        body {
-            background: transparent !important;
-            color: #ffffff;
-            overflow: hidden;
-            height: 100vh;
-            pointer-events: none;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            font-weight: 400;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        @keyframes slideInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-100%) scale(0.95);
-                filter: blur(8px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0) scale(1);
-                filter: blur(0);
-            }
-        }
+        body {
+            font-family: var(--font);
+            background-color: transparent;
+            color: var(--primary-text);
+            overflow: hidden;
+            user-select: none;
+        }
 
-        @keyframes glow {
-            from {
-                filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.6)) brightness(1);
-            }
-            to {
-                filter: drop-shadow(0 0 40px rgba(168, 85, 247, 1)) brightness(1.2);
-            }
-        }
-        
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+        .hidden { display: none !important; }
 
-        .menu-container {
-            width: 420px;
-            height: 100vh;
-            background: rgba(8, 8, 12, 0.75);
-            backdrop-filter: blur(20px) saturate(180%);
-            border-right: 1px solid rgba(255, 255, 255, 0.08);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            animation: slideInLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            position: fixed;
-            top: 0;
-            left: 0;
-            visibility: hidden;
-            pointer-events: auto;
-            box-shadow: none;
-        }
+        .menu-container {
+            position: absolute;
+            top: 15vh;
+            left: 5vw;
+            width: 420px;
+            background: var(--bg-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-color);
+            visibility: hidden;
+        }
 
-        .menu-header {
-            padding: 24px 20px 20px 20px;
-            text-align: center;
-            background: rgba(8, 8, 12, 0.75);
-            backdrop-filter: blur(20px) saturate(180%);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            flex-shrink: 0;
-            position: relative;
-            overflow: hidden;
-        }
+        .header-image {
+            width: 100%;
+            height: 100px;
+            background-image: url('https://raw.githubusercontent.com/uhfdsauifgyuasfbhasgdghu/LUIOS8BV8/main/banner.png');
+            background-size: cover;
+            background-position: center;
+            border-bottom: 1px solid var(--border-color);
+            border-top-left-radius: var(--border-radius);
+            border-top-right-radius: var(--border-radius);
+        }
 
-        .banner-container {
-            width: 100%;
-            height: 80px;
-            margin-bottom: 16px;
-            border-radius: 12px;
-            overflow: hidden;
-            position: relative;
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(168, 85, 247, 0.1));
-            border: 1px solid rgba(139, 92, 246, 0.2);
-            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3), 0 0 40px rgba(139, 92, 246, 0.1);
-        }
+        .breadcrumb-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 15px;
+            background: rgba(0,0,0,0.3);
+            font-size: 14px;
+            font-weight: 500;
+            border-bottom: 1px solid var(--border-color);
+        }
+        #breadcrumb { color: var(--secondary-text); text-transform: uppercase; }
+        #option-counter { color: var(--primary-text); }
 
-        .banner-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 11px;
-        }
+        .menu-items {
+            list-style: none;
+            position: relative;
+            height: 410px;
+            overflow: hidden;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
 
-        .banner-fallback {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(168, 85, 247, 0.2));
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 18px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
-        }
+        .menu-items::-webkit-scrollbar {
+            display: none;
+        }
 
-        .logo h1 {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 24px;
-            font-weight: 700;
-            background: linear-gradient(45deg, #a855f7, #c084fc, #e879f9, #f0abfc);
-            background-size: 400% 400%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: 1px;
-            margin-bottom: 4px;
-            text-transform: uppercase;
-            text-shadow: 0 0 20px rgba(168, 85, 247, 0.6), 0 0 40px rgba(168, 85, 247, 0.3);
-            filter: drop-shadow(0 0 15px rgba(168, 85, 247, 0.6));
-            animation: glow 3s ease-in-out infinite alternate, gradientShift 4s ease-in-out infinite;
-            position: relative;
-        }
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 11px 15px;
+            font-size: 15px;
+            position: relative;
+            height: 41px;
+        }
+        
+        .selection-highlight {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 41px;
+            background: var(--highlight-bg);
+            z-index: 1;
+            transition: top var(--transition-speed) ease-out;
+        }
 
-        .logo p {
-            font-size: 11px;
-            color: rgba(168, 85, 247, 0.9);
-            font-weight: 600;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
-        }
+        .item-content {
+            display: flex;
+            width: 100%;
+            align-items: center;
+            z-index: 2;
+        }
+        
+        .item-label { flex-grow: 1; }
+        .item-value { color: var(--primary-text); font-weight: 500; }
+        
+        .toggle-indicator { font-weight: 600; }
+        .toggle-indicator.on { color: #2ecc71; }
+        .toggle-indicator.off { color: #ff4757; }
 
-        .tab-nav {
-            padding: 16px 12px;
-            background: rgba(8, 8, 12, 0.75);
-            backdrop-filter: blur(20px) saturate(180%);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            flex-shrink: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
+        .slider-bar {
+            width: 120px;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            position: relative;
+        }
+        .slider-fill {
+            height: 100%;
+            background: var(--primary-text);
+            border-radius: 4px;
+        }
+        .slider-container { display: flex; align-items: center; gap: 10px; }
 
-        .tab-button {
-            padding: 12px 16px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            border-radius: 10px;
-            position: relative;
-            overflow: hidden;
-            font-family: 'Inter', sans-serif;
-            text-align: left;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+        .footer {
+            padding: 10px 15px;
+            background: rgba(0,0,0,0.3);
+            border-top: 1px solid var(--border-color);
+            min-height: 20px;
+            font-size: 13px;
+            color: var(--secondary-text);
+            border-bottom-left-radius: var(--border-radius);
+            border-bottom-right-radius: var(--border-radius);
+        }
 
-        .tab-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.1), transparent);
-            transition: left 0.6s;
-        }
+        #notification-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .notification { background: var(--bg-color); border: 1px solid var(--border-color); color: var(--primary-text); padding: 10px 20px; border-radius: 8px; border-left: 4px solid var(--accent-color); box-shadow: 0 5px 15px rgba(0,0,0,0.3); opacity: 0; animation: slideIn 0.3s forwards, slideOut 0.3s 2.7s forwards; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+        
+        .input-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+            display: flex; align-items: center; justify-content: center; z-index: 10000;
+        }
+        .input-box {
+            background: var(--bg-color); padding: 25px; border-radius: var(--border-radius);
+            border: 1px solid var(--border-color); width: 400px; text-align: center;
+        }
+        .input-box h3 { margin-bottom: 15px; font-size: 18px; }
+        .input-box input {
+            width: 100%; padding: 12px; background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color); color: var(--primary-text);
+            border-radius: 6px; font-size: 16px; text-align: center;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .input-box input:focus { 
+            outline: none; 
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.2);
+        }
+        .input-box input:hover {
+            border-color: rgba(138, 43, 226, 0.6);
+        }
 
-        .tab-button:hover {
-            background: rgba(255, 255, 255, 0.06);
-            color: rgba(255, 255, 255, 0.8);
-            border-color: rgba(139, 92, 246, 0.3);
-            transform: translateX(6px);
-        }
+        .input-box small { color: var(--secondary-text); margin-top: 10px; display: block; }
 
-        .tab-button:hover::before {
-            left: 100%;
-        }
+        /* Status panel styles */
+        .status-panel {
+            position: absolute;
+            right: 50px;
+            top: 15vh;
+            width: 350px;
+            height: 500px;
+            background: var(--bg-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+            visibility: hidden;
+            overflow-y: auto;
+        }
 
-        .tab-button.active {
-            color: #ffffff;
-            background: rgba(139, 92, 246, 0.15);
-            border-color: rgba(139, 92, 246, 0.4);
-            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.2);
-            transform: translateX(8px);
-        }
+        .status-panel::-webkit-scrollbar {
+            width: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+        .status-panel::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-color);
+            border-radius: 4px;
+        }
 
-        .tab-arrow {
-            font-size: 16px;
-            opacity: 0.6;
-            transition: all 0.3s ease;
-        }
+        .status-header {
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+        }
 
-        .tab-button:hover .tab-arrow {
-            opacity: 1;
-            transform: translateX(2px);
-        }
+        .status-content {
+            padding: 15px;
+            position: relative;
+        }
 
-        .tab-button.active .tab-arrow {
-            opacity: 1;
-            color: rgba(139, 92, 246, 1);
-        }
+        /* Status panel highlight */
+        .status-selection-highlight {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            background: var(--highlight-bg);
+            z-index: 1;
+            transition: top var(--transition-speed) ease-out;
+            opacity: 0;
+        }
 
-        .main-content {
-            flex: 1;
-            overflow: hidden;
-            position: relative;
-            background: rgba(8, 8, 12, 0.75);
-            backdrop-filter: blur(20px) saturate(180%);
-        }
+        .status-item-external {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 14px;
+            position: relative;
+            z-index: 2;
+            transition: background-color 0.2s ease;
+        }
 
-        .tab-content {
-            display: none;
-            padding: 20px;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            overflow-y: auto;
-            overflow-x: hidden;
-            scroll-behavior: smooth;
-        }
+        .status-item-external:last-child {
+            border-bottom: none;
+        }
 
-        .tab-content.active {
-            display: block;
-        }
+        .status-item-external.selected {
+            background: rgba(138, 43, 226, 0.3);
+            margin: 0 -15px;
+            padding: 8px 15px;
+        }
 
-        .section-header {
-            font-size: 13px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 16px;
-            text-align: left;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            padding-bottom: 8px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        }
+        .status-item-external:hover {
+            background: rgba(138, 43, 226, 0.2) !important;
+            cursor: pointer;
+        }
 
-        .button-grid {
-            display: grid;
-            gap: 10px;
-            grid-template-columns: 1fr 1fr;
-        }
+        /* Add hover effect to main menu items */
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 11px 15px;
+            font-size: 15px;
+            position: relative;
+            height: 41px;
+            transition: background-color 0.2s ease;
+        }
 
-        .list-container {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
+        .menu-item:hover {
+            background: rgba(138, 43, 226, 0.3) !important;
+            cursor: pointer;
+        }
 
-        .action-button, .list-item, .input-group {
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+        /* Input hover styling in status panel */
+        .status-item-input {
+            padding: 10px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 2;
+            transition: background-color 0.2s ease;
+        }
 
-        .action-button {
-            padding: 14px 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 12px;
-            font-weight: 500;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.04);
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            font-family: 'Inter', sans-serif;
-        }
+        .status-item-input:hover {
+            background: rgba(138, 43, 226, 0.2) !important;
+            cursor: pointer;
+        }
 
-        .action-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, transparent, rgba(139, 92, 246, 0.1), transparent);
-            transition: left 0.5s ease;
-        }
+        .status-item-input:hover input {
+            border-color: var(--accent-color) !important;
+            background: rgba(0,0,0,0.6) !important;
+            box-shadow: 0 0 0 1px rgba(138, 43, 226, 0.4) !important;
+        }
 
-        .action-button:hover {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(139, 92, 246, 0.3);
-            transform: translateY(-1px);
-            color: #ffffff;
-        }
+        /* Make sure input boxes are easily distinguishable when hovered */
+        .status-item-input {
+            transition: all 0.2s ease;
+        }
 
-        .action-button:hover::before {
-            left: 100%;
-        }
+        .status-item-input input {
+            transition: all 0.2s ease;
+        }
 
-        .action-button.selected {
-            background: rgba(139, 92, 246, 0.15);
-            color: #ffffff;
-            border-color: rgba(139, 92, 246, 0.4);
-            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
-            transform: translateY(-1px);
-        }
+        .status-on { color: #2ecc71; font-weight: 600; }
+        .status-off { color: #ff4757; font-weight: 600; }
+        .status-unknown { color: #f39c12; font-weight: 600; }
 
-        .list-item {
-            padding: 12px 14px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            color: rgba(255, 255, 255, 0.85);
-            font-size: 12px;
-            font-weight: 400;
-            background: rgba(255, 255, 255, 0.04);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            font-family: 'JetBrains Mono', monospace;
-            word-break: break-all;
-            white-space: pre-wrap;
-            position: relative;
-            overflow: hidden;
-        }
+        .jiggy-status-banner {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: var(--bg-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-color);
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .jiggy-status-banner.loading {
+            animation: pulse 1.5s infinite;
+        }
 
-        .list-item::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 3px;
-            height: 100%;
-            background: rgba(139, 92, 246, 0.6);
-            transform: scaleY(0);
-            transition: transform 0.3s ease;
-        }
-
-        .list-item:hover {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(139, 92, 246, 0.3);
-            transform: translateX(6px);
-            color: #ffffff;
-        }
-
-        .list-item:hover::before {
-            transform: scaleY(1);
-        }
-
-        .list-item.selected {
-            background: rgba(139, 92, 246, 0.12);
-            color: #ffffff;
-            border-color: rgba(139, 92, 246, 0.3);
-            box-shadow: 0 3px 12px rgba(139, 92, 246, 0.15);
-            transform: translateX(6px);
-        }
-
-        .list-item.selected::before {
-            transform: scaleY(1);
-            background: rgba(139, 92, 246, 1);
-        }
-
-        .info-label {
-            padding: 12px 14px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 12px;
-            font-weight: 500;
-            background: rgba(0, 0, 0, 0.2);
-            text-align: center;
-            margin-bottom: 12px;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .input-group {
-            margin-bottom: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 14px;
-            background: rgba(255, 255, 255, 0.04);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .input-group::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(139, 92, 246, 0.04) 0%, transparent 70%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-        }
-
-        .input-group.selected::before {
-            opacity: 1;
-        }
-
-        .input-group.selected {
-            background: rgba(139, 92, 246, 0.08);
-            border-color: rgba(139, 92, 246, 0.25);
-            box-shadow: 0 3px 12px rgba(139, 92, 246, 0.1);
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 10px 12px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 6px;
-            color: #fff;
-            font-size: 12px;
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 400;
-            transition: all 0.25s ease;
-            position: relative;
-            z-index: 1;
-        }
-
-        .input-field:focus {
-            outline: none;
-            border-color: rgba(139, 92, 246, 0.6);
-            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.1);
-            background: rgba(0, 0, 0, 0.4);
-        }
-
-        .input-field::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-        }
-
-        .state {
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 9px;
-            padding: 3px 8px;
-            border-radius: 4px;
-            letter-spacing: 0.5px;
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .state.started {
-            color: #000;
-            background: linear-gradient(135deg, #10b981, #059669);
-            box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
-        }
-
-        .state.stopped {
-            color: #000;
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
-        }
-
-        .state.unknown {
-            color: #000;
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4);
-        }
-
-        ::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.1);
-            border-radius: 2px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: rgba(139, 92, 246, 0.4);
-            border-radius: 2px;
-            transition: background 0.25s ease;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(139, 92, 246, 0.6);
-        }
-
-        .player-item {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
-            font-weight: 400;
-        }
-
-        .player-id {
-            color: #8b5cf6;
-            font-weight: 600;
-        }
-
-        .resource-name {
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 400;
-            word-break: break-all;
-            white-space: pre-wrap;
-            flex: 1;
-            margin-right: 10px;
-        }
-    </style>
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
 </head>
 <body>
-    <div class="menu-container" id="menu-container">
-        <header class="menu-header">
-            <div class="banner-container">
-                <img src="https://github.com/uhfdsauifgyuasfbhasgdghu/LUIOS8BV8/raw/main/banner.png"
-                     alt="XCLIPS.LUA Banner"
-                     class="banner-image"
-                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <div class="banner-fallback" style="display: none;">
-                    COOKED.LUA
-                </div>
-            </div>
-            <div class="logo">
-                <h1>Made By CodePlug</h1>
-                <p>.gg/codeplug</p>
-            </div>
-        </header>
-        <nav class="tab-nav" id="tab-nav-buttons"></nav>
-        <div class="main-content">
-            <div class="tab-content" id="servers-content"></div>
-            <div class="tab-content" id="executor-content"></div>
-            <div class="tab-content" id="trigger_finder-content"></div>
-            <div class="tab-content" id="players-content"></div>
-            <div class="tab-content" id="resources-content"></div>
-        </div>
-    </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const menuContainer = document.getElementById('menu-container');
-            const tabButtonsContainer = document.getElementById('tab-nav-buttons');
+<div id="notification-container"></div>
+<div class="input-overlay hidden" id="input-overlay"></div>
 
-            const tabContents = {
-                servers: document.getElementById('servers-content'),
-                executor: document.getElementById('executor-content'),
-                trigger_finder: document.getElementById('trigger_finder-content'),
-                players: document.getElementById('players-content'),
-                resources: document.getElementById('resources-content')
-            };
+<div class="menu-container" id="menu-container">
+    <div class="header-image"></div>
+    <div class="breadcrumb-bar">
+        <span id="breadcrumb"></span>
+        <span id="option-counter"></span>
+    </div>
+    <ul class="menu-items" id="menu-items">
+        <div class="selection-highlight" id="selection-highlight"></div>
+    </ul>
+    <div class="footer" id="footer">
+    </div>
+</div>
 
-            function safeEncode(text) {
-                if (!text || typeof text !== 'string') return '';
-                return text.replace(/&/g, '&amp;')
-                           .replace(/</g, '&lt;')
-                           .replace(/>/g, '&gt;')
-                           .replace(/"/g, '&quot;')
-                           .replace(/'/g, '&#39;');
-            }
+<div class="status-panel" id="status-panel">
+    <div class="status-header" id="status-header">STATUS</div>
+    <div class="status-content" id="status-content">
+        <div class="status-selection-highlight" id="status-selection-highlight"></div>
+    </div>
+</div>
 
-            function sanitizeResourceName(text) {
-                if (!text) return 'Unknown Resource';
-                const str = String(text);
-                return str.replace(/[^\x20-\x7E]/g, '?');
-            }
+<div class="jiggy-status-banner" id="jiggy-status-banner">
+    UNDETECTED
+</div>
 
-            function scrollIntoView() {
-                const activeContent = document.querySelector('.tab-content.active');
-                if (!activeContent) return;
-                const selected = activeContent.querySelector('.selected');
-                if (selected) {
-                    selected.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-            }
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const menuItemsEl = document.getElementById('menu-items');
+        const breadcrumbEl = document.getElementById('breadcrumb');
+        const counterEl = document.getElementById('option-counter');
+        const footerEl = document.getElementById('footer');
+        let highlightEl = document.getElementById('selection-highlight');
+        const notificationContainer = document.getElementById('notification-container');
+        const inputOverlay = document.getElementById('input-overlay');
+        const menuContainer = document.getElementById('menu-container');
+        const statusPanel = document.getElementById('status-panel');
+        const statusHeader = document.getElementById('status-header');
+        const statusContent = document.getElementById('status-content');
+        const statusHighlight = document.getElementById('status-selection-highlight');
+        const banner = document.getElementById('jiggy-status-banner');
 
-            window.addEventListener("message", (event) => {
-                const { action, data } = event.data;
-                if (action === "show" || action === "update") {
-                    renderMenu(data);
-                    setTimeout(scrollIntoView, 100);
-                }
-                menuContainer.style.visibility = (action === 'hide') ? 'hidden' : 'visible';
-            });
+        let currentMenuId = 'main';
+        let navigationStack = [];
+        let selectedIndex = 0;
+        let statusSelectedIndex = 0;
+        let optionStates = {};
+        let currentState = null;
+        let isContentPanelOpen = false;
+        let welcomeMessageShown = false;
+        const MAX_VISIBLE_ITEMS = 10;
+        const ITEM_HEIGHT = 41;
 
-            function renderMenu(state) {
-                if (!state || !state.tabs) return;
+        const defaultMenuData = {
+            main: {
+                title: 'Loading Cooked...',
+                items: [
+                    { label: 'Loading Menu', target: 'self', description: 'Please Wait While The Menu Loads.' },
+                ]
+            }
+        };
 
-                tabButtonsContainer.innerHTML = '';
-                let activeTabKey = '';
+        function safeEncode(text) {
+            if (!text || typeof text !== 'string') return '';
+            return text.replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#39;');
+        }
 
-                state.tabs.forEach((tabData, tabIndex) => {
-                    const isActive = state.activeTab === tabIndex;
-                    if (isActive) activeTabKey = tabData.key;
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            notificationContainer.appendChild(notification);
+            setTimeout(() => { notification.remove(); }, 3000);
+        }
 
-                    const tabButton = document.createElement('button');
-                    tabButton.className = `tab-button ${isActive ? 'active' : ''}`;
-                    tabButton.innerHTML = `
-                        <span>${tabData.title}</span>
-                        <span class="tab-arrow">›</span>
-                    `;
-                    tabButtonsContainer.appendChild(tabButton);
-                });
+        function showInputPrompt(title, placeholder, callback) {
+            inputOverlay.innerHTML = `
+                <div class="input-box">
+                    <h3>${title}</h3>
+                    <input type="text" id="prompt-input" placeholder="${placeholder}">
+                    <small>Press Enter to submit, Escape to cancel.</small>
+                </div>
+            `;
+            inputOverlay.classList.remove('hidden');
+            const inputField = document.getElementById('prompt-input');
+            inputField.focus();
 
-                for (const key in tabContents) {
-                    const isActive = key === activeTabKey;
-                    const contentElement = tabContents[key];
-                    if (contentElement) {
-                        contentElement.classList.toggle('active', isActive);
-                        if (isActive) populateTab(contentElement, state.tabs[state.activeTab], state);
-                    }
-                }
-            }
+            const close = () => {
+                inputOverlay.classList.add('hidden');
+                document.onkeydown = handleMenuInput;
+            };
 
-            function populateTab(tabElement, tabData, state) {
-                tabElement.innerHTML = '';
-                const sectionHeader = document.createElement('div');
-                sectionHeader.className = 'section-header';
-                sectionHeader.textContent = tabData.header;
-                tabElement.appendChild(sectionHeader);
+            const keyHandler = (e) => {
+                if (e.key === 'Enter') {
+                    callback(inputField.value);
+                    close();
+                } else if (e.key === 'Escape') {
+                    close();
+                }
+            };
+            document.onkeydown = keyHandler;
+        }
 
-                const itemsContainer = document.createElement('div');
-                itemsContainer.className = tabData.type === 'grid' ? 'button-grid' : 'list-container';
+        function updateStatusSelection(items) {
+            if (!items || items.length === 0) return;
+            
+            const itemElements = statusContent.querySelectorAll('.status-item-external, .status-item-input');
+            if (!itemElements[statusSelectedIndex]) return;
 
-                if (tabData.items && Array.isArray(tabData.items)) {
-                    tabData.items.forEach((item, index) => {
-                        let element;
-                        const isSelected = state.selection.index === index;
+            // Calculate the position and height of the selected item
+            let itemTop = 0;
+            let itemHeight = 0;
+            
+            for (let i = 0; i < statusSelectedIndex; i++) {
+                if (itemElements[i]) {
+                    itemTop += itemElements[i].offsetHeight;
+                }
+            }
+            
+            if (itemElements[statusSelectedIndex]) {
+                itemHeight = itemElements[statusSelectedIndex].offsetHeight;
+            }
 
-                        if (item.type === 'input') {
-                            element = document.createElement('div');
-                            element.className = `input-group ${isSelected ? 'selected' : ''}`;
-                            element.innerHTML = `
-                                <label>${safeEncode(item.label)}</label>
-                                <input type="text" class="input-field" value="${safeEncode(item.value || '')}" placeholder="${safeEncode(item.placeholder || '')}" readonly>
-                            `;
-                        } else if (item.type === 'label') {
-                             element = document.createElement('div');
-                             element.className = 'info-label';
-                             element.textContent = item.label || 'Info';
-                        } else if (tabData.key === 'resources') {
-                            element = document.createElement('div');
-                            element.className = `list-item ${isSelected ? 'selected' : ''}`;
-                            const stateText = item.state ? item.state.toUpperCase() : 'UNKNOWN';
-                            const stateClass = item.state || 'unknown';
-                            const resourceName = sanitizeResourceName(item.label);
-                            element.innerHTML = `<span class="resource-name">${safeEncode(resourceName)}</span><span class="state ${stateClass}">${stateText}</span>`;
-                        } else if (tabData.key === 'players') {
-                            element = document.createElement('div');
-                            element.className = `list-item player-item ${isSelected ? 'selected' : ''}`;
-                            element.innerHTML = `<span>${safeEncode(item.label || 'Unknown Player')}</span>`;
-                        } else { // Default to button/list-item
-                            element = document.createElement('button');
-                            const baseClass = (tabData.type === 'grid' || (tabData.type === 'form' && item.type === 'button')) ? 'action-button' : 'list-item';
-                            element.className = `${baseClass} ${isSelected ? 'selected' : ''}`;
-                            element.textContent = item.label || 'Unknown';
-                        }
+            // Update highlight position and make it visible
+            statusHighlight.style.top = `${itemTop}px`;
+            statusHighlight.style.height = `${itemHeight}px`;
+            statusHighlight.style.opacity = '1';
 
-                        itemsContainer.appendChild(element);
-                    });
-                }
+            // Handle scrolling to keep the highlight in view
+            const statusContentEl = statusContent.parentElement; // status-panel
+            const scrollTop = statusContentEl.scrollTop;
+            const containerHeight = statusContentEl.clientHeight - statusHeader.offsetHeight; // Account for header
+            const itemBottom = itemTop + itemHeight;
+            
+            // Adjust for the status content padding (15px)
+            const contentPadding = 15;
+            const adjustedItemTop = itemTop + statusHeader.offsetHeight + contentPadding;
+            const adjustedItemBottom = adjustedItemTop + itemHeight;
+            
+            if (adjustedItemTop < scrollTop + statusHeader.offsetHeight) {
+                statusContentEl.scrollTop = adjustedItemTop - statusHeader.offsetHeight;
+            } else if (adjustedItemBottom > scrollTop + statusContentEl.clientHeight) {
+                statusContentEl.scrollTop = adjustedItemBottom - statusContentEl.clientHeight;
+            }
 
-                tabElement.appendChild(itemsContainer);
-            }
-        });
-    </script>
+            // Update classes for visual feedback
+            itemElements.forEach((el, i) => {
+                el.classList.toggle('selected', i === statusSelectedIndex);
+            });
+        }
+
+        function populateStatusContent(tabData, state) {
+            statusContent.innerHTML = '<div class="status-selection-highlight" id="status-selection-highlight"></div>';
+            const statusHighlightEl = document.getElementById('status-selection-highlight');
+            
+            if (!tabData || !tabData.items || !Array.isArray(tabData.items)) return;
+
+            tabData.items.forEach((item, index) => {
+                const element = document.createElement('div');
+                
+                const isToggleOrState = (item.type === 'toggle' || (item.label && (item.label.toLowerCase().includes('toggle') || item.label.toLowerCase().includes('enabled') || item.label.toLowerCase().includes('boost') || item.label.toLowerCase().includes('crasher'))));
+                const isResourceState = (tabData.key === 'resources' && item.state !== undefined);
+
+                if (item.type === 'input') {
+                    element.className = 'status-item-input';
+                    element.innerHTML = `
+                        <div style="width: 100%;">
+                            <label style="display: block; margin-bottom: 5px; font-size: 12px; color: var(--secondary-text);">${safeEncode(item.label)}</label>
+                            <input type="text" style="width: 100%; padding: 5px; background: rgba(0,0,0,0.5); border: 1px solid var(--border-color); color: var(--primary-text); border-radius: 3px; transition: border-color 0.2s ease, background-color 0.2s ease;" value="${safeEncode(item.value || '')}" readonly>
+                        </div>`;
+                } else {
+                    element.className = 'status-item-external';
+                    
+                    if (isToggleOrState || isResourceState) {
+                        const statusClass = item.state ? (item.state === 'ON' ? 'status-on' : item.state === '' ? 'status-off' : 'status-unknown') : 'status-off';
+                        const statusText = item.state ? item.state : '';
+                        element.innerHTML = `<span>${safeEncode(item.label || 'Unknown')}</span><span class="${statusClass}">${safeEncode(statusText)}</span>`;
+                    } else {
+                        element.innerHTML = `<span>${safeEncode(item.label || 'Unknown')}</span>`;
+                    }
+                }
+
+                element.addEventListener('click', () => {
+                    statusSelectedIndex = index;
+                    updateStatusSelection(tabData.items);
+                    if (window.parent) {
+                        window.parent.postMessage({ action: 'select', itemIndex: index, isContentPanel: true }, '*');
+                    }
+                });
+
+                statusContent.appendChild(element);
+            });
+
+            // Set initial selection if specified in state
+            if (state.selection && state.selection.index !== undefined) {
+                statusSelectedIndex = state.selection.index;
+            } else {
+                statusSelectedIndex = 0;
+            }
+            
+            // Update the highlight reference and position
+            window.statusHighlight = statusHighlightEl;
+            updateStatusSelection(tabData.items);
+        }
+        
+        function updateMenuFromState(state) {
+            if (!state || !state.tabs) return;
+
+            currentState = state;
+            
+            menuItemsEl.innerHTML = `<div class="selection-highlight" id="selection-highlight"></div>`;
+            highlightEl = document.getElementById('selection-highlight');
+            
+            const menuItems = state.tabs.map((tabData, index) => ({
+                label: tabData.title || `Tab ${index + 1}`,
+                tabIndex: index,
+                type: 'tab',
+                description: `Open ${tabData.title || `Tab ${index + 1}`}`
+            }));
+
+            menuItems.forEach((item, index) => {
+                const menuItemEl = document.createElement('li');
+                menuItemEl.className = 'menu-item';
+                
+                let content = `<div class="item-content">`;
+                content += `<span class="item-label">${item.label}</span>`;
+                content += `<i class="chevron fa-solid fa-angle-right"></i>`;
+                content += `</div>`;
+                
+                menuItemEl.innerHTML = content;
+                menuItemsEl.appendChild(menuItemEl);
+
+                menuItemEl.addEventListener('click', () => {
+                    if (window.parent) {
+                        window.parent.postMessage({ action: 'select', tabIndex: item.tabIndex, isContentPanel: false }, '*');
+                    }
+                });
+            });
+
+            breadcrumbEl.textContent = 'Made By CodePlug';
+            counterEl.textContent = `${state.activeTab + 1} / ${state.tabs.length}`;
+            
+            selectedIndex = state.activeTab;
+            updateSelection(menuItems);
+
+            isContentPanelOpen = state.isContentPanelOpen;
+            if (isContentPanelOpen) {
+                statusPanel.style.visibility = 'visible';
+                const activeTab = state.tabs[state.activeTab];
+                if (activeTab) {
+                    statusHeader.textContent = activeTab.header || activeTab.title;
+                    populateStatusContent(activeTab, state);
+                }
+            } else {
+                statusPanel.style.visibility = 'hidden';
+            }
+
+            const activeTab = state.tabs[state.activeTab];
+            footerEl.textContent = activeTab ? (activeTab.description || `Current Tab: ${activeTab.title}`) : '';
+        }
+
+        function renderMenu(menuId) {
+            const menu = defaultMenuData[menuId];
+            if (!menu) return;
+
+            currentMenuId = menuId;
+            breadcrumbEl.textContent = menu.title;
+            menuItemsEl.innerHTML = `<div class="selection-highlight" id="selection-highlight"></div>`;
+            highlightEl = document.getElementById('selection-highlight');
+            
+            const itemsToRender = menu.items.map(item => {
+                if (item.target) return { ...item, type: 'submenu' };
+                return item;
+            });
+
+            if (menu.parent) {
+                itemsToRender.unshift({ type: 'back', label: 'Back', icon: 'fa-solid fa-arrow-left', description: 'Return to the previous menu.' });
+            }
+
+            itemsToRender.forEach((item, index) => {
+                const menuItemEl = document.createElement('li');
+                menuItemEl.className = 'menu-item';
+                
+                let content = `<div class="item-content">`;
+                if (item.icon) content += `<i class="icon ${item.icon}"></i>`;
+                content += `<span class="item-label">${item.label}</span>`;
+
+                if (item.type === 'submenu' || item.type === 'player') {
+                    content += `<i class="chevron fa-solid fa-angle-right"></i>`;
+                } else if (item.type === 'toggle') {
+                    const isChecked = optionStates[item.stateId] || false;
+                    content += `<div class="item-value"></div>`;
+                } else if (item.type === 'slider') {
+                    const value = optionStates[item.stateId] || item.min;
+                    const percent = ((value - item.min) / (item.max - item.min)) * 100;
+                    content += `<div class="item-value slider-container"><div class="slider-bar"><div class="slider-fill" style="width: ${percent}%"></div></div></div>`;
+                }
+                content += `</div>`;
+                menuItemEl.innerHTML = content;
+                menuItemsEl.appendChild(menuItemEl);
+            });
+            
+            selectedIndex = 0;
+            updateSelection(itemsToRender);
+        }
+        
+        function updateSelection(itemsToRender) {
+            const items = menuItemsEl.querySelectorAll('.menu-item');
+            if (!items[selectedIndex]) return;
+
+            items.forEach((item, i) => item.classList.toggle('selected', i === selectedIndex));
+            
+            const itemTop = selectedIndex * ITEM_HEIGHT;
+            const itemBottom = itemTop + ITEM_HEIGHT;
+            const scrollTop = menuItemsEl.scrollTop;
+            const containerHeight = menuItemsEl.clientHeight;
+            
+            if (itemTop < scrollTop) {
+                menuItemsEl.scrollTop = itemTop;
+            } else if (itemBottom > scrollTop + containerHeight) {
+                menuItemsEl.scrollTop = itemBottom - containerHeight;
+            }
+
+            highlightEl.style.top = `${itemTop - menuItemsEl.scrollTop}px`;
+            
+            counterEl.textContent = `${selectedIndex + 1} / ${items.length}`;
+            const currentItemData = itemsToRender[selectedIndex];
+            footerEl.textContent = currentItemData?.description || '';
+        }
+
+        function handleMenuInput(e) {
+            if (currentState) return;
+
+            e.preventDefault();
+            const menu = defaultMenuData[currentMenuId];
+            const itemsToRender = menu.items.map(item => item.target ? { ...item, type: 'submenu' } : item);
+            if (menu.parent) {
+                itemsToRender.unshift({ type: 'back', label: 'Back', icon: 'fa-solid fa-arrow-left', description: 'Return to the previous menu.' });
+            }
+            const currentItemData = itemsToRender[selectedIndex];
+            
+            switch (e.key) {
+                case 'ArrowUp':
+                    selectedIndex = (selectedIndex - 1 + itemsToRender.length) % itemsToRender.length;
+                    break;
+                case 'ArrowDown':
+                    selectedIndex = (selectedIndex + 1) % itemsToRender.length;
+                    break;
+                case 'Enter':
+                    if (currentItemData.target) {
+                        navigationStack.push(currentMenuId);
+                        renderMenu(currentItemData.target);
+                    } else if (currentItemData.type === 'button') {
+                        showNotification(`Action: ${currentItemData.label}`);
+                    } else if (currentItemData.type === 'toggle') {
+                        optionStates[currentItemData.stateId] = !optionStates[currentItemData.stateId];
+                        showNotification(`${currentItemData.label}: ${optionStates[currentItemData.stateId] ? 'Enabled' : 'Disabled'}`);
+                        renderMenu(currentMenuId);
+                    } else if (currentItemData.type === 'input') {
+                        showInputPrompt(`Enter value for ${currentItemData.label}:`, currentItemData.placeholder, (result) => {
+                            if (result) showNotification(`Set ${currentItemData.label} to: ${result}`);
+                        });
+                    } else if (currentItemData.type === 'back') {
+                        const parentMenu = navigationStack.pop();
+                        renderMenu(parentMenu || 'main');
+                    }
+                    break;
+                case 'Backspace':
+                    if (navigationStack.length > 0) {
+                        const parentMenu = navigationStack.pop();
+                        renderMenu(parentMenu);
+                    }
+                    break;
+            }
+            updateSelection(itemsToRender);
+        }
+        
+        window.addEventListener("message", (event) => {
+            const { action, data } = event.data;
+            
+            if (action === "update" || action === "show") {
+                if (data) {
+                    updateMenuFromState(data);
+                    menuContainer.style.visibility = 'visible';
+                    if (action === "show" && !welcomeMessageShown) {
+                        welcomeMessageShown = true;
+                        showNotification("Cooked Menu loaded successfully");
+                    }
+                }
+            }
+            
+            if (action === 'hide') {
+                menuContainer.style.visibility = 'hidden';
+                statusPanel.style.visibility = 'hidden';
+            }
+        });
+        
+        document.onkeydown = handleMenuInput;
+        renderMenu('main');
+        menuContainer.style.visibility = 'visible';
+        
+        const headerImage = document.querySelector('.header-image');
+        const bannerEl = document.getElementById('jiggy-status-banner');
+        
+        bannerEl.classList.add('loading');
+
+        const img = new Image();
+        img.onload = () => {
+            bannerEl.classList.remove('loading');
+        };
+        img.onerror = () => {
+            bannerEl.classList.remove('loading');
+        };
+        img.src = 'https://raw.githubusercontent.com/uhfdsauifgyuasfbhasgdghu/LUIOS8BV8/main/banner.png';
+    });
+</script>
+
 </body>
 </html>
