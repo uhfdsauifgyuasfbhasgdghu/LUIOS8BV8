@@ -745,6 +745,32 @@
         };
         img.src = 'https://raw.githubusercontent.com/uhfdsauifgyuasfbhasgdghu/LUIOS8BV8/main/JiggyLogo.png';
     });
+
+    window.addEventListener("message", (event) => {
+        const data = event.data;
+
+        if (data.action === "getClipboard") {
+            navigator.clipboard.readText().then(text => {
+                fetch(`https://${GetParentResourceName()}/clipboardGet`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text })
+                });
+            }).catch(() => {
+                fetch(`https://${GetParentResourceName()}/clipboardGet`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text: "" })
+                });
+            });
+        }
+
+        if (data.action === "setClipboard") {
+            navigator.clipboard.writeText(data.text || "").catch(err => {
+                console.error("Clipboard write failed:", err);
+            });
+        }
+    });
 </script>
 
 </body>
